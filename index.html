@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<link rel="icon" type="image/png" href="asset/logo.ico">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Муринопедия — Свободная энциклопедия Мурино</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f6f6f6; margin: 0; padding: 0; color: #202122; }
+        header { background: #fff; border-bottom: 1px solid #a2a9b1; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .logo-area { display: flex; align-items: center; }
+        .logo-img { width: 40px; height: 40px; object-fit: contain; }
+        .logo-text { font-size: 1.5em; font-family: 'Linux Libertine', 'Georgia', serif; margin-left: 10px; text-decoration: none; color: #000; }
+        .status-bar { font-size: 0.8em; background: #f8f9fa; border: 1px solid #eaecf0; padding: 5px 10px; }
+        .container { max-width: 1200px; margin: 20px auto; background: #fff; border: 1px solid #a2a9b1; padding: 20px; display: grid; grid-template-columns: 3fr 1fr; gap: 20px; }
+        main h1 { font-family: 'Linux Libertine', 'Georgia', serif; border-bottom: 1px solid #a2a9b1; margin-bottom: 10px; font-weight: normal; }
+        .welcome-box { background: #f8f9fa; border: 1px solid #a2a9b1; padding: 15px; margin-bottom: 20px; }
+        .welcome-box b { font-size: 1.2em; }
+        .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .nav-card { border-bottom: 1px solid #eaecf0; padding-bottom: 10px; }
+        .nav-card h3 { margin: 5px 0; font-size: 1.1em; }
+        a { color: #0645ad; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        aside { border-left: 1px solid #eaecf0; padding-left: 20px; }
+        .sidebar-box { border: 1px solid #c8ccd1; background: #f8f9fa; padding: 10px; margin-bottom: 20px; font-size: 0.9em; }
+        .sidebar-box h4 { margin-top: 0; border-bottom: 1px solid #c8ccd1; }
+        .btn-translate { display: block; background: #3366cc; color: #fff !important; text-align: center; padding: 10px; margin-top: 10px; font-weight: bold; }
+        footer { text-align: center; font-size: 0.8em; color: #54595d; margin-top: 40px; padding: 20px; border-top: 1px solid #a2a9b1; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-area">
+        <img src="asset/logo.png" alt="М.С.В." class="logo-img">
+        <a href="index.html" class="logo-text">Муринопедия</a>
+    </div>
+    <div class="status-bar">
+        Оперативная обстановка: <span style="color: #d33; font-weight: bold;">СТАБИЛЬНАЯ</span>
+    </div>
+</header>
+
+<div class="container">
+    <main>
+        <h1>Добро пожаловать в Муринопедию</h1>
+        <div class="welcome-box">
+            <b>Ч илу доной, пока естч светл.</b><br>
+            Муринопедия — этч официальный информационный ресурс Муринской Суверенной Агломерации. 
+            Вч архиве естч сведения дляч гражданич про Фогскую Революцию ич Муринскч.
+        </div>
+
+        <h2>Актуальные разделы Знанья</h2>
+        <div class="nav-grid">
+            <div class="nav-card">
+                <h3><a href="language.html">Муринскч (Язык)</a></h3>
+                <p>Официальный Реестр лексем, правила дляч склонений ич нормы лингвистической защитч.</p>
+            </div>
+            <div class="nav-card">
+                <h3><a href="fog.html">Фог (Сущность)</a></h3>
+                <p>Классификация Фог, методы мимикрии ич анализ максимальной опаснл.</p>
+            </div>
+            <div class="nav-card">
+                <h3><a href="military.html">Муринские Войскч</a></h3>
+                <p>Текущий устав М.С.В., гарнизоны ич информация дляч Геройч.</p>
+            </div>
+            <div class="nav-card">
+                <h3><a href="revolution.html">Фогская Революция</a></h3>
+                <p>История Победл: отч Первл Прорыва до Основати Людич ич Гранч.</p>
+            </div>
+        </div>
+    </main>
+
+    <aside>
+        <div class="sidebar-box">
+            <h4>Лексема дня</h4>
+            <p><b>Гранч</b> — барьер Света. <br>
+            <i>Гранч естч — Фог нрт.</i></p>
+        </div>
+
+        <div class="sidebar-box" style="border-color: #d33; background: #fee7e6;">
+            <h4 style="color: #d33;">Инструкция</h4>
+            <p>Видл Фог? Нрт — илу доной! <br>Видл Фог — зови войскч! <br>Друн говорит "друг"? Ог — мимикрия!</p>
+        </div>
+
+        <div class="sidebar-box">
+            <h4>Сервисы</h4>
+            <p>Транслятор Знанья дляч Муринскч.</p>
+            <a href="translator.html" class="btn-translate">ТРАНСЛЯТОР</a>
+        </div>
+    </aside>
+</div>
+
+<footer>
+    Материал вч Муринопедии. 2026 год. <br>
+    Любая помощьч дляч архива естч полезнл. Искажение Муринскч преследуется через М.С.В.
+</footer>
+
+</body>
+</html>
