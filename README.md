@@ -6,7 +6,7 @@
 
 
 
-https://murinopedia.pages.dev/ (старая версия)
+https://murinopedia.pages.dev/ (старый домен)
 https://pap3ryyy.github.io/murinopedia/ (легаси версия)
 
 
