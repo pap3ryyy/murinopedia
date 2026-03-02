@@ -6,8 +6,9 @@
 
 
 
-https://murinopedia.pages.dev/ (старый домен)
-https://pap3ryyy.github.io/murinopedia/ (легаси версия)
+https://murinopedia.pages.dev/ (старый домен) (у многих не работает по причине блокировки в россии)
+https://pap3ryyy.github.io/murinopedia/
+
 
 
 если будете использовать пожалйуста указывайте автора (меня)
