@@ -1,32 +1,11 @@
 <!DOCTYPE html>
 <html lang="ru">
-<link rel="icon" type="image/png" href="asset/logo.ico">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Муринопедия — Свободная энциклопедия Мурино</title>
-    <style>
-        body { font-family: sans-serif; background-color: #f6f6f6; margin: 0; padding: 0; color: #202122; }
-        header { background: #fff; border-bottom: 1px solid #a2a9b1; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
-        .logo-area { display: flex; align-items: center; }
-        .logo-img { width: 40px; height: 40px; object-fit: contain; }
-        .logo-text { font-size: 1.5em; font-family: serif; margin-left: 10px; text-decoration: none; color: #000; }
-        .status-bar { font-size: 0.8em; background: #f8f9fa; border: 1px solid #eaecf0; padding: 5px 10px; }
-        .container { max-width: 1200px; margin: 20px auto; background: #fff; border: 1px solid #a2a9b1; padding: 20px; display: grid; grid-template-columns: 3fr 1fr; gap: 20px; }
-        main h1 { font-family: serif; border-bottom: 1px solid #a2a9b1; margin-bottom: 10px; font-weight: normal; }
-        .welcome-box { background: #f8f9fa; border: 1px solid #a2a9b1; padding: 15px; margin-bottom: 20px; border-left: 5px solid #3366cc; }
-        .welcome-box b { font-size: 1.2em; }
-        .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .nav-card { border-bottom: 1px solid #eaecf0; padding-bottom: 10px; }
-        .nav-card h3 { margin: 5px 0; font-size: 1.1em; }
-        a { color: #0645ad; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        aside { border-left: 1px solid #eaecf0; padding-left: 20px; }
-        .sidebar-box { border: 1px solid #c8ccd1; background: #f8f9fa; padding: 10px; margin-bottom: 20px; font-size: 0.9em; }
-        .sidebar-box h4 { margin-top: 0; border-bottom: 1px solid #c8ccd1; }
-        .btn-translate { display: block; background: #3366cc; color: #fff !important; text-align: center; padding: 10px; margin-top: 10px; font-weight: bold; border-radius: 2px; }
-        footer { text-align: center; font-size: 0.8em; color: #54595d; margin-top: 40px; padding: 20px; border-top: 1px solid #a2a9b1; }
-    </style>
+    <link rel="icon" type="image/png" href="asset/logo.ico">
+    <link rel="stylesheet" href="css/wiki.css">
 </head>
 <body>
 
@@ -35,69 +14,116 @@
         <img src="asset/logo.png" alt="М.С.В." class="logo-img">
         <a href="index.html" class="logo-text">Муринопедия</a>
     </div>
-    <div class="status-bar">
-        Оперативная обстановка: <span style="color: #d33; font-weight: bold;">СТАБИЛЬНАЯ</span>
+    <div style="display:flex;align-items:center;gap:12px;">
+        <div class="status-bar">
+            Оперативная обстановка: <span style="color: #d33; font-weight: bold;">СТАБИЛЬНАЯ</span>
+        </div>
+        <div id="nav-user-zone" style="font-size:0.85em;color:#54595d;"></div>
     </div>
 </header>
 
 <div class="container">
+
     <main>
-        <h1>Добро пожаловать в Муринопедию</h1>
-        <div class="welcome-box">
+        <h1>Заглавная страница</h1>
+
+        <div class="info-box">
             <b>Ч илу доной, пока естч светл.</b><br>
-            Муринопедия — этч официальный информационный ресурс Муринской Суверенной Агломерации. Вч архиве естч сведения про историю Битл, Гранч ич Муринскч.
+            Муринопедия — официальный информационный ресурс Муринской Суверенной Агломерации. Защищено М.С.В.
         </div>
 
-        <h2>Главные статьи Агломерации</h2>
+        <div style="margin-top:20px; margin-bottom: 30px; display:flex; gap:10px; align-items:center;">
+            <a href="articles.html" class="btn btn-primary">Перейти на архив знань</a>
+        </div>
+
+        <h2>Легаси Знань <span style="font-size:0.6em;font-family:sans-serif;color:#54595d;font-weight:normal;vertical-align:middle;">Официальные записи</span></h2>
+
+        <div style="background:#fef6e4;border:1px solid #c8a850;padding:8px 12px;font-size:0.85em;color:#7a6000;margin-bottom:14px;">
+            Это канонические Знань — первоисточники Муринопедии. Они нрт редактируются и нрт удаляются.
+        </div>
+
         <div class="nav-grid">
-            <div class="nav-card" style="grid-column: span 2; background: #f0f4ff; padding: 15px; border: 1px solid #a2a9b1;">
-                <h3><a href="murino.html" style="font-size: 1.4em;">Мурино (Столица)</a></h3>
-                <p>Центр цивилизации Людич, оплот М.С.В. ич главный бастион против Фог-шума. Информация про жизнь вч окружении Гранч.</p>
+            <div class="nav-card" style="grid-column: span 2; background: #f0f4ff; border: 1px solid #a2a9b1; padding: 15px;">
+                <div style="font-size:0.72em;color:#54595d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Локация · Столица</div>
+                <h3 style="margin:0 0 6px 0;"><a href="murino.html" style="font-size:1.2em;">Мурино</a></h3>
+                <p style="margin:0;font-size:0.9em;color:#54595d;">Центр цивилизации Людич, оплот М.С.В. и главный бастион против Фог-шума.</p>
             </div>
 
             <div class="nav-card">
-                <h3><a href="mitishi.html">Мытищи (Остров)</a></h3>
-                <p>Безопаснол локация, гле естч чистость ич Фрутигерл-аерность. Место дляч отдыха Людич вч тазикостью.</p>
+                <div style="font-size:0.72em;color:#54595d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Локация · Остров</div>
+                <h3 style="margin:0 0 6px 0;"><a href="mitishi.html">Мытищи</a></h3>
+                <p style="margin:0;font-size:0.88em;color:#54595d;">Локация Фрутигер-аерности. Место дляч отдыха Людич вч тазикостью.</p>
             </div>
+
             <div class="nav-card">
-                <h3><a href="molochnoe.html">Молочное (Смертч)</a></h3>
-                <p>Белый Фог, Паукость ич потерянол территория. Вход запрещенол М.С.В.</p>
+                <div style="font-size:0.72em;color:#d33;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Локация · Запретч</div>
+                <h3 style="margin:0 0 6px 0;"><a href="molochnoe.html">Молочное</a></h3>
+                <p style="margin:0;font-size:0.88em;color:#54595d;">Паукость ич потерянная территория. Вход запрещенол М.С.В.</p>
             </div>
+
             <div class="nav-card">
-                <h3><a href="language.html">Муринскч (Язык)</a></h3>
-                <p>Официальный Реестр 2026.1.1. Правила созвучности "вч/ич" ич защита от мимикрии.</p>
+                <div style="font-size:0.72em;color:#54595d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Реестр · 2026.1.1</div>
+                <h3 style="margin:0 0 6px 0;"><a href="language.html">Муринскч (Язык)</a></h3>
+                <p style="margin:0;font-size:0.88em;color:#54595d;">Правила созвучности "вч/ич" ич защита от мимикрии.</p>
             </div>
+
             <div class="nav-card">
-                <h3><a href="military.html">Муринские Войскч (М.С.В.)</a></h3>
-                <p>Наша армия. Устав, вооружениость ич посты защиты Гранч.</p>
+                <div style="font-size:0.72em;color:#54595d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Армия · Защитч</div>
+                <h3 style="margin:0 0 6px 0;"><a href="military.html">Муринские Войскч (М.С.В.)</a></h3>
+                <p style="margin:0;font-size:0.88em;color:#54595d;">Устав, вооружениость ич посты защиты Гранч.</p>
             </div>
+
             <div class="nav-card">
-                <h3><a href="revolution.html">Фогская Революция</a></h3>
-                <p>Как мыч выбили Фог ич основали Муринопедию. История Победл.</p>
+                <div style="font-size:0.72em;color:#54595d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">История · Победл</div>
+                <h3 style="margin:0 0 6px 0;"><a href="revolution.html">Фогская Революция</a></h3>
+                <p style="margin:0;font-size:0.88em;color:#54595d;">Как мыч выбили Фог ич основали Муринопедию.</p>
             </div>
+
             <div class="nav-card">
-                <h3><a href="fog.html">Фог (Сущность)</a></h3>
-                <p>Исследование врага: Глюч, Паукость ич Смертч-шум.</p>
+                <div style="font-size:0.72em;color:#d33;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Сущность · Угроза</div>
+                <h3 style="margin:0 0 6px 0;"><a href="fog.html">Фог</a></h3>
+                <p style="margin:0;font-size:0.88em;color:#54595d;">Исследование врага: Глюч, Паукость ич Смертч-шум.</p>
             </div>
         </div>
     </main>
 
     <aside>
         <div class="sidebar-box">
-            <h4>Лексема дня</h4>
-            <p><b>Гранч</b> — барьер Света. <br>
-            <i>Гранч естч — Фог нрт.</i></p>
+            <h4>Навигация</h4>
+            <p>
+                <a href="index.html">Заглавная</a><br>
+                <a href="articles.html">Архив Знань</a>
+            </p>
+            <p>
+                <a href="language.html">Реестр языка</a><br>
+                <a href="translator.html">Транслятор</a>
+            </p>
+            <div id="msv-nav" style="display:none; border-top: 1px solid #eaecf0; padding-top: 10px; margin-top: 10px;">
+                <b>М.С.В.</b><br>
+                <a href="admin.html">Штаб М.С.В.</a><br>
+                <a href="createarticle.html">Создати Знань</a>
+            </div>
+        </div>
+
+        <div class="sidebar-box">
+            <h4>Оперативная сводка</h4>
+            Статус: <span style="color: #d33; font-weight: bold;">СТАБИЛЬНАЯ</span><br>
+            Гранч: <span style="color: green;">АКТИВЕН</span>
+        </div>
+
+        <div class="sidebar-box" id="archive-stats">
+            <h4>Статистика</h4>
+            <p style="color:#a2a9b1;font-size:0.85em;">Загружати...</p>
         </div>
 
         <div class="sidebar-box" style="border-color: #d33; background: #fee7e6;">
             <h4 style="color: #d33;">Инструкция</h4>
-            <p>Видл Фог? Нрт — илу доной! <br>Видл Фог — зови войскч! <br>Друн говорит "друг"? Ог — мимикрия!</p>
+            Видл Фог? Нрт — илу доной!<br>Видл Фог — зови войскч!
         </div>
 
         <div class="sidebar-box">
-            <h4>Сервисы</h4>
-            <p>Проверь свою речь нач чистость вч реестре.</p>
-            <a href="translator.html" class="btn-translate">ТРАНСЛЯТОР ЗНАНЬЯ</a>
+            <h4>Транслятор</h4>
+            <a href="translator.html" class="btn-translate">ПЕРЕВОД ЗНАНЬЯ</a>
         </div>
     </aside>
 </div>
@@ -106,6 +132,65 @@
     Муринопедия — 2026 год. <br>
     Ч илу доной, пока естч светл. Мурино стояти, Фог дрожати.
 </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+async function init() {
+    const { data: { session } } = await supabaseClient.auth.getSession()
+
+    if (session) {
+        const { data: user } = await supabaseClient
+            .from('users').select('username, role').eq('id', session.user.id).single()
+
+        if (user) {
+            const zone = document.getElementById('nav-user-zone')
+            zone.innerHTML = `
+                <span>${user.username}</span>
+                &nbsp;
+                <button onclick="logout()" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;">Выйти</button>
+            `
+            if (user.role === 'м.с.в.') {
+                const msvNav = document.getElementById('msv-nav'); if (msvNav) msvNav.style.display = 'block'
+            }
+        }
+    } else {
+        document.getElementById('nav-user-zone').innerHTML =
+            `<a href="login.html" style="font-size:0.85em;">Войти</a>`
+    }
+
+    await loadStats()
+}
+
+async function loadStats() {
+    const statsEl = document.getElementById('archive-stats')
+    
+    const { count, error } = await supabaseClient
+        .from('articles')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'published')
+
+    if (error) {
+        statsEl.innerHTML = '<h4>Архив</h4><p style="font-size:0.85em;color:#54595d;">Ошибка загрузки</p>'
+        return
+    }
+
+    statsEl.innerHTML = `
+        <h4>Архив</h4>
+        <p style="font-size:0.85em;color:#54595d;">
+            Знань: <b>${count ?? 0}</b><br>
+            <a href="articles.html">Открыти Архив →</a>
+        </p>
+    `
+}
+
+async function logout() {
+    await supabaseClient.auth.signOut()
+    window.location.reload()
+}
+
+init()
+</script>
 
 </body>
 </html>
