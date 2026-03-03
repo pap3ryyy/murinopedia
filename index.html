@@ -32,8 +32,9 @@
             Муринопедия — официальный информационный ресурс Муринской Суверенной Агломерации. Защищено М.С.В.
         </div>
 
-        <div style="margin-top:20px; margin-bottom: 30px; display:flex; gap:10px; align-items:center;">
+        <div style="margin-top:20px; margin-bottom: 30px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
             <a href="articles.html" class="btn btn-primary">Перейти на архив знань</a>
+            <a href="createarticle.html" class="btn btn-secondary" id="create-btn" style="display:none;">+ Создати Знань</a>
         </div>
 
         <h2>Легаси Знань <span style="font-size:0.6em;font-family:sans-serif;color:#54595d;font-weight:normal;vertical-align:middle;">Официальные записи</span></h2>
@@ -141,17 +142,21 @@ async function init() {
 
     if (session) {
         const { data: user } = await supabaseClient
-            .from('users').select('username, role').eq('id', session.user.id).single()
+            .from('users').select('id, username, role').eq('id', session.user.id).single()
 
         if (user) {
             const zone = document.getElementById('nav-user-zone')
             zone.innerHTML = `
-                <span>${user.username}</span>
+                <a href="profile.html?id=${user.id}" style="color:#0645ad;">${user.username}</a>
                 &nbsp;
                 <button onclick="logout()" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;">Выйти</button>
             `
+
+            document.getElementById('create-btn').style.display = 'inline-block'
+
             if (user.role === 'м.с.в.') {
-                const msvNav = document.getElementById('msv-nav'); if (msvNav) msvNav.style.display = 'block'
+                const msvNav = document.getElementById('msv-nav')
+                if (msvNav) msvNav.style.display = 'block'
             }
         }
     } else {
@@ -164,7 +169,7 @@ async function init() {
 
 async function loadStats() {
     const statsEl = document.getElementById('archive-stats')
-    
+
     const { count, error } = await supabaseClient
         .from('articles')
         .select('id', { count: 'exact', head: true })
