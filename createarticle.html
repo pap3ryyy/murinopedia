@@ -148,33 +148,6 @@
             color: #54595d;
         }
 
-        .image-tabs {
-            display: flex;
-            border-bottom: 1px solid #a2a9b1;
-            margin-bottom: 8px;
-        }
-
-        .image-tab {
-            padding: 5px 12px;
-            font-size: 0.8em;
-            cursor: pointer;
-            border: 1px solid transparent;
-            border-bottom: none;
-            background: none;
-            color: #54595d;
-            margin-bottom: -1px;
-        }
-
-        .image-tab.active {
-            background: #fff;
-            border-color: #a2a9b1;
-            color: #202122;
-            font-weight: bold;
-        }
-
-        .image-tab-content { display: none; }
-        .image-tab-content.active { display: block; }
-
         .image-preview {
             border: 1px solid #a2a9b1;
             background: #fff;
@@ -356,17 +329,10 @@ function renderEditor() {
                 <div class="image-block">
                     <h4>Обложка (инфобокс) — макс. 300×200px</h4>
                     <div class="image-preview" id="cover-preview">Нрт обложки</div>
-                    <div class="image-tabs">
-                        <button class="image-tab active" id="cover-tab-url" onclick="switchTab('cover','url')">URL</button>
-                        <button class="image-tab" id="cover-tab-upload" onclick="switchTab('cover','upload')">Файл</button>
-                    </div>
-                    <div class="image-tab-content active" id="cover-content-url">
-                        <input type="text" class="field-input" id="cover-url-input" placeholder="https://..." oninput="previewUrl('cover', this.value)">
-                    </div>
-                    <div class="image-tab-content" id="cover-content-upload">
+                    <div class="image-tab-content active" id="cover-content-upload">
                         <div class="upload-zone" onclick="document.getElementById('cover-file').click()">
                             Выбери PNG / JPG / WebP
-                            <input type="file" id="cover-file" accept="image/png,image/jpeg,image/webp" onchange="uploadImage(this,'cover')">
+                            <input type="file" id="cover-file" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="uploadImage(this,'cover')">
                         </div>
                         <div class="upload-status" id="cover-upload-status"></div>
                     </div>
@@ -375,17 +341,10 @@ function renderEditor() {
                 <div class="image-block">
                     <h4>Картинка для &lt;image&gt; в тексте — макс. 800×500px</h4>
                     <div class="image-preview" id="content-preview">Нрт картинки</div>
-                    <div class="image-tabs">
-                        <button class="image-tab active" id="content-tab-url" onclick="switchTab('content','url')">URL</button>
-                        <button class="image-tab" id="content-tab-upload" onclick="switchTab('content','upload')">Файл</button>
-                    </div>
-                    <div class="image-tab-content active" id="content-content-url">
-                        <input type="text" class="field-input" id="content-url-input" placeholder="https://..." oninput="previewUrl('content', this.value)">
-                    </div>
-                    <div class="image-tab-content" id="content-content-upload">
+                    <div class="image-tab-content active" id="content-content-upload">
                         <div class="upload-zone" onclick="document.getElementById('content-file').click()">
                             Выбери PNG / JPG / WebP
-                            <input type="file" id="content-file" accept="image/png,image/jpeg,image/webp" onchange="uploadImage(this,'content')">
+                            <input type="file" id="content-file" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="uploadImage(this,'content')">
                         </div>
                         <div class="upload-status" id="content-upload-status"></div>
                     </div>
@@ -426,19 +385,6 @@ function renderEditor() {
     `
 
     renderInfoboxFields()
-}
-
-function switchTab(type, tab) {
-    document.getElementById(`${type}-tab-url`).classList.toggle('active', tab === 'url')
-    document.getElementById(`${type}-tab-upload`).classList.toggle('active', tab === 'upload')
-    document.getElementById(`${type}-content-url`).classList.toggle('active', tab === 'url')
-    document.getElementById(`${type}-content-upload`).classList.toggle('active', tab === 'upload')
-}
-
-function previewUrl(type, url) {
-    if (type === 'cover') coverUrl = url
-    else contentImageUrl = url
-    updatePreview(type, url)
 }
 
 function updatePreview(type, url) {
