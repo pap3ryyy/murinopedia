@@ -181,6 +181,17 @@
             gap: 10px;
             align-items: center;
         }
+
+        .banned-row {
+            background: #fee7e6 !important;
+        }
+        
+        .banned-label {
+            color: #d33;
+            font-weight: bold;
+            font-size: 0.75em;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -232,23 +243,25 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script>
-let adminUser = null
+let adminUser = null;
+let adminUserId = null;
 
 async function init() {
-    const { data: { session } } = await supabaseClient.auth.getSession()
-    if (!session) { showDenied('Нрт идентификации — войди вч систему'); return }
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { showDenied('Нрт идентификации — войди вч систему'); return; }
 
     const { data: user } = await supabaseClient
-        .from('users').select('username, role').eq('id', session.user.id).single()
+        .from('users').select('*').eq('id', session.user.id).single();
 
     if (!user || user.role !== 'м.с.в.') {
-        showDenied('Доступ только дляч М.С.В.')
-        return
+        showDenied('Доступ только дляч М.С.В.');
+        return;
     }
 
-    adminUser = user.username
-    document.getElementById('admin-username').textContent = adminUser
-    renderAdmin()
+    adminUser = user.username;
+    adminUserId = user.id;
+    document.getElementById('admin-username').textContent = adminUser;
+    renderAdmin();
 }
 
 function showDenied(msg) {
@@ -258,7 +271,7 @@ function showDenied(msg) {
             <p>${msg}</p>
             <a href="index.html" class="btn btn-secondary">← На главную</a>
         </div>
-    `
+    `;
 }
 
 function renderAdmin() {
@@ -284,39 +297,39 @@ function renderAdmin() {
         <div class="admin-tab-content" id="tab-users">
             <div id="users-content"><p style="color:#54595d;">Загружати...</p></div>
         </div>
-    `
+    `;
 
-    loadPending()
+    loadPending();
 }
 
 function switchTab(name, btn) {
-    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'))
-    document.querySelectorAll('.admin-tab-content').forEach(t => t.classList.remove('active'))
-    btn.classList.add('active')
-    document.getElementById('tab-' + name).classList.add('active')
-    if (name === 'stats') loadStats()
-    if (name === 'users') loadUsers()
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.admin-tab-content').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+    if (name === 'stats') loadStats();
+    if (name === 'users') loadUsers();
 }
 
 async function loadPending() {
     const { data, error } = await supabaseClient
         .from('articles').select('*')
         .eq('status', 'pending')
-        .order('created_at', { ascending: true })
+        .order('created_at', { ascending: true });
 
-    const container = document.getElementById('pending-list')
-    if (error) { container.innerHTML = '<p style="color:#d33;">Смертч-шум при загрузке</p>'; return }
+    const container = document.getElementById('pending-list');
+    if (error) { container.innerHTML = '<p style="color:#d33;">Смертч-шум при загрузке</p>'; return; }
 
     if (!data || data.length === 0) {
-        container.innerHTML = '<div class="empty-state">Нрт статей нач проверке — Архив чистч</div>'
-        return
+        container.innerHTML = '<div class="empty-state">Нрт статей нач проверке — Архив чистч</div>';
+        return;
     }
 
-    container.innerHTML = `<div class="pending-list">${data.map(a => renderPendingCard(a)).join('')}</div>`
+    container.innerHTML = `<div class="pending-list">${data.map(a => renderPendingCard(a)).join('')}</div>`;
 }
 
 function renderPendingCard(a) {
-    const date = new Date(a.created_at).toLocaleDateString('ru-RU')
+    const date = new Date(a.created_at).toLocaleDateString('ru-RU');
     return `
         <div class="pending-card" id="pcard-${a.id}">
             <div class="pending-card-header">
@@ -337,70 +350,70 @@ function renderPendingCard(a) {
                 <span class="action-status" id="pstatus-${a.id}"></span>
             </div>
         </div>
-    `
+    `;
 }
 
 async function approveArticle(id) {
-    const msg = document.getElementById('pstatus-' + id)
-    msg.className = 'action-status'
-    msg.textContent = 'Обрабатываем...'
+    const msg = document.getElementById('pstatus-' + id);
+    msg.className = 'action-status';
+    msg.textContent = 'Обрабатываем...';
 
     const { error } = await supabaseClient.from('articles').update({
         status: 'published',
         reviewed_by: adminUser,
         reviewed_at: new Date().toISOString()
-    }).eq('id', id)
+    }).eq('id', id);
 
     if (error) {
-        msg.className = 'action-status error'
-        msg.textContent = 'Смертч-шум: ' + error.message
-        return
+        msg.className = 'action-status error';
+        msg.textContent = 'Смертч-шум: ' + error.message;
+        return;
     }
 
-    const card = document.getElementById('pcard-' + id)
-    if (card) { card.style.opacity = '0.4'; card.style.pointerEvents = 'none' }
-    msg.className = 'action-status success'
-    msg.textContent = 'Знань опубликовано ✓'
+    const card = document.getElementById('pcard-' + id);
+    if (card) { card.style.opacity = '0.4'; card.style.pointerEvents = 'none'; }
+    msg.className = 'action-status success';
+    msg.textContent = 'Знань опубликовано ✓';
 }
 
 async function rejectArticle(id) {
-    if (!confirm('Удалити это Знань навсегда?')) return
-    const msg = document.getElementById('pstatus-' + id)
+    if (!confirm('Удалити это Знань навсегда?')) return;
+    const msg = document.getElementById('pstatus-' + id);
 
-    const { error } = await supabaseClient.from('articles').delete().eq('id', id)
+    const { error } = await supabaseClient.from('articles').delete().eq('id', id);
 
     if (error) {
-        msg.className = 'action-status error'
-        msg.textContent = 'Смертч-шум: ' + error.message
-        return
+        msg.className = 'action-status error';
+        msg.textContent = 'Смертч-шум: ' + error.message;
+        return;
     }
 
-    const card = document.getElementById('pcard-' + id)
-    if (card) card.remove()
+    const card = document.getElementById('pcard-' + id);
+    if (card) card.remove();
 
-    const list = document.querySelector('.pending-list')
+    const list = document.querySelector('.pending-list');
     if (list && !list.querySelector('.pending-card')) {
-        document.getElementById('pending-list').innerHTML = '<div class="empty-state">Нрт статей нач проверке — Архив чистч</div>'
+        document.getElementById('pending-list').innerHTML = '<div class="empty-state">Нрт статей нач проверке — Архив чистч</div>';
     }
 }
 
 async function loadStats() {
-    const container = document.getElementById('stats-content')
+    const container = document.getElementById('stats-content');
 
     const [articles, users, comments] = await Promise.all([
         supabaseClient.from('articles').select('id, status, views_count, likes_count'),
         supabaseClient.from('users').select('id, role'),
         supabaseClient.from('comments').select('id')
-    ])
+    ]);
 
-    const all = articles.data ?? []
-    const published = all.filter(a => a.status === 'published').length
-    const pending = all.filter(a => a.status === 'pending').length
-    const totalViews = all.reduce((s, a) => s + (a.views_count ?? 0), 0)
-    const totalLikes = all.reduce((s, a) => s + (a.likes_count ?? 0), 0)
-    const totalUsers = (users.data ?? []).length
-    const totalMsv = (users.data ?? []).filter(u => u.role === 'м.с.в.').length
-    const totalComments = (comments.data ?? []).length
+    const all = articles.data ?? [];
+    const published = all.filter(a => a.status === 'published').length;
+    const pending = all.filter(a => a.status === 'pending').length;
+    const totalViews = all.reduce((s, a) => s + (a.views_count ?? 0), 0);
+    const totalLikes = all.reduce((s, a) => s + (a.likes_count ?? 0), 0);
+    const totalUsers = (users.data ?? []).length;
+    const totalMsv = (users.data ?? []).filter(u => u.role === 'м.с.в.').length;
+    const totalComments = (comments.data ?? []).length;
 
     container.innerHTML = `
         <div class="stats-grid">
@@ -433,16 +446,16 @@ async function loadStats() {
                 <span class="stat-label">Комментариев</span>
             </div>
         </div>
-    `
+    `;
 }
 
 async function loadUsers() {
-    const container = document.getElementById('users-content')
+    const container = document.getElementById('users-content');
 
     const { data, error } = await supabaseClient
-        .from('users').select('*').order('created_at', { ascending: false })
+        .from('users').select('*').order('created_at', { ascending: false });
 
-    if (error || !data) { container.innerHTML = '<p style="color:#d33;">Смертч-шум</p>'; return }
+    if (error || !data) { container.innerHTML = '<p style="color:#d33;">Смертч-шум</p>'; return; }
 
     container.innerHTML = `
         <table class="users-table">
@@ -455,36 +468,65 @@ async function loadUsers() {
                 </tr>
             </thead>
             <tbody>
-                ${data.map(u => `
-                    <tr>
-                        <td><b>${u.username}</b></td>
-                        <td><span class="role-badge ${u.role === 'м.с.в.' ? 'msv' : 'ludich'}">${u.role}</span></td>
+                ${data.map(u => {
+                    const isMsv = u.role === 'м.с.в.';
+                    const isSelf = u.id === adminUserId;
+                    const bannedClass = u.is_banned ? 'class="banned-row"' : '';
+                    
+                    return `
+                    <tr ${bannedClass}>
+                        <td>
+                            <b>${u.username}</b> 
+                            ${u.is_banned ? '<span class="banned-label">[В ФОГЕ]</span>' : ''}
+                        </td>
+                        <td><span class="role-badge ${isMsv ? 'msv' : 'ludich'}">${u.role}</span></td>
                         <td>${new Date(u.created_at).toLocaleDateString('ru-RU')}</td>
                         <td>
-                            ${u.username !== adminUser ? `
-                                <button class="btn btn-secondary" style="font-size:0.78em;padding:3px 8px;" onclick="setRole('${u.id}', '${u.role === 'м.с.в.' ? 'людич' : 'м.с.в.'}')">
-                                    ${u.role === 'м.с.в.' ? 'Снять М.С.В.' : 'Сделать М.С.В.'}
+                            ${(!isMsv && !isSelf) ? `
+                                <button class="btn" style="padding:2px 8px; font-size:0.8em; background:${u.is_banned ? '#14866d' : '#d33'}; color:#fff;" onclick="toggleBan('${u.id}', ${u.is_banned})">
+                                    ${u.is_banned ? 'Вернуть' : 'В Фог'}
                                 </button>
-                            ` : '<span style="font-size:0.8em;color:#a2a9b1;">это ты</span>'}
+                                <button class="btn btn-secondary" style="padding:2px 8px; font-size:0.8em;" onclick="exileUser('${u.id}', '${u.username}')">Изгнать</button>
+                            ` : (isSelf ? '<span style="font-size:0.8em; color:#a2a9b1;">Вы</span>' : '<span style="font-size:0.8em; color:#3366cc;">Штаб</span>')}
                         </td>
                     </tr>
-                `).join('')}
+                `}).join('')}
             </tbody>
         </table>
-    `
+    `;
 }
 
-async function setRole(userId, role) {
-    await supabaseClient.from('users').update({ role }).eq('id', userId)
-    loadUsers()
+async function toggleBan(userId, currentStatus) {
+    const action = currentStatus ? 'вернуть' : 'заточить в Фог';
+    if (!confirm(`Ты хочешь ${action} этого Людича?`)) return;
+
+    const { error } = await supabaseClient
+        .from('users')
+        .update({ is_banned: !currentStatus })
+        .eq('id', userId);
+
+    if (error) alert('Ошибка бана: ' + error.message);
+    else loadUsers();
+}
+
+async function exileUser(userId, name) {
+    if (!confirm(`Изгнать ${name} навсегда? Профиль будет удален.`)) return;
+
+    const { error } = await supabaseClient
+        .from('users')
+        .delete()
+        .eq('id', userId);
+
+    if (error) alert('Ошибка изгнания: ' + error.message);
+    else loadUsers();
 }
 
 async function logout() {
-    await supabaseClient.auth.signOut()
-    window.location.href = 'login.html'
+    await supabaseClient.auth.signOut();
+    window.location.href = 'login.html';
 }
 
-init()
+init();
 </script>
 
 </body>
