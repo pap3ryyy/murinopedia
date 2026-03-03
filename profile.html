@@ -336,15 +336,19 @@ async function init() {
             `<a href="login.html" style="font-size:0.85em;">Войти</a>`
     }
 
-    const targetId = profileId || currentUserId
-
-    if (!targetId) {
+    if (!profileId && !currentUserId) {
         showError('Нрт идентификатора Людич')
         return
     }
 
-    const { data: user, error } = await supabaseClient
-        .from('users').select('*').eq('id', targetId).single()
+    let userQuery = supabaseClient.from('users').select('*')
+    if (profileId) {
+        userQuery = userQuery.eq('public_id', profileId)
+    } else {
+        userQuery = userQuery.eq('id', currentUserId)
+    }
+
+    const { data: user, error } = await userQuery.single()
 
     if (error || !user) {
         showError('Людич нрт найденол вч реестре')
@@ -359,7 +363,7 @@ async function init() {
 
 function renderHeaderUser(user) {
     document.getElementById('header-user').innerHTML = `
-        <a href="profile.html">${user.username}</a>
+        <a href="profile.html?id=${user.public_id}">${user.username}</a>
         &nbsp;
         <button onclick="logout()" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;">Выйти</button>
     `
