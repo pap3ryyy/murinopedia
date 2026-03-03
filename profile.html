@@ -318,17 +318,23 @@ let isOwnProfile = false
 let avatarUrl = ''
 let nicknameTimer = null
 
-async function // Badge tooltips
 document.addEventListener('mouseover', e => {
     const wrap = e.target.closest('.badge-wrap')
-    if (wrap) wrap.querySelector('.badge-tip').style.display = 'block'
-})
-document.addEventListener('mouseout', e => {
-    const wrap = e.target.closest('.badge-wrap')
-    if (wrap) wrap.querySelector('.badge-tip').style.display = 'none'
+    if (wrap) {
+        const tip = wrap.querySelector('.badge-tip')
+        if (tip) tip.style.display = 'block'
+    }
 })
 
-init() {
+document.addEventListener('mouseout', e => {
+    const wrap = e.target.closest('.badge-wrap')
+    if (wrap) {
+        const tip = wrap.querySelector('.badge-tip')
+        if (tip) tip.style.display = 'none'
+    }
+})
+
+async function init() {
     const params = new URLSearchParams(window.location.search)
     const profileId = params.get('id')
 
@@ -393,10 +399,6 @@ async function renderProfile() {
     const u = profileUser
     const joined = new Date(u.created_at).toLocaleDateString('ru-RU')
     const prevNicks = (u.previous_usernames ?? []).filter(n => n !== u.username)
-
-    const avatarHtml = u.avatar_url
-        ? `<img src="${u.avatar_url}" alt="${u.username}">`
-        : `<div class="profile-avatar" style="width:80px;height:80px;border:1px solid #a2a9b1;background:#eaecf0;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:2em;color:#a2a9b1;">${u.username[0].toUpperCase()}</div>`
 
     const { data: userBadges } = await supabaseClient
         .from('user_badges')
