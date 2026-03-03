@@ -121,39 +121,83 @@
             background: #fee7e6;
         }
 
-        .image-placeholder {
-            border: 2px dashed #a2a9b1;
-            background: #f8f9fa;
-            padding: 30px;
-            text-align: center;
-            color: #54595d;
+        .image-tabs {
+            display: flex;
+            border-bottom: 1px solid #a2a9b1;
             margin-bottom: 10px;
+        }
+
+        .image-tab {
+            padding: 6px 16px;
+            font-size: 0.85em;
             cursor: pointer;
-            transition: border-color 0.15s;
+            border: 1px solid transparent;
+            border-bottom: none;
+            background: none;
+            color: #54595d;
+            margin-bottom: -1px;
         }
 
-        .image-placeholder:hover {
-            border-color: #3366cc;
-        }
-
-        .image-placeholder.has-image {
-            padding: 0;
-            border-style: solid;
+        .image-tab.active {
+            background: #fff;
             border-color: #a2a9b1;
+            color: #202122;
+            font-weight: bold;
         }
 
-        .image-placeholder img {
+        .image-tab-content {
+            display: none;
+        }
+
+        .image-tab-content.active {
+            display: block;
+        }
+
+        .image-preview {
+            border: 1px solid #a2a9b1;
+            background: #f8f9fa;
+            padding: 0;
+            margin-bottom: 10px;
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #54595d;
+            font-size: 0.85em;
+        }
+
+        .image-preview img {
             max-width: 100%;
             max-height: 200px;
             display: block;
             margin: 0 auto;
         }
 
-        .image-controls {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 18px;
+        .upload-zone {
+            border: 2px dashed #a2a9b1;
+            background: #f8f9fa;
+            padding: 24px;
+            text-align: center;
+            color: #54595d;
+            cursor: pointer;
+            transition: border-color 0.15s;
+            margin-bottom: 8px;
+            font-size: 0.9em;
         }
+
+        .upload-zone:hover {
+            border-color: #3366cc;
+        }
+
+        .upload-status {
+            font-size: 0.8em;
+            color: #54595d;
+            margin-top: 6px;
+        }
+
+        .upload-status.error { color: #d33; }
+        .upload-status.success { color: #14866d; }
 
         .content-hint {
             font-size: 0.8em;
@@ -239,6 +283,7 @@ let currentUser = null
 let currentRole = null
 let infoboxFields = []
 let imageUrl = ''
+let activeImageTab = 'url'
 
 async function init() {
     const { data: { session } } = await supabaseClient.auth.getSession()
@@ -311,11 +356,24 @@ function renderEditor() {
 
         <div class="field-group">
             <label class="field-label">Картинка статьи</label>
-            <div class="image-placeholder" id="img-placeholder" onclick="promptImage()">
-                Нажми дляч добавления картинки
+
+            <div class="image-preview" id="img-preview">Нрт картинки</div>
+
+            <div class="image-tabs">
+                <button class="image-tab active" id="tab-url" onclick="switchImageTab('url')">По URL</button>
+                <button class="image-tab" id="tab-upload" onclick="switchImageTab('upload')">Загрузити файл</button>
             </div>
-            <div class="image-controls">
-                <input type="text" class="field-input" id="img-url-input" placeholder="или вставь URL картинки..." style="flex:1;" oninput="previewImage(this.value)">
+
+            <div class="image-tab-content active" id="tab-content-url">
+                <input type="text" class="field-input" id="img-url-input" placeholder="https://example.com/image.png" oninput="previewImageUrl(this.value)">
+            </div>
+
+            <div class="image-tab-content" id="tab-content-upload">
+                <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+                    Нажми дляч выбора PNG / JPG / WebP
+                    <input type="file" id="file-input" accept="image/png,image/jpeg,image/webp" onchange="uploadFile(this)">
+                </div>
+                <div class="upload-status" id="upload-status"></div>
             </div>
         </div>
 
@@ -353,6 +411,59 @@ function renderEditor() {
     renderInfoboxFields()
 }
 
+function switchImageTab(tab) {
+    activeImageTab = tab
+    document.getElementById('tab-url').classList.toggle('active', tab === 'url')
+    document.getElementById('tab-upload').classList.toggle('active', tab === 'upload')
+    document.getElementById('tab-content-url').classList.toggle('active', tab === 'url')
+    document.getElementById('tab-content-upload').classList.toggle('active', tab === 'upload')
+}
+
+function previewImageUrl(url) {
+    imageUrl = url
+    updatePreview(url)
+}
+
+function updatePreview(url) {
+    const preview = document.getElementById('img-preview')
+    if (url) {
+        preview.innerHTML = `<img src="${url}" onerror="this.parentElement.textContent='Нрт — картинка нрт загружалость'">`
+    } else {
+        preview.textContent = 'Нрт картинки'
+    }
+}
+
+async function uploadFile(input) {
+    const file = input.files[0]
+    if (!file) return
+
+    const status = document.getElementById('upload-status')
+    status.className = 'upload-status'
+    status.textContent = 'Загружати...'
+
+    const ext = file.name.split('.').pop()
+    const fileName = `${Date.now()}.${ext}`
+
+    const { data, error } = await supabaseClient.storage
+        .from('images')
+        .upload(fileName, file, { upsert: false })
+
+    if (error) {
+        status.className = 'upload-status error'
+        status.textContent = 'Смертч-шум: ' + error.message
+        return
+    }
+
+    const { data: urlData } = supabaseClient.storage
+        .from('images')
+        .getPublicUrl(fileName)
+
+    imageUrl = urlData.publicUrl
+    status.className = 'upload-status success'
+    status.textContent = 'Загруженол: ' + file.name
+    updatePreview(imageUrl)
+}
+
 function addInfoboxField() {
     infoboxFields.push({ label: '', value: '' })
     renderInfoboxFields()
@@ -373,26 +484,6 @@ function renderInfoboxFields() {
             <button class="btn-remove" onclick="removeInfoboxField(${i})">Удалить</button>
         </div>
     `).join('')
-}
-
-function promptImage() {
-    const url = prompt('Вставь URL картинки:')
-    if (url) {
-        document.getElementById('img-url-input').value = url
-        previewImage(url)
-    }
-}
-
-function previewImage(url) {
-    imageUrl = url
-    const placeholder = document.getElementById('img-placeholder')
-    if (url) {
-        placeholder.classList.add('has-image')
-        placeholder.innerHTML = `<img src="${url}" onerror="this.parentElement.innerHTML='Нрт — картинка нрт загружалость'">`
-    } else {
-        placeholder.classList.remove('has-image')
-        placeholder.textContent = 'Нажми дляч добавления картинки'
-    }
 }
 
 function insertText(before, after) {
