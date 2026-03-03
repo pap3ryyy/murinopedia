@@ -7,191 +7,39 @@
     <title>Штаб М.С.В. — Муринопедия</title>
     <link rel="stylesheet" href="css/wiki.css">
     <style>
-        .admin-tabs {
-            display: flex;
-            border-bottom: 2px solid #a2a9b1;
-            margin-bottom: 24px;
-        }
-
-        .admin-tab {
-            padding: 6px 18px;
-            font-size: 0.9em;
-            cursor: pointer;
-            border: 1px solid transparent;
-            border-bottom: none;
-            background: none;
-            color: #54595d;
-            margin-bottom: -2px;
-        }
-
-        .admin-tab.active {
-            background: #fff;
-            border-color: #a2a9b1;
-            color: #202122;
-            font-weight: bold;
-            border-bottom: 2px solid #fff;
-        }
-
+        .admin-tabs { display: flex; border-bottom: 2px solid #a2a9b1; margin-bottom: 24px; }
+        .admin-tab { padding: 6px 18px; font-size: 0.9em; cursor: pointer; border: 1px solid transparent; border-bottom: none; background: none; color: #54595d; margin-bottom: -2px; }
+        .admin-tab.active { background: #fff; border-color: #a2a9b1; color: #202122; font-weight: bold; border-bottom: 2px solid #fff; }
         .admin-tab-content { display: none; }
         .admin-tab-content.active { display: block; }
-
-        .pending-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .pending-card {
-            border: 1px solid #a2a9b1;
-            background: #f8f9fa;
-            padding: 16px;
-        }
-
-        .pending-card-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 8px;
-        }
-
-        .pending-card-title {
-            font-family: serif;
-            font-size: 1.2em;
-            font-weight: normal;
-        }
-
-        .pending-card-tag {
-            font-size: 0.75em;
-            color: #54595d;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-bottom: 3px;
-        }
-
-        .pending-card-meta {
-            font-size: 0.82em;
-            color: #54595d;
-            margin-bottom: 8px;
-        }
-
-        .pending-card-content {
-            font-size: 0.85em;
-            color: #54595d;
-            background: #fff;
-            border: 1px solid #eaecf0;
-            padding: 10px;
-            max-height: 100px;
-            overflow-y: auto;
-            margin-bottom: 12px;
-            line-height: 1.5;
-            white-space: pre-wrap;
-        }
-
-        .pending-card-actions {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
+        .pending-list { display: flex; flex-direction: column; gap: 16px; }
+        .pending-card { border: 1px solid #a2a9b1; background: #f8f9fa; padding: 16px; }
+        .pending-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+        .pending-card-title { font-family: serif; font-size: 1.2em; font-weight: normal; }
+        .pending-card-tag { font-size: 0.75em; color: #54595d; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; }
+        .pending-card-meta { font-size: 0.82em; color: #54595d; margin-bottom: 8px; }
+        .pending-card-content { font-size: 0.85em; color: #54595d; background: #fff; border: 1px solid #eaecf0; padding: 10px; max-height: 100px; overflow-y: auto; margin-bottom: 12px; line-height: 1.5; white-space: pre-wrap; }
+        .pending-card-actions { display: flex; gap: 8px; align-items: center; }
         .action-status { font-size: 0.82em; color: #54595d; }
         .action-status.success { color: #14866d; }
         .action-status.error { color: #d33; }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .stat-card {
-            border: 1px solid #a2a9b1;
-            background: #f8f9fa;
-            padding: 14px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-family: serif;
-            font-size: 1.8em;
-            color: #3366cc;
-            display: block;
-        }
-
-        .stat-label {
-            font-size: 0.8em;
-            color: #54595d;
-        }
-
-        .users-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9em;
-        }
-
-        .users-table th {
-            background: #eaecf0;
-            border: 1px solid #a2a9b1;
-            padding: 6px 10px;
-            text-align: left;
-        }
-
-        .users-table td {
-            border: 1px solid #a2a9b1;
-            padding: 6px 10px;
-            vertical-align: middle;
-        }
-
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
+        .stat-card { border: 1px solid #a2a9b1; background: #f8f9fa; padding: 14px; text-align: center; }
+        .stat-number { font-family: serif; font-size: 1.8em; color: #3366cc; display: block; }
+        .stat-label { font-size: 0.8em; color: #54595d; }
+        .users-table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+        .users-table th { background: #eaecf0; border: 1px solid #a2a9b1; padding: 6px 10px; text-align: left; }
+        .users-table td { border: 1px solid #a2a9b1; padding: 6px 10px; vertical-align: middle; }
         .users-table tr:nth-child(even) td { background: #f8f9fa; }
-
-        .role-badge {
-            display: inline-block;
-            padding: 2px 7px;
-            border-radius: 2px;
-            font-size: 0.8em;
-            font-weight: bold;
-        }
-
+        .role-badge { display: inline-block; padding: 2px 7px; border-radius: 2px; font-size: 0.8em; font-weight: bold; }
         .role-badge.msv { background: #cee0f2; color: #3366cc; border: 1px solid #3366cc; }
         .role-badge.ludich { background: #eaecf0; color: #54595d; border: 1px solid #a2a9b1; }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #54595d;
-            font-style: italic;
-        }
-
-        .access-denied {
-            text-align: center;
-            padding: 80px 20px;
-        }
-
-        .access-denied h2 {
-            font-family: serif;
-            font-weight: normal;
-            color: #d33;
-        }
-
-        .admin-user-bar {
-            font-size: 0.82em;
-            color: #54595d;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .banned-row {
-            background: #fee7e6 !important;
-        }
-        
-        .banned-label {
-            color: #d33;
-            font-weight: bold;
-            font-size: 0.75em;
-            margin-left: 5px;
-        }
+        .empty-state { text-align: center; padding: 40px 20px; color: #54595d; font-style: italic; }
+        .access-denied { text-align: center; padding: 80px 20px; }
+        .access-denied h2 { font-family: serif; font-weight: normal; color: #d33; }
+        .admin-user-bar { font-size: 0.82em; color: #54595d; display: flex; gap: 10px; align-items: center; }
+        .banned-row { background: #fee7e6 !important; }
+        .banned-label { color: #d33; font-weight: bold; font-size: 0.75em; margin-left: 5px; }
     </style>
 </head>
 <body>
@@ -258,6 +106,12 @@ async function init() {
         return;
     }
 
+    if (user.is_banned) {
+        showDenied('Ваш позывной заблокирован Штабом зач нарушение Кодекса.');
+        await supabaseClient.auth.signOut();
+        return;
+    }
+
     adminUser = user.username;
     adminUserId = user.id;
     document.getElementById('admin-username').textContent = adminUser;
@@ -298,7 +152,6 @@ function renderAdmin() {
             <div id="users-content"><p style="color:#54595d;">Загружати...</p></div>
         </div>
     `;
-
     loadPending();
 }
 
@@ -318,13 +171,11 @@ async function loadPending() {
         .order('created_at', { ascending: true });
 
     const container = document.getElementById('pending-list');
-    if (error) { container.innerHTML = '<p style="color:#d33;">Смертч-шум при загрузке</p>'; return; }
-
+    if (error) { container.innerHTML = '<p style="color:#d33;">Смертч-шум</p>'; return; }
     if (!data || data.length === 0) {
-        container.innerHTML = '<div class="empty-state">Нрт статей нач проверке — Архив чистч</div>';
+        container.innerHTML = '<div class="empty-state">Нрт статей нач проверке</div>';
         return;
     }
-
     container.innerHTML = `<div class="pending-list">${data.map(a => renderPendingCard(a)).join('')}</div>`;
 }
 
@@ -337,12 +188,9 @@ function renderPendingCard(a) {
                     <div class="pending-card-tag">${a.tag ?? '—'}</div>
                     <div class="pending-card-title">${a.title}</div>
                 </div>
-                <a href="article.html?id=${a.id}" target="_blank" class="btn btn-secondary" style="font-size:0.8em;white-space:nowrap;">Открыти →</a>
+                <a href="article.html?id=${a.id}" target="_blank" class="btn btn-secondary" style="font-size:0.8em;">Открыти →</a>
             </div>
-            <div class="pending-card-meta">
-                Автор: <b>${a.author ?? 'Аноним'}</b> &nbsp;·&nbsp; Создано: <b>${date}</b>
-            </div>
-            ${a.description ? `<div style="font-size:0.88em;color:#202122;margin-bottom:8px;">${a.description}</div>` : ''}
+            <div class="pending-card-meta">Автор: <b>${a.author ?? 'Аноним'}</b> &nbsp;·&nbsp; ${date}</div>
             <div class="pending-card-content">${(a.content ?? '').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
             <div class="pending-card-actions">
                 <button class="btn btn-primary" onclick="approveArticle(${a.id})">Принять</button>
@@ -354,108 +202,42 @@ function renderPendingCard(a) {
 }
 
 async function approveArticle(id) {
-    const msg = document.getElementById('pstatus-' + id);
-    msg.className = 'action-status';
-    msg.textContent = 'Обрабатываем...';
-
-    const { error } = await supabaseClient.from('articles').update({
+    await supabaseClient.from('articles').update({
         status: 'published',
         reviewed_by: adminUser,
         reviewed_at: new Date().toISOString()
     }).eq('id', id);
-
-    if (error) {
-        msg.className = 'action-status error';
-        msg.textContent = 'Смертч-шум: ' + error.message;
-        return;
-    }
-
-    const card = document.getElementById('pcard-' + id);
-    if (card) { card.style.opacity = '0.4'; card.style.pointerEvents = 'none'; }
-    msg.className = 'action-status success';
-    msg.textContent = 'Знань опубликовано ✓';
+    loadPending();
 }
 
 async function rejectArticle(id) {
     if (!confirm('Удалити это Знань навсегда?')) return;
-    const msg = document.getElementById('pstatus-' + id);
-
-    const { error } = await supabaseClient.from('articles').delete().eq('id', id);
-
-    if (error) {
-        msg.className = 'action-status error';
-        msg.textContent = 'Смертч-шум: ' + error.message;
-        return;
-    }
-
-    const card = document.getElementById('pcard-' + id);
-    if (card) card.remove();
-
-    const list = document.querySelector('.pending-list');
-    if (list && !list.querySelector('.pending-card')) {
-        document.getElementById('pending-list').innerHTML = '<div class="empty-state">Нрт статей нач проверке — Архив чистч</div>';
-    }
+    await supabaseClient.from('articles').delete().eq('id', id);
+    loadPending();
 }
 
 async function loadStats() {
     const container = document.getElementById('stats-content');
-
     const [articles, users, comments] = await Promise.all([
-        supabaseClient.from('articles').select('id, status, views_count, likes_count'),
+        supabaseClient.from('articles').select('id, status, views_count'),
         supabaseClient.from('users').select('id, role'),
         supabaseClient.from('comments').select('id')
     ]);
-
     const all = articles.data ?? [];
-    const published = all.filter(a => a.status === 'published').length;
-    const pending = all.filter(a => a.status === 'pending').length;
-    const totalViews = all.reduce((s, a) => s + (a.views_count ?? 0), 0);
-    const totalLikes = all.reduce((s, a) => s + (a.likes_count ?? 0), 0);
-    const totalUsers = (users.data ?? []).length;
-    const totalMsv = (users.data ?? []).filter(u => u.role === 'м.с.в.').length;
-    const totalComments = (comments.data ?? []).length;
-
     container.innerHTML = `
         <div class="stats-grid">
-            <div class="stat-card">
-                <span class="stat-number">${published}</span>
-                <span class="stat-label">Опубликовано Знань</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number" style="color:#c8a850;">${pending}</span>
-                <span class="stat-label">На проверке</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number">${totalViews}</span>
-                <span class="stat-label">Всего просмотров</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number">${totalLikes}</span>
-                <span class="stat-label">Всего лайков</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number">${totalUsers}</span>
-                <span class="stat-label">Людич вч системе</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number" style="color:#3366cc;">${totalMsv}</span>
-                <span class="stat-label">М.С.В.</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number">${totalComments}</span>
-                <span class="stat-label">Комментариев</span>
-            </div>
+            <div class="stat-card"><span class="stat-number">${all.filter(a => a.status === 'published').length}</span><span class="stat-label">Опубликовано</span></div>
+            <div class="stat-card"><span class="stat-number">${all.filter(a => a.status === 'pending').length}</span><span class="stat-label">На проверке</span></div>
+            <div class="stat-card"><span class="stat-number">${(users.data ?? []).length}</span><span class="stat-label">Людич</span></div>
+            <div class="stat-card"><span class="stat-number">${(users.data ?? []).filter(u => u.role === 'м.с.в.').length}</span><span class="stat-label">М.С.В.</span></div>
         </div>
     `;
 }
 
 async function loadUsers() {
     const container = document.getElementById('users-content');
-
-    const { data, error } = await supabaseClient
-        .from('users').select('*').order('created_at', { ascending: false });
-
-    if (error || !data) { container.innerHTML = '<p style="color:#d33;">Смертч-шум</p>'; return; }
+    const { data, error } = await supabaseClient.from('users').select('*').order('created_at', { ascending: false });
+    if (error) return;
 
     container.innerHTML = `
         <table class="users-table">
@@ -463,7 +245,7 @@ async function loadUsers() {
                 <tr>
                     <th>Позывной</th>
                     <th>Роль</th>
-                    <th>Зарегистрировано</th>
+                    <th>Регистрация</th>
                     <th>Действия</th>
                 </tr>
             </thead>
@@ -471,20 +253,15 @@ async function loadUsers() {
                 ${data.map(u => {
                     const isMsv = u.role === 'м.с.в.';
                     const isSelf = u.id === adminUserId;
-                    const bannedClass = u.is_banned ? 'class="banned-row"' : '';
-                    
                     return `
-                    <tr ${bannedClass}>
-                        <td>
-                            <b>${u.username}</b> 
-                            ${u.is_banned ? '<span class="banned-label">[В ФОГЕ]</span>' : ''}
-                        </td>
+                    <tr class="${u.is_banned ? 'banned-row' : ''}">
+                        <td><b>${u.username}</b> ${u.is_banned ? '<span class="banned-label">[В БАНЕ]</span>' : ''}</td>
                         <td><span class="role-badge ${isMsv ? 'msv' : 'ludich'}">${u.role}</span></td>
                         <td>${new Date(u.created_at).toLocaleDateString('ru-RU')}</td>
                         <td>
                             ${(!isMsv && !isSelf) ? `
-                                <button class="btn" style="padding:2px 8px; font-size:0.8em; background:${u.is_banned ? '#14866d' : '#d33'}; color:#fff;" onclick="toggleBan('${u.id}', ${u.is_banned})">
-                                    ${u.is_banned ? 'Вернуть' : 'В Фог'}
+                                <button class="btn" style="padding:2px 8px; font-size:0.8em; background:${u.is_banned ? '#14866d' : '#d33'}; color:#fff; border:none; cursor:pointer;" onclick="toggleBan('${u.id}', ${u.is_banned})">
+                                    ${u.is_banned ? 'Разбанить' : 'В Бан'}
                                 </button>
                                 <button class="btn btn-secondary" style="padding:2px 8px; font-size:0.8em;" onclick="exileUser('${u.id}', '${u.username}')">Изгнать</button>
                             ` : (isSelf ? '<span style="font-size:0.8em; color:#a2a9b1;">Вы</span>' : '<span style="font-size:0.8em; color:#3366cc;">Штаб</span>')}
@@ -497,28 +274,25 @@ async function loadUsers() {
 }
 
 async function toggleBan(userId, currentStatus) {
-    const action = currentStatus ? 'вернуть' : 'заточить в Фог';
-    if (!confirm(`Ты хочешь ${action} этого Людича?`)) return;
-
+    if (!confirm(currentStatus ? 'Вернуть Людича вч строй?' : 'Отправить Людича вч Бан?')) return;
+    
     const { error } = await supabaseClient
         .from('users')
         .update({ is_banned: !currentStatus })
         .eq('id', userId);
 
-    if (error) alert('Ошибка бана: ' + error.message);
-    else loadUsers();
+    if (error) {
+        alert('Ошибка: убедись, что колонка is_banned добавлена в таблицу users');
+        console.error(error);
+    } else {
+        loadUsers();
+    }
 }
 
 async function exileUser(userId, name) {
-    if (!confirm(`Изгнать ${name} навсегда? Профиль будет удален.`)) return;
-
-    const { error } = await supabaseClient
-        .from('users')
-        .delete()
-        .eq('id', userId);
-
-    if (error) alert('Ошибка изгнания: ' + error.message);
-    else loadUsers();
+    if (!confirm(`Изгнать ${name} навсегда?`)) return;
+    await supabaseClient.from('users').delete().eq('id', userId);
+    loadUsers();
 }
 
 async function logout() {
@@ -528,6 +302,5 @@ async function logout() {
 
 init();
 </script>
-
 </body>
 </html>
