@@ -106,34 +106,19 @@
             background: #fff;
         }
 
-        .username-hint {
-            font-size: 0.8em;
-            color: #54595d;
-        }
-
-        .username-hint.error {
-            color: #d33;
-        }
-
-        .username-hint.success {
-            color: #14866d;
-        }
+        .username-hint { font-size: 0.8em; color: #54595d; }
+        .username-hint.error { color: #d33; }
+        .username-hint.success { color: #14866d; }
 
         .loading-step {
             text-align: center;
             color: #54595d;
             font-size: 0.9em;
-            padding: 10px 0;
+            padding: 20px 0;
             display: none;
         }
 
-        .loading-step.visible {
-            display: block;
-        }
-
-        .notice-box {
-            font-size: 0.85em;
-        }
+        .notice-box { font-size: 0.85em; }
     </style>
 </head>
 <body>
@@ -205,42 +190,46 @@
 <script src="js/config.js"></script>
 <script>
 let checkTimer = null
+let sessionHandled = false
 
 function getRedirectUrl() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('redirect') || 'index.html';
+    const params = new URLSearchParams(window.location.search)
+    return params.get('redirect') || 'index.html'
 }
 
 function showStep(name) {
-    ['login', 'loading', 'username', 'error'].forEach(s => {
-        const el = document.getElementById('step-' + s)
-        if (!el) return
-        el.style.display = 'none'
-        el.classList && el.classList.remove('visible')
-    })
+    document.getElementById('step-login').style.display = 'none'
+    document.getElementById('step-loading').style.display = 'none'
+    document.getElementById('step-username').style.display = 'none'
+    document.getElementById('step-username').classList.remove('visible')
+    document.getElementById('step-error').style.display = 'none'
+
     const target = document.getElementById('step-' + name)
     if (!target) return
-    target.style.display = 'flex'
-    target.classList && target.classList.add('visible')
+
     if (name === 'loading') {
+        target.style.display = 'block'
+    } else if (name === 'username') {
+        target.style.display = 'flex'
+        target.classList.add('visible')
+    } else {
         target.style.display = 'block'
     }
 }
 
 async function loginWithGoogle() {
-    const currentRedirect = getRedirectUrl();
     const { error } = await supabaseClient.auth.signInWithOAuth({
         provider: 'google',
         options: {
-            redirectTo: window.location.origin + window.location.pathname + '?redirect=' + encodeURIComponent(currentRedirect)
+            redirectTo: 'https://pap3ryyy.github.io/murinopedia/login.html'
         }
     })
     if (error) showError(error.message)
 }
 
-async function handleSession() {
-    const { data: { session } } = await supabaseClient.auth.getSession()
-    if (!session) return
+async function handleSession(session) {
+    if (sessionHandled) return
+    sessionHandled = true
 
     showStep('loading')
 
@@ -261,19 +250,18 @@ async function handleSession() {
 async function checkUsername() {
     const val = document.getElementById('username-input').value
     const hint = document.getElementById('username-hint')
-
     clearTimeout(checkTimer)
 
     if (val.length < 3) {
         hint.className = 'username-hint'
         hint.textContent = 'От 3 до 20 символов. Только буквы, цифры ич _'
-        return;
+        return
     }
 
     if (!/^[a-zA-Zа-яА-ЯёЁ0-9_]+$/.test(val)) {
         hint.className = 'username-hint error'
         hint.textContent = 'Недопустимые символы — Фог вч позывном'
-        return;
+        return
     }
 
     hint.className = 'username-hint'
@@ -281,11 +269,7 @@ async function checkUsername() {
 
     checkTimer = setTimeout(async () => {
         const { data } = await supabaseClient
-            .from('users')
-            .select('username')
-            .eq('username', val)
-            .single()
-
+            .from('users').select('username').eq('username', val).single()
         if (data) {
             hint.className = 'username-hint error'
             hint.textContent = 'Этот позывной уже занят другим Людич'
@@ -303,7 +287,7 @@ async function submitUsername() {
     if (val.length < 3 || !/^[a-zA-Zа-яА-ЯёЁ0-9_]+$/.test(val)) {
         hint.className = 'username-hint error'
         hint.textContent = 'Проверь позывной — Фог обнаруженол'
-        return;
+        return
     }
 
     const { data: { session } } = await supabaseClient.auth.getSession()
@@ -321,7 +305,7 @@ async function submitUsername() {
         } else {
             showError(error.message)
         }
-        return;
+        return
     }
 
     window.location.href = getRedirectUrl()
@@ -332,26 +316,20 @@ function showError(msg) {
     showStep('error')
 }
 
-supabaseClient.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session) {
-        showStep('loading')
-
-        const { data: existing } = await supabaseClient
-            .from('users')
-            .select('username')
-            .eq('id', session.user.id)
-            .single()
-
-        if (existing) {
-            window.location.href = getRedirectUrl()
-            return;
-        }
-
-        showStep('username')
+// Сначала проверяем hash в URL (OAuth редирект кладёт токен туда)
+supabaseClient.auth.getSession().then(({ data: { session } }) => {
+    if (session) {
+        handleSession(session)
     }
+    // нет сессии — показываем кнопку (дефолт)
 })
 
-handleSession()
+// Ловим событие когда Supabase обработал hash из URL
+supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+        handleSession(session)
+    }
+})
 </script>
 
 </body>
