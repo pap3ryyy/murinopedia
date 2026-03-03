@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="icon" type="image/png" href="asset/logo.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Архив Знань — Муринопедия</title>
+    <link rel="stylesheet" href="css/wiki.css">
+    <style>
+        .articles-search {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .articles-search input {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1px solid #a2a9b1;
+            font-size: 0.95em;
+            background: #f8f9fa;
+            color: #202122;
+            outline: none;
+        }
+
+        .articles-search input:focus {
+            border-color: #3366cc;
+            background: #fff;
+        }
+
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .article-card {
+            border: 1px solid #a2a9b1;
+            background: #f8f9fa;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            text-decoration: none !important;
+            color: inherit;
+            transition: border-color 0.15s, background 0.15s;
+        }
+
+        .article-card:hover {
+            border-color: #3366cc;
+            background: #f0f4ff;
+        }
+
+        .article-card-tag {
+            font-size: 0.75em;
+            color: #54595d;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .article-card-title {
+            font-family: serif;
+            font-size: 1.1em;
+            color: #0645ad;
+            font-weight: normal;
+        }
+
+        .article-card:hover .article-card-title {
+            text-decoration: underline;
+        }
+
+        .article-card-desc {
+            font-size: 0.85em;
+            color: #54595d;
+            line-height: 1.4;
+        }
+
+        .article-card-meta {
+            font-size: 0.75em;
+            color: #a2a9b1;
+            margin-top: auto;
+            padding-top: 6px;
+            border-top: 1px solid #eaecf0;
+        }
+
+        .articles-count {
+            font-size: 0.85em;
+            color: #54595d;
+            margin-bottom: 12px;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .filter-btn {
+            padding: 4px 12px;
+            border: 1px solid #a2a9b1;
+            background: #f8f9fa;
+            color: #202122;
+            font-size: 0.85em;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+
+        .filter-btn.active {
+            background: #3366cc;
+            color: #fff;
+            border-color: #2a4b8d;
+        }
+
+        .state-box {
+            padding: 30px 20px;
+            text-align: center;
+            border: 1px solid #a2a9b1;
+            background: #f8f9fa;
+        }
+
+        .state-box-title {
+            font-family: serif;
+            font-size: 1.3em;
+            margin-bottom: 8px;
+        }
+
+        .state-box-desc {
+            font-size: 0.9em;
+            color: #54595d;
+        }
+
+        .state-box.error {
+            border-color: #d33;
+            background: #fee7e6;
+        }
+
+        .state-box.error .state-box-title {
+            color: #d33;
+        }
+
+        .loading-text {
+            color: #54595d;
+            font-size: 0.9em;
+            padding: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-area">
+        <img src="asset/logo.png" alt="М.С.В." class="logo-img">
+        <a href="index.html" class="logo-text">Муринопедия</a>
+    </div>
+    <div class="status-bar">
+        Оперативная обстановка: <span style="color: #d33; font-weight: bold;">СТАБИЛЬНАЯ</span>
+    </div>
+</header>
+
+<div class="container">
+    <main>
+        <h1>Архив Знань</h1>
+        <p class="text-muted">Полный реестр статей Муринопедии. Вч архиве — всё, что Людич должны ведати.</p>
+
+        <div class="articles-search">
+            <input type="text" id="search-input" placeholder="Искати вч архиве...">
+            <button class="btn btn-primary" onclick="filterArticles()">Искати</button>
+        </div>
+
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="setFilter('all', this)">Всч</button>
+            <button class="filter-btn" onclick="setFilter('Локация', this)">Локации</button>
+            <button class="filter-btn" onclick="setFilter('Сущность', this)">Сущности</button>
+            <button class="filter-btn" onclick="setFilter('История', this)">История</button>
+            <button class="filter-btn" onclick="setFilter('Язык', this)">Язык</button>
+            <button class="filter-btn" onclick="setFilter('М.С.В.', this)">М.С.В.</button>
+        </div>
+
+        <div class="articles-count" id="articles-count"></div>
+        <div id="articles-container"><p class="loading-text">Загружати данных изч архива...</p></div>
+    </main>
+
+    <aside>
+        <div class="sidebar-box">
+            <h4>Архив</h4>
+            <p>Здесч собраны все статьи Муринопедии. Информация проверена М.С.В. ич одобрена Лингво-патрулем.</p>
+        </div>
+        <div class="sidebar-box" id="sidebar-stats">
+            <h4>Статистика</h4>
+            <p>Загружати...</p>
+        </div>
+        <div class="sidebar-box" style="border-color: #d33; background: #fee7e6;">
+            <h4 style="color:#d33;">Напоминание</h4>
+            <p>Видл слово «Друг»? Ог — мимикрия Фога. Говори <b>Друн</b>.</p>
+        </div>
+    </aside>
+</div>
+
+<footer>
+    Муринопедия — 2026 год. <br>
+    Ч илу доной, пока естч светл. Мурино стояти, Фог дрожати.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+let allArticles = []
+let currentFilter = 'all'
+
+async function loadArticles() {
+    const container = document.getElementById('articles-container')
+    const statsEl = document.getElementById('sidebar-stats')
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('articles')
+            .select('*')
+            .eq('status', 'published')
+            .order('created_at', { ascending: false })
+
+        if (error) throw error
+
+        allArticles = data
+        updateStats(data)
+        renderArticles(data)
+
+    } catch (e) {
+        container.innerHTML = `
+            <div class="state-box error">
+                <div class="state-box-title">Смертч-шум вч Архиве</div>
+                <div class="state-box-desc">
+                    Серверч нрт отвечати. Фог нарушилость соединение сч базой Знань.<br>
+                    М.С.В. уже вч пути — попробуй позже.
+                </div>
+            </div>
+        `
+        document.getElementById('articles-count').textContent = ''
+        statsEl.innerHTML = '<h4>Статистика</h4><p style="color:#d33;">Нрт данных</p>'
+    }
+}
+
+function renderArticles(data) {
+    const container = document.getElementById('articles-container')
+    const countEl = document.getElementById('articles-count')
+
+    if (data.length === 0) {
+        container.innerHTML = `
+            <div class="state-box">
+                <div class="state-box-title">Архив пустч</div>
+                <div class="state-box-desc">
+                    Нрт ниодного Знань вч этом разделе.<br>
+                    Людич ещё нрт написали ничего — или Фог скрылость все записи.
+                </div>
+            </div>
+        `
+        countEl.textContent = 'Нрт статей'
+        return
+    }
+
+    countEl.textContent = `Показано ${data.length} статей`
+
+    const grid = document.createElement('div')
+    grid.className = 'articles-grid'
+    grid.innerHTML = data.map(article => `
+        <a href="article.html?id=${article.id}" class="article-card">
+            <div class="article-card-tag">${article.tag ?? ''}</div>
+            <div class="article-card-title">${article.title}</div>
+            <div class="article-card-desc">${article.description ?? ''}</div>
+            <div class="article-card-meta">Автор: ${article.author ?? 'Аноним'}</div>
+        </a>
+    `).join('')
+
+    container.innerHTML = ''
+    container.appendChild(grid)
+}
+
+function updateStats(data) {
+    const statsEl = document.getElementById('sidebar-stats')
+    const tags = {}
+    data.forEach(a => {
+        if (a.tag) tags[a.tag] = (tags[a.tag] || 0) + 1
+    })
+    const tagLines = Object.entries(tags).map(([k, v]) => `${k}: <b>${v}</b>`).join('<br>')
+    statsEl.innerHTML = `<h4>Статистика</h4><p>Всч статей: <b>${data.length}</b><br>${tagLines || 'Нрт категорий'}</p>`
+}
+
+function setFilter(tag, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'))
+    btn.classList.add('active')
+    currentFilter = tag
+    filterArticles()
+}
+
+function filterArticles() {
+    const query = document.getElementById('search-input').value.toLowerCase()
+    let filtered = allArticles
+
+    if (currentFilter !== 'all') {
+        filtered = filtered.filter(a => a.tag === currentFilter)
+    }
+
+    if (query) {
+        filtered = filtered.filter(a =>
+            (a.title && a.title.toLowerCase().includes(query)) ||
+            (a.description && a.description.toLowerCase().includes(query))
+        )
+    }
+
+    renderArticles(filtered)
+}
+
+document.getElementById('search-input').addEventListener('input', filterArticles)
+
+loadArticles()
+</script>
+
+</body>
+</html>
