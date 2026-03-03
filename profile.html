@@ -318,7 +318,17 @@ let isOwnProfile = false
 let avatarUrl = ''
 let nicknameTimer = null
 
-async function init() {
+async function // Badge tooltips
+document.addEventListener('mouseover', e => {
+    const wrap = e.target.closest('.badge-wrap')
+    if (wrap) wrap.querySelector('.badge-tip').style.display = 'block'
+})
+document.addEventListener('mouseout', e => {
+    const wrap = e.target.closest('.badge-wrap')
+    if (wrap) wrap.querySelector('.badge-tip').style.display = 'none'
+})
+
+init() {
     const params = new URLSearchParams(window.location.search)
     const profileId = params.get('id')
 
@@ -388,6 +398,12 @@ async function renderProfile() {
         ? `<img src="${u.avatar_url}" alt="${u.username}">`
         : `<div class="profile-avatar" style="width:80px;height:80px;border:1px solid #a2a9b1;background:#eaecf0;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:2em;color:#a2a9b1;">${u.username[0].toUpperCase()}</div>`
 
+    const { data: userBadges } = await supabaseClient
+        .from('user_badges')
+        .select('badge_id, granted_at, badges(id, name, description, icon_url)')
+        .eq('user_id', u.id)
+        .order('granted_at', { ascending: true })
+
     const { data: articles } = await supabaseClient
         .from('articles').select('id, title, tag, status, created_at')
         .eq('author', u.username)
@@ -411,6 +427,15 @@ async function renderProfile() {
                 <div class="profile-username">
                     ${u.username}
                     ${renderBadge(u.role)}
+                </div>
+                <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">
+                    ${(userBadges ?? []).map(ub => {
+                        const b = ub.badges
+                        return `<span style="position:relative;display:inline-flex;align-items:center;" class="badge-wrap">
+                            <img src="${b.icon_url}" style="width:20px;height:20px;object-fit:contain;cursor:help;" title="${b.description ?? b.name}" onerror="this.style.display='none'">
+                            <span style="display:none;position:absolute;bottom:26px;left:50%;transform:translateX(-50%);background:#202122;color:#fff;font-size:0.7em;padding:3px 8px;border-radius:2px;white-space:nowrap;z-index:10;pointer-events:none;" class="badge-tip">${b.description ?? b.name}</span>
+                        </span>`
+                    }).join('')}
                 </div>
                 ${u.bio ? `<div class="profile-bio">${u.bio.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>` : '<div class="profile-bio" style="font-style:italic;color:#a2a9b1;">Нрт описания</div>'}
                 <div class="profile-meta">Вч реестре сч: ${joined}</div>
