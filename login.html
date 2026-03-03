@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="icon" type="image/png" href="asset/logo.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход — Муринопедия</title>
+    <link rel="stylesheet" href="css/wiki.css">
+    <style>
+        .auth-wrap {
+            max-width: 420px;
+            margin: 60px auto;
+            background: #fff;
+            border: 1px solid #a2a9b1;
+            padding: 30px;
+        }
+
+        .auth-wrap h1 {
+            font-family: serif;
+            font-weight: normal;
+            font-size: 1.6em;
+            border-bottom: 1px solid #a2a9b1;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .auth-desc {
+            font-size: 0.9em;
+            color: #54595d;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .btn-google {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #a2a9b1;
+            background: #f8f9fa;
+            color: #202122;
+            font-size: 0.95em;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 2px;
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+
+        .btn-google:hover {
+            background: #eaecf0;
+            text-decoration: none;
+        }
+
+        .btn-google svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .divider {
+            text-align: center;
+            color: #a2a9b1;
+            font-size: 0.8em;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 42%;
+            height: 1px;
+            background: #eaecf0;
+        }
+
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+
+        .username-form {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .username-form.visible {
+            display: flex;
+        }
+
+        .username-form input {
+            padding: 8px 10px;
+            border: 1px solid #a2a9b1;
+            font-size: 0.95em;
+            background: #f8f9fa;
+            color: #202122;
+            outline: none;
+            width: 100%;
+        }
+
+        .username-form input:focus {
+            border-color: #3366cc;
+            background: #fff;
+        }
+
+        .username-hint {
+            font-size: 0.8em;
+            color: #54595d;
+        }
+
+        .username-hint.error {
+            color: #d33;
+        }
+
+        .username-hint.success {
+            color: #14866d;
+        }
+
+        .loading-step {
+            text-align: center;
+            color: #54595d;
+            font-size: 0.9em;
+            padding: 10px 0;
+            display: none;
+        }
+
+        .loading-step.visible {
+            display: block;
+        }
+
+        .notice-box {
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-area">
+        <img src="asset/logo.png" alt="М.С.В." class="logo-img">
+        <a href="index.html" class="logo-text">Муринопедия</a>
+    </div>
+    <div class="status-bar">
+        Оперативная обстановка: <span style="color: #d33; font-weight: bold;">СТАБИЛЬНАЯ</span>
+    </div>
+</header>
+
+<div class="auth-wrap">
+    <h1>Вход вч Архив</h1>
+
+    <div id="step-login">
+        <p class="auth-desc">
+            Дляч доступа кч Архиву Знань необходима идентификация.<br>
+            М.С.В. проверяет каждого Людич через защищённый протокол.
+        </p>
+
+        <div class="notice-box info-box">
+            Вч систему можно войти толькч через Google-протокол. Пароли — этость Фог.
+        </div>
+
+        <div class="divider">идентификация</div>
+
+        <button class="btn-google" onclick="loginWithGoogle()">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            Войти через Google
+        </button>
+    </div>
+
+    <div id="step-loading" class="loading-step">
+        Проверка идентификации Людич...
+    </div>
+
+    <div id="step-username" class="username-form">
+        <p class="auth-desc">
+            Идентификация пройдена. Выбери свой позывной вч Архиве — он будет виден другим Людич.
+        </p>
+        <input type="text" id="username-input" placeholder="Твой позывной..." maxlength="20" oninput="checkUsername()">
+        <div class="username-hint" id="username-hint">От 3 до 20 символов. Только буквы, цифры ич _</div>
+        <button class="btn btn-primary" onclick="submitUsername()">Подтвердити позывной</button>
+    </div>
+
+    <div id="step-error" style="display:none;">
+        <div class="warning-box">
+            <b>Смертч-шум вч протоколе</b><br>
+            <span id="error-text">Нрт соединения сч М.С.В.</span>
+        </div>
+        <button class="btn btn-secondary" onclick="location.reload()">Попробовати снова</button>
+    </div>
+</div>
+
+<footer>
+    Муринопедия — 2026 год. <br>
+    Ч илу доной, пока естч светл. Мурино стояти, Фог дрожати.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+let checkTimer = null
+
+function showStep(name) {
+    ['login', 'loading', 'username', 'error'].forEach(s => {
+        const el = document.getElementById('step-' + s)
+        if (!el) return
+        el.style.display = 'none'
+        el.classList && el.classList.remove('visible')
+    })
+    const target = document.getElementById('step-' + name)
+    if (!target) return
+    target.style.display = 'flex'
+    target.classList && target.classList.add('visible')
+    if (name === 'loading') {
+        target.style.display = 'block'
+    }
+}
+
+async function loginWithGoogle() {
+    const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo: 'https://pap3ryyy.github.io/murinopedia/login.html'
+        }
+    })
+    if (error) showError(error.message)
+}
+
+async function handleSession() {
+    const { data: { session } } = await supabaseClient.auth.getSession()
+    if (!session) return
+
+    showStep('loading')
+
+    const { data: existing } = await supabaseClient
+        .from('users')
+        .select('username')
+        .eq('id', session.user.id)
+        .single()
+
+    if (existing) {
+        window.location.href = 'index.html'
+        return
+    }
+
+    showStep('username')
+}
+
+async function checkUsername() {
+    const val = document.getElementById('username-input').value
+    const hint = document.getElementById('username-hint')
+
+    clearTimeout(checkTimer)
+
+    if (val.length < 3) {
+        hint.className = 'username-hint'
+        hint.textContent = 'От 3 до 20 символов. Только буквы, цифры ич _'
+        return
+    }
+
+    if (!/^[a-zA-Zа-яА-ЯёЁ0-9_]+$/.test(val)) {
+        hint.className = 'username-hint error'
+        hint.textContent = 'Недопустимые символы — Фог вч позывном'
+        return
+    }
+
+    hint.className = 'username-hint'
+    hint.textContent = 'Проверка...'
+
+    checkTimer = setTimeout(async () => {
+        const { data } = await supabaseClient
+            .from('users')
+            .select('username')
+            .eq('username', val)
+            .single()
+
+        if (data) {
+            hint.className = 'username-hint error'
+            hint.textContent = 'Этот позывной уже занят другим Людич'
+        } else {
+            hint.className = 'username-hint success'
+            hint.textContent = 'Позывной свободен — можно подтвердити'
+        }
+    }, 500)
+}
+
+async function submitUsername() {
+    const val = document.getElementById('username-input').value
+    const hint = document.getElementById('username-hint')
+
+    if (val.length < 3 || !/^[a-zA-Zа-яА-ЯёЁ0-9_]+$/.test(val)) {
+        hint.className = 'username-hint error'
+        hint.textContent = 'Проверь позывной — Фог обнаруженол'
+        return
+    }
+
+    const { data: { session } } = await supabaseClient.auth.getSession()
+    if (!session) { showError('Нрт сессии — войди снова'); return }
+
+    const { error } = await supabaseClient.from('users').insert({
+        id: session.user.id,
+        username: val
+    })
+
+    if (error) {
+        if (error.code === '23505') {
+            hint.className = 'username-hint error'
+            hint.textContent = 'Этот позывной уже занят другим Людич'
+        } else {
+            showError(error.message)
+        }
+        return
+    }
+
+    window.location.href = 'index.html'
+}
+
+function showError(msg) {
+    document.getElementById('error-text').textContent = msg
+    showStep('error')
+}
+
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+        showStep('loading')
+
+        const { data: existing } = await supabaseClient
+            .from('users')
+            .select('username')
+            .eq('id', session.user.id)
+            .single()
+
+        if (existing) {
+            window.location.href = 'index.html'
+            return
+        }
+
+        showStep('username')
+    }
+})
+
+handleSession()
+</script>
+
+</body>
+</html>
