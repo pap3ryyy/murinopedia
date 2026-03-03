@@ -218,7 +218,7 @@ let currentFilter = 'all'
 
 async function init() {
     const { data: { session } } = await supabaseClient.auth.getSession()
-    if (session) { document.getElementById('fab').style.display = 'flex'; document.getElementById('create-btn').style.display = 'inline-block'; }
+    if (session) { const btn = document.getElementById('create-btn'); if (btn) btn.style.display = 'inline-block'; }
     await loadArticles()
 }
 
