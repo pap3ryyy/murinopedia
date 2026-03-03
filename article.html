@@ -14,8 +14,8 @@
             background: #f8f9fa;
             border: 1px solid #a2a9b1;
             font-size: 0.9em;
-            min-width: 200px;
-            max-width: 280px;
+            min-width: 180px;
+            max-width: 260px;
         }
 
         .infobox-title {
@@ -28,11 +28,21 @@
             font-family: serif;
         }
 
+        .infobox-image {
+            width: 100%;
+            overflow: hidden;
+            max-height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eaecf0;
+        }
+
         .infobox-image img {
             width: 100%;
-            display: block;
-            max-height: 200px;
+            height: 180px;
             object-fit: cover;
+            display: block;
         }
 
         .infobox-table {
@@ -44,14 +54,14 @@
             padding: 4px 8px;
             vertical-align: top;
             border-top: 1px solid #eaecf0;
-            font-size: 0.9em;
+            font-size: 0.88em;
         }
 
         .infobox-table td:first-child {
             font-weight: bold;
             color: #54595d;
             white-space: nowrap;
-            width: 40%;
+            width: 42%;
         }
 
         .meta-infobox {
@@ -61,7 +71,7 @@
             background: #f8f9fa;
             border: 1px solid #a2a9b1;
             font-size: 0.85em;
-            min-width: 200px;
+            min-width: 180px;
             max-width: 260px;
         }
 
@@ -71,39 +81,19 @@
             font-size: 0.9em;
         }
 
-        .meta-infobox .infobox-table td {
-            font-size: 0.85em;
-        }
-
         .review-badge {
             display: inline-block;
-            padding: 2px 7px;
+            padding: 2px 6px;
             border-radius: 2px;
             font-size: 0.8em;
             font-weight: bold;
         }
 
-        .review-badge.verified {
-            background: #d4f5e9;
-            color: #14866d;
-            border: 1px solid #14866d;
-        }
+        .review-badge.verified { background: #d4f5e9; color: #14866d; border: 1px solid #14866d; }
+        .review-badge.msv { background: #cee0f2; color: #3366cc; border: 1px solid #3366cc; }
+        .review-badge.pending { background: #fef6e4; color: #c8a850; border: 1px solid #c8a850; }
 
-        .review-badge.msv {
-            background: #cee0f2;
-            color: #3366cc;
-            border: 1px solid #3366cc;
-        }
-
-        .review-badge.pending {
-            background: #fef6e4;
-            color: #c8a850;
-            border: 1px solid #c8a850;
-        }
-
-        .article-content {
-            line-height: 1.7;
-        }
+        .article-content { line-height: 1.7; }
 
         .article-content h2 {
             font-family: serif;
@@ -128,10 +118,15 @@
             font-style: italic;
         }
 
-        .article-content img {
+        .article-content .content-image {
             max-width: 100%;
+            max-height: 500px;
+            width: auto;
+            height: auto;
             border: 1px solid #a2a9b1;
-            margin: 10px 0;
+            margin: 12px 0;
+            display: block;
+            object-fit: contain;
         }
 
         .article-content .inline-image-placeholder {
@@ -142,14 +137,6 @@
             color: #54595d;
             font-size: 0.85em;
             margin: 10px 0;
-        }
-
-        .article-meta {
-            font-size: 0.82em;
-            color: #54595d;
-            border-bottom: 1px solid #eaecf0;
-            padding-bottom: 8px;
-            margin-bottom: 16px;
         }
 
         .article-actions {
@@ -186,9 +173,7 @@
             transition: background 0.1s;
         }
 
-        .like-btn:hover {
-            background: #eaecf0;
-        }
+        .like-btn:hover { background: #eaecf0; }
 
         .like-btn.liked {
             background: #cee0f2;
@@ -197,10 +182,7 @@
             font-weight: bold;
         }
 
-        .views-count {
-            color: #a2a9b1;
-            font-size: 0.85em;
-        }
+        .views-count { color: #a2a9b1; font-size: 0.85em; }
 
         .comments-section {
             margin-top: 32px;
@@ -215,9 +197,7 @@
             margin-bottom: 16px;
         }
 
-        .comment-form {
-            margin-bottom: 24px;
-        }
+        .comment-form { margin-bottom: 24px; }
 
         .comment-form textarea {
             width: 100%;
@@ -232,10 +212,7 @@
             min-height: 80px;
         }
 
-        .comment-form textarea:focus {
-            border-color: #3366cc;
-            background: #fff;
-        }
+        .comment-form textarea:focus { border-color: #3366cc; background: #fff; }
 
         .comment-form-actions {
             display: flex;
@@ -265,14 +242,8 @@
             font-size: 0.85em;
         }
 
-        .comment-author {
-            font-weight: bold;
-            color: #0645ad;
-        }
-
-        .comment-date {
-            color: #a2a9b1;
-        }
+        .comment-author { font-weight: bold; color: #0645ad; }
+        .comment-date { color: #a2a9b1; }
 
         .comment-content {
             font-size: 0.9em;
@@ -280,11 +251,7 @@
             margin-bottom: 8px;
         }
 
-        .comment-actions {
-            display: flex;
-            gap: 12px;
-            font-size: 0.8em;
-        }
+        .comment-actions { display: flex; gap: 12px; font-size: 0.8em; }
 
         .comment-btn {
             background: none;
@@ -298,11 +265,7 @@
         .comment-btn:hover { color: #0645ad; }
         .comment-btn.liked { color: #3366cc; font-weight: bold; }
 
-        .reply-form {
-            margin-top: 10px;
-            display: none;
-        }
-
+        .reply-form { margin-top: 10px; display: none; }
         .reply-form.visible { display: block; }
 
         .reply-form textarea {
@@ -319,18 +282,9 @@
         }
 
         .reply-form textarea:focus { border-color: #3366cc; }
+        .reply-form-actions { display: flex; gap: 6px; margin-top: 4px; }
 
-        .reply-form-actions {
-            display: flex;
-            gap: 6px;
-            margin-top: 4px;
-        }
-
-        .no-comments {
-            color: #54595d;
-            font-size: 0.9em;
-            font-style: italic;
-        }
+        .no-comments { color: #54595d; font-size: 0.9em; font-style: italic; }
 
         .login-prompt {
             background: #f8f9fa;
@@ -347,17 +301,9 @@
             background: #f8f9fa;
         }
 
-        .state-box-title {
-            font-family: serif;
-            font-size: 1.3em;
-            margin-bottom: 8px;
-        }
+        .state-box-title { font-family: serif; font-size: 1.3em; margin-bottom: 8px; }
 
-        .state-box.error {
-            border-color: #d33;
-            background: #fee7e6;
-        }
-
+        .state-box.error { border-color: #d33; background: #fee7e6; }
         .state-box.error .state-box-title { color: #d33; }
 
         .pinned-badge {
@@ -365,10 +311,10 @@
             background: #fef6e4;
             border: 1px solid #c8a850;
             color: #c8a850;
-            font-size: 0.75em;
+            font-size: 0.7em;
             padding: 2px 8px;
             font-weight: bold;
-            margin-left: 10px;
+            margin-right: 8px;
             vertical-align: middle;
         }
     </style>
@@ -419,7 +365,6 @@ let articleLiked = false
 async function init() {
     const params = new URLSearchParams(window.location.search)
     articleId = params.get('id')
-
     if (!articleId) { showError('Нрт идентификатора Знань'); return }
 
     const { data: { session } } = await supabaseClient.auth.getSession()
@@ -444,8 +389,7 @@ async function loadArticle() {
     }
 
     await supabaseClient.from('articles')
-        .update({ views_count: (article.views_count ?? 0) + 1 })
-        .eq('id', articleId)
+        .update({ views_count: (article.views_count ?? 0) + 1 }).eq('id', articleId)
 
     if (currentUserId) {
         const { data: alreadyLiked } = await supabaseClient
@@ -461,21 +405,14 @@ async function loadArticle() {
 }
 
 function renderReviewBadge(article) {
-    if (article.status === 'pending') {
-        return `<span class="review-badge pending">На проверке</span>`
-    }
-    if (article.reviewed_by) {
-        return `<span class="review-badge verified">Проверена М.С.В. — ${article.reviewed_by}</span>`
-    }
+    if (article.status === 'pending') return `<span class="review-badge pending">На проверке</span>`
+    if (article.reviewed_by) return `<span class="review-badge verified">Проверена — ${article.reviewed_by}</span>`
     return `<span class="review-badge msv">Опубликована без проверки (М.С.В.)</span>`
 }
 
 function renderMetaInfobox(article) {
     const created = new Date(article.created_at).toLocaleDateString('ru-RU')
-    const reviewed = article.reviewed_at
-        ? new Date(article.reviewed_at).toLocaleDateString('ru-RU')
-        : '—'
-
+    const reviewed = article.reviewed_at ? new Date(article.reviewed_at).toLocaleDateString('ru-RU') : '—'
     return `
         <div class="meta-infobox">
             <span class="infobox-title">Сведения о Знань</span>
@@ -492,11 +429,45 @@ function renderMetaInfobox(article) {
     `
 }
 
+function renderContentInfobox(article) {
+    const fields = article.infobox ?? []
+    const hasCover = article.cover_url
+    const hasFields = fields.length > 0
+    if (!hasCover && !hasFields) return ''
+    return `
+        <div class="article-infobox">
+            <span class="infobox-title">${article.title}</span>
+            ${hasCover ? `<div class="infobox-image"><img src="${article.cover_url}" alt="${article.title}"></div>` : ''}
+            ${hasFields ? `
+            <table class="infobox-table">
+                ${fields.map(f => `<tr><td>${f.label}</td><td>${f.value}</td></tr>`).join('')}
+            </table>` : ''}
+        </div>
+    `
+}
+
+function renderContent(content, imageUrl) {
+    if (!content) return ''
+    let html = content
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/&lt;image&gt;/g, imageUrl
+            ? `<img class="content-image" src="${imageUrl}" alt="Картинка">`
+            : `<div class="inline-image-placeholder">Нрт картинки дляч этого тега</div>`)
+        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+
+    return html.split('\n').map(line => {
+        if (/^<(h2|h3|blockquote|img|div)/.test(line)) return line
+        if (line.trim() === '') return '<br>'
+        return `<p>${line}</p>`
+    }).join('')
+}
+
 function renderArticle(article) {
     const isMsv = currentRole === 'м.с.в.'
-    const contentInfobox = renderContentInfobox(article)
-    const metaInfobox = renderMetaInfobox(article)
-    const contentHtml = renderContent(article.content, article.image_url)
 
     document.getElementById('main-content').innerHTML = `
         <h1 style="font-family:serif;font-weight:normal;font-size:2em;border-bottom:1px solid #a2a9b1;padding-bottom:5px;margin-bottom:10px;">
@@ -506,18 +477,16 @@ function renderArticle(article) {
 
         ${isMsv ? `
         <div class="article-actions">
-            <button class="btn btn-secondary" onclick="togglePin(${article.pinned})">
-                ${article.pinned ? 'Открепити' : 'Закрепити'}
-            </button>
+            <button class="btn btn-secondary" onclick="togglePin(${article.pinned})">${article.pinned ? 'Открепити' : 'Закрепити'}</button>
             <button class="btn btn-danger" onclick="deleteArticle()">Удалити Знань</button>
             ${article.status === 'pending' ? `<button class="btn btn-primary" onclick="publishArticle()">Опубликовати</button>` : ''}
         </div>
         ` : ''}
 
         <div class="article-content clearfix">
-            ${metaInfobox}
-            ${contentInfobox}
-            ${contentHtml}
+            ${renderMetaInfobox(article)}
+            ${renderContentInfobox(article)}
+            ${renderContent(article.content, article.image_url)}
         </div>
 
         <div class="like-bar">
@@ -536,48 +505,8 @@ function renderArticle(article) {
     `
 }
 
-function renderContentInfobox(article) {
-    const fields = article.infobox ?? []
-    const hasImage = article.image_url
-    const hasFields = fields.length > 0
-    if (!hasImage && !hasFields) return ''
-
-    return `
-        <div class="article-infobox">
-            <span class="infobox-title">${article.title}</span>
-            ${hasImage ? `<div class="infobox-image"><img src="${article.image_url}" alt="${article.title}"></div>` : ''}
-            ${hasFields ? `
-            <table class="infobox-table">
-                ${fields.map(f => `<tr><td>${f.label}</td><td>${f.value}</td></tr>`).join('')}
-            </table>` : ''}
-        </div>
-    `
-}
-
-function renderContent(content, imageUrl) {
-    if (!content) return ''
-    let html = content
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/&lt;image&gt;/g, imageUrl
-            ? `<img src="${imageUrl}" alt="Картинка">`
-            : `<div class="inline-image-placeholder">Нрт картинки дляч этого тега</div>`)
-        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.+?)\*/g, '<em>$1</em>')
-        .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
-
-    return html.split('\n').map(line => {
-        if (/^<(h2|h3|blockquote|img|div)/.test(line)) return line
-        if (line.trim() === '') return '<br>'
-        return `<p>${line}</p>`
-    }).join('')
-}
-
 function renderCommentForm() {
-    if (!currentUser) {
-        return `<div class="login-prompt">Дляч участия вч обсуждении необходима идентификация. <a href="login.html">Войти вч систему</a></div>`
-    }
+    if (!currentUser) return `<div class="login-prompt">Дляч участия вч обсуждении необходима идентификация. <a href="login.html">Войти вч систему</a></div>`
     return `
         <div class="comment-form">
             <textarea id="new-comment" placeholder="Пиши своё Знань вч обсуждение..."></textarea>
@@ -591,38 +520,31 @@ function renderCommentForm() {
 
 async function toggleArticleLike() {
     if (!currentUserId) { window.location.href = 'login.html'; return }
-
     const btn = document.getElementById('like-btn')
     const countEl = document.getElementById('likes-count')
 
     if (articleLiked) {
-        await supabaseClient.from('article_likes')
-            .delete().eq('article_id', articleId).eq('user_id', currentUserId)
-        await supabaseClient.from('articles')
-            .update({ likes_count: supabaseClient.rpc('decrement', { x: 1 }) })
-            .eq('id', articleId)
+        await supabaseClient.from('article_likes').delete()
+            .eq('article_id', articleId).eq('user_id', currentUserId)
         articleLiked = false
     } else {
-        await supabaseClient.from('article_likes')
-            .insert({ article_id: articleId, user_id: currentUserId })
-        await supabaseClient.from('articles')
-            .update({ likes_count: supabaseClient.rpc('increment', { x: 1 }) })
-            .eq('id', articleId)
+        await supabaseClient.from('article_likes').insert({ article_id: articleId, user_id: currentUserId })
         articleLiked = true
     }
 
-    const { data } = await supabaseClient
-        .from('articles').select('likes_count').eq('id', articleId).single()
+    const newCount = articleLiked
+        ? (parseInt(countEl.textContent) || 0) + 1
+        : Math.max((parseInt(countEl.textContent) || 1) - 1, 0)
 
+    await supabaseClient.from('articles').update({ likes_count: newCount }).eq('id', articleId)
     btn.className = `like-btn ${articleLiked ? 'liked' : ''}`
     btn.textContent = `▲ ${articleLiked ? 'Лайк поставленол' : 'Поставити лайк'}`
-    if (countEl) countEl.textContent = `${data?.likes_count ?? 0} лайков`
+    countEl.textContent = `${newCount} лайков`
 }
 
 async function togglePin(currentlyPinned) {
     if (currentRole !== 'м.с.в.') return
-    await supabaseClient.from('articles')
-        .update({ pinned: !currentlyPinned }).eq('id', articleId)
+    await supabaseClient.from('articles').update({ pinned: !currentlyPinned }).eq('id', articleId)
     window.location.reload()
 }
 
@@ -645,8 +567,7 @@ async function deleteArticle() {
 
 async function loadUserCommentLikes() {
     if (!currentUserId) return
-    const { data } = await supabaseClient
-        .from('likes').select('comment_id').eq('user_id', currentUserId)
+    const { data } = await supabaseClient.from('likes').select('comment_id').eq('user_id', currentUserId)
     if (data) data.forEach(l => userCommentLikes.add(l.comment_id))
 }
 
@@ -657,7 +578,6 @@ async function loadComments() {
 
     const container = document.getElementById('comments-list')
     if (!container) return
-
     if (error) { container.innerHTML = '<p style="color:#d33;">Смертч-шум вч обсуждении</p>'; return }
     if (!data || data.length === 0) {
         container.innerHTML = '<p class="no-comments">Нрт обсуждения — будь первым Людич</p>'
@@ -666,10 +586,8 @@ async function loadComments() {
 
     const roots = data.filter(c => !c.parent_id)
     const replies = data.filter(c => c.parent_id)
-
     container.innerHTML = roots.map(c => {
-        const commentReplies = replies.filter(r => r.parent_id === c.id)
-        return renderComment(c) + commentReplies.map(r => renderComment(r, true)).join('')
+        return renderComment(c) + replies.filter(r => r.parent_id === c.id).map(r => renderComment(r, true)).join('')
     }).join('')
 }
 
@@ -677,7 +595,6 @@ function renderComment(c, isReply = false) {
     const likeCount = c.likes?.[0]?.count ?? 0
     const liked = userCommentLikes.has(c.id)
     const date = new Date(c.created_at).toLocaleDateString('ru-RU')
-
     return `
         <div class="comment ${isReply ? 'reply' : ''}" id="comment-${c.id}">
             <div class="comment-header">
@@ -711,8 +628,7 @@ async function toggleCommentLike(commentId) {
     if (!currentUserId) { window.location.href = 'login.html'; return }
     const liked = userCommentLikes.has(commentId)
     if (liked) {
-        await supabaseClient.from('likes').delete()
-            .eq('comment_id', commentId).eq('user_id', currentUserId)
+        await supabaseClient.from('likes').delete().eq('comment_id', commentId).eq('user_id', currentUserId)
         userCommentLikes.delete(commentId)
     } else {
         await supabaseClient.from('likes').insert({ comment_id: commentId, user_id: currentUserId })

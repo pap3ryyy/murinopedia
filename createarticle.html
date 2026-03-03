@@ -24,14 +24,19 @@
             margin-bottom: 24px;
         }
 
-        .field-group {
-            margin-bottom: 18px;
-        }
+        .field-group { margin-bottom: 18px; }
 
         .field-label {
             font-size: 0.85em;
             font-weight: bold;
             color: #54595d;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .field-hint {
+            font-size: 0.78em;
+            color: #a2a9b1;
             margin-bottom: 5px;
             display: block;
         }
@@ -52,9 +57,7 @@
             background: #fff;
         }
 
-        select.field-input {
-            cursor: pointer;
-        }
+        select.field-input { cursor: pointer; }
 
         textarea.field-input {
             min-height: 300px;
@@ -102,9 +105,7 @@
             width: 100%;
         }
 
-        .infobox-row input:focus {
-            border-color: #3366cc;
-        }
+        .infobox-row input:focus { border-color: #3366cc; }
 
         .btn-remove {
             background: none;
@@ -117,19 +118,45 @@
             white-space: nowrap;
         }
 
-        .btn-remove:hover {
-            background: #fee7e6;
+        .btn-remove:hover { background: #fee7e6; }
+
+        .image-section {
+            border: 1px solid #a2a9b1;
+            padding: 15px;
+            background: #f8f9fa;
+            margin-bottom: 18px;
+        }
+
+        .image-section h3 {
+            margin: 0 0 12px 0;
+            font-size: 1em;
+            font-family: serif;
+            font-weight: normal;
+            border-bottom: 1px solid #eaecf0;
+            padding-bottom: 6px;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .image-block h4 {
+            margin: 0 0 8px 0;
+            font-size: 0.85em;
+            color: #54595d;
         }
 
         .image-tabs {
             display: flex;
             border-bottom: 1px solid #a2a9b1;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .image-tab {
-            padding: 6px 16px;
-            font-size: 0.85em;
+            padding: 5px 12px;
+            font-size: 0.8em;
             cursor: pointer;
             border: 1px solid transparent;
             border-bottom: none;
@@ -145,55 +172,47 @@
             font-weight: bold;
         }
 
-        .image-tab-content {
-            display: none;
-        }
-
-        .image-tab-content.active {
-            display: block;
-        }
+        .image-tab-content { display: none; }
+        .image-tab-content.active { display: block; }
 
         .image-preview {
             border: 1px solid #a2a9b1;
-            background: #f8f9fa;
-            padding: 0;
-            margin-bottom: 10px;
+            background: #fff;
+            margin-bottom: 8px;
             text-align: center;
-            min-height: 60px;
+            min-height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #54595d;
-            font-size: 0.85em;
+            color: #a2a9b1;
+            font-size: 0.82em;
+            overflow: hidden;
         }
 
         .image-preview img {
             max-width: 100%;
-            max-height: 200px;
+            max-height: 160px;
             display: block;
-            margin: 0 auto;
+            object-fit: contain;
         }
 
         .upload-zone {
             border: 2px dashed #a2a9b1;
             background: #f8f9fa;
-            padding: 24px;
+            padding: 16px;
             text-align: center;
             color: #54595d;
             cursor: pointer;
             transition: border-color 0.15s;
-            margin-bottom: 8px;
-            font-size: 0.9em;
+            font-size: 0.82em;
         }
 
-        .upload-zone:hover {
-            border-color: #3366cc;
-        }
+        .upload-zone:hover { border-color: #3366cc; }
 
         .upload-status {
-            font-size: 0.8em;
+            font-size: 0.78em;
             color: #54595d;
-            margin-top: 6px;
+            margin-top: 4px;
         }
 
         .upload-status.error { color: #d33; }
@@ -222,9 +241,7 @@
             color: #202122;
         }
 
-        .toolbar-btn:hover {
-            background: #eaecf0;
-        }
+        .toolbar-btn:hover { background: #eaecf0; }
 
         .submit-bar {
             display: flex;
@@ -235,24 +252,12 @@
             border-top: 1px solid #eaecf0;
         }
 
-        .status-msg {
-            font-size: 0.85em;
-            color: #54595d;
-        }
-
+        .status-msg { font-size: 0.85em; color: #54595d; }
         .status-msg.error { color: #d33; }
         .status-msg.success { color: #14866d; }
 
-        .access-denied {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .access-denied h2 {
-            font-family: serif;
-            font-weight: normal;
-            color: #d33;
-        }
+        .access-denied { text-align: center; padding: 60px 20px; }
+        .access-denied h2 { font-family: serif; font-weight: normal; color: #d33; }
     </style>
 </head>
 <body>
@@ -282,27 +287,17 @@
 let currentUser = null
 let currentRole = null
 let infoboxFields = []
-let imageUrl = ''
-let activeImageTab = 'url'
+let coverUrl = ''
+let contentImageUrl = ''
 
 async function init() {
     const { data: { session } } = await supabaseClient.auth.getSession()
-
-    if (!session) {
-        showDenied('Нрт идентификации — войди вч систему')
-        return
-    }
+    if (!session) { showDenied('Нрт идентификации — войди вч систему'); return }
 
     const { data: user } = await supabaseClient
-        .from('users')
-        .select('username, role')
-        .eq('id', session.user.id)
-        .single()
+        .from('users').select('username, role').eq('id', session.user.id).single()
 
-    if (!user) {
-        showDenied('Людич нрт найденол вч реестре')
-        return
-    }
+    if (!user) { showDenied('Людич нрт найденол вч реестре'); return }
 
     currentUser = user.username
     currentRole = user.role
@@ -354,26 +349,48 @@ function renderEditor() {
             <button class="btn btn-secondary" onclick="addInfoboxField()" style="margin-top:8px;">+ Добавить поле</button>
         </div>
 
-        <div class="field-group">
-            <label class="field-label">Картинка статьи</label>
+        <div class="image-section">
+            <h3>Картинки</h3>
+            <div class="image-grid">
 
-            <div class="image-preview" id="img-preview">Нрт картинки</div>
-
-            <div class="image-tabs">
-                <button class="image-tab active" id="tab-url" onclick="switchImageTab('url')">По URL</button>
-                <button class="image-tab" id="tab-upload" onclick="switchImageTab('upload')">Загрузити файл</button>
-            </div>
-
-            <div class="image-tab-content active" id="tab-content-url">
-                <input type="text" class="field-input" id="img-url-input" placeholder="https://example.com/image.png" oninput="previewImageUrl(this.value)">
-            </div>
-
-            <div class="image-tab-content" id="tab-content-upload">
-                <div class="upload-zone" onclick="document.getElementById('file-input').click()">
-                    Нажми дляч выбора PNG / JPG / WebP
-                    <input type="file" id="file-input" accept="image/png,image/jpeg,image/webp" onchange="uploadFile(this)">
+                <div class="image-block">
+                    <h4>Обложка (инфобокс) — макс. 300×200px</h4>
+                    <div class="image-preview" id="cover-preview">Нрт обложки</div>
+                    <div class="image-tabs">
+                        <button class="image-tab active" id="cover-tab-url" onclick="switchTab('cover','url')">URL</button>
+                        <button class="image-tab" id="cover-tab-upload" onclick="switchTab('cover','upload')">Файл</button>
+                    </div>
+                    <div class="image-tab-content active" id="cover-content-url">
+                        <input type="text" class="field-input" id="cover-url-input" placeholder="https://..." oninput="previewUrl('cover', this.value)">
+                    </div>
+                    <div class="image-tab-content" id="cover-content-upload">
+                        <div class="upload-zone" onclick="document.getElementById('cover-file').click()">
+                            Выбери PNG / JPG / WebP
+                            <input type="file" id="cover-file" accept="image/png,image/jpeg,image/webp" onchange="uploadImage(this,'cover')">
+                        </div>
+                        <div class="upload-status" id="cover-upload-status"></div>
+                    </div>
                 </div>
-                <div class="upload-status" id="upload-status"></div>
+
+                <div class="image-block">
+                    <h4>Картинка для &lt;image&gt; в тексте — макс. 800×500px</h4>
+                    <div class="image-preview" id="content-preview">Нрт картинки</div>
+                    <div class="image-tabs">
+                        <button class="image-tab active" id="content-tab-url" onclick="switchTab('content','url')">URL</button>
+                        <button class="image-tab" id="content-tab-upload" onclick="switchTab('content','upload')">Файл</button>
+                    </div>
+                    <div class="image-tab-content active" id="content-content-url">
+                        <input type="text" class="field-input" id="content-url-input" placeholder="https://..." oninput="previewUrl('content', this.value)">
+                    </div>
+                    <div class="image-tab-content" id="content-content-upload">
+                        <div class="upload-zone" onclick="document.getElementById('content-file').click()">
+                            Выбери PNG / JPG / WebP
+                            <input type="file" id="content-file" accept="image/png,image/jpeg,image/webp" onchange="uploadImage(this,'content')">
+                        </div>
+                        <div class="upload-status" id="content-upload-status"></div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -411,42 +428,42 @@ function renderEditor() {
     renderInfoboxFields()
 }
 
-function switchImageTab(tab) {
-    activeImageTab = tab
-    document.getElementById('tab-url').classList.toggle('active', tab === 'url')
-    document.getElementById('tab-upload').classList.toggle('active', tab === 'upload')
-    document.getElementById('tab-content-url').classList.toggle('active', tab === 'url')
-    document.getElementById('tab-content-upload').classList.toggle('active', tab === 'upload')
+function switchTab(type, tab) {
+    document.getElementById(`${type}-tab-url`).classList.toggle('active', tab === 'url')
+    document.getElementById(`${type}-tab-upload`).classList.toggle('active', tab === 'upload')
+    document.getElementById(`${type}-content-url`).classList.toggle('active', tab === 'url')
+    document.getElementById(`${type}-content-upload`).classList.toggle('active', tab === 'upload')
 }
 
-function previewImageUrl(url) {
-    imageUrl = url
-    updatePreview(url)
+function previewUrl(type, url) {
+    if (type === 'cover') coverUrl = url
+    else contentImageUrl = url
+    updatePreview(type, url)
 }
 
-function updatePreview(url) {
-    const preview = document.getElementById('img-preview')
+function updatePreview(type, url) {
+    const preview = document.getElementById(type + '-preview')
     if (url) {
-        preview.innerHTML = `<img src="${url}" onerror="this.parentElement.textContent='Нрт — картинка нрт загружалость'">`
+        preview.innerHTML = `<img src="${url}" onerror="this.parentElement.textContent='Нрт — нрт загружалость'">`
     } else {
-        preview.textContent = 'Нрт картинки'
+        preview.textContent = type === 'cover' ? 'Нрт обложки' : 'Нрт картинки'
     }
 }
 
-async function uploadFile(input) {
+async function uploadImage(input, type) {
     const file = input.files[0]
     if (!file) return
 
-    const status = document.getElementById('upload-status')
+    const status = document.getElementById(type + '-upload-status')
     status.className = 'upload-status'
     status.textContent = 'Загружати...'
 
     const ext = file.name.split('.').pop()
-    const fileName = `${Date.now()}.${ext}`
+    const folder = type === 'cover' ? 'covers' : 'content'
+    const fileName = `${folder}/${Date.now()}.${ext}`
 
-    const { data, error } = await supabaseClient.storage
-        .from('images')
-        .upload(fileName, file, { upsert: false })
+    const { error } = await supabaseClient.storage
+        .from('images').upload(fileName, file, { upsert: false })
 
     if (error) {
         status.className = 'upload-status error'
@@ -454,14 +471,15 @@ async function uploadFile(input) {
         return
     }
 
-    const { data: urlData } = supabaseClient.storage
-        .from('images')
-        .getPublicUrl(fileName)
+    const { data: urlData } = supabaseClient.storage.from('images').getPublicUrl(fileName)
+    const url = urlData.publicUrl
 
-    imageUrl = urlData.publicUrl
+    if (type === 'cover') coverUrl = url
+    else contentImageUrl = url
+
     status.className = 'upload-status success'
     status.textContent = 'Загруженол: ' + file.name
-    updatePreview(imageUrl)
+    updatePreview(type, url)
 }
 
 function addInfoboxField() {
@@ -519,7 +537,8 @@ async function submitArticle() {
         content,
         author: currentUser,
         status,
-        image_url: imageUrl || null,
+        cover_url: coverUrl || null,
+        image_url: contentImageUrl || null,
         infobox: infoboxFields.filter(f => f.label || f.value)
     }).select().single()
 
@@ -531,10 +550,7 @@ async function submitArticle() {
 
     msg.className = 'status-msg success'
     msg.textContent = 'Знань отправленол!'
-
-    setTimeout(() => {
-        window.location.href = 'article.html?id=' + data.id
-    }, 1000)
+    setTimeout(() => { window.location.href = 'article.html?id=' + data.id }, 1000)
 }
 
 init()
