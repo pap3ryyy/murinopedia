@@ -326,8 +326,11 @@
         <img src="asset/logo.png" alt="М.С.В." class="logo-img">
         <a href="index.html" class="logo-text">Муринопедия</a>
     </div>
-    <div class="status-bar">
-        Оперативная обстановка: <span style="color: #d33; font-weight: bold;">СТАБИЛЬНАЯ</span>
+    <div style="display:flex;align-items:center;gap:12px;">
+        <div class="status-bar">
+            Оперативная обстановка: <span style="color: #d33; font-weight: bold;">СТАБИЛЬНАЯ</span>
+        </div>
+        <div id="header-user" style="font-size:0.85em;color:#54595d;"></div>
     </div>
 </header>
 
@@ -376,6 +379,22 @@ async function init() {
     }
 
     await loadArticle()
+    renderHeaderUser()
+}
+
+function renderHeaderUser() {
+    const el = document.getElementById('header-user')
+    if (!el) return
+    if (currentUser) {
+        el.innerHTML = `<span>${currentUser}</span> &nbsp;<button onclick="logout()" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;">Выйти</button>`
+    } else {
+        el.innerHTML = `<a href="login.html" style="font-size:0.85em;">Войти</a>`
+    }
+}
+
+async function logout() {
+    await supabaseClient.auth.signOut()
+    window.location.href = 'login.html'
 }
 
 async function loadArticle() {
@@ -388,8 +407,14 @@ async function loadArticle() {
         return
     }
 
-    await supabaseClient.from('articles')
-        .update({ views_count: (article.views_count ?? 0) + 1 }).eq('id', articleId)
+    if (currentUserId) {
+        const { error: viewError } = await supabaseClient.from('article_views')
+            .insert({ article_id: articleId, user_id: currentUserId })
+        if (!viewError) {
+            await supabaseClient.from('articles')
+                .update({ views_count: (article.views_count ?? 0) + 1 }).eq('id', articleId)
+        }
+    }
 
     if (currentUserId) {
         const { data: alreadyLiked } = await supabaseClient
