@@ -145,6 +145,51 @@
             font-size: 0.9em;
             padding: 20px 0;
         }
+
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 52px;
+            height: 52px;
+            background: #3366cc;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.8em;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: background 0.15s;
+            line-height: 1;
+        }
+
+        .fab:hover {
+            background: #2a4b8d;
+            text-decoration: none;
+        }
+
+        .fab-tooltip {
+            position: fixed;
+            bottom: 38px;
+            right: 90px;
+            background: #202122;
+            color: #fff;
+            font-size: 0.8em;
+            padding: 4px 10px;
+            border-radius: 2px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s;
+            white-space: nowrap;
+        }
+
+        .fab:hover ~ .fab-tooltip {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -198,6 +243,9 @@
     </aside>
 </div>
 
+<a href="create.html" class="fab" id="fab" style="display:none;">+</a>
+<div class="fab-tooltip">Создати Знань</div>
+
 <footer>
     Муринопедия — 2026 год. <br>
     Ч илу доной, пока естч светл. Мурино стояти, Фог дрожати.
@@ -209,11 +257,13 @@
 let allArticles = []
 let currentFilter = 'all'
 
-async function loadArticles()
+async function init() {
+    const { data: { session } } = await supabaseClient.auth.getSession()
+    if (session) document.getElementById('fab').style.display = 'flex'
+    await loadArticles()
+}
 
-supabaseClient.auth.getSession().then(({ data: { session } }) => {
-    if (session) document.getElementById('fab-wrap').style.display = 'block'
-}) {
+async function loadArticles() {
     const container = document.getElementById('articles-container')
     const statsEl = document.getElementById('sidebar-stats')
 
@@ -317,52 +367,8 @@ function filterArticles() {
 
 document.getElementById('search-input').addEventListener('input', filterArticles)
 
-loadArticles()
+init()
 </script>
-
-<style>
-.fab {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 52px;
-    height: 52px;
-    background: #3366cc;
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    font-size: 1.8em;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    transition: background 0.15s;
-    line-height: 1;
-}
-.fab:hover { background: #2a4b8d; text-decoration: none; }
-.fab-tooltip {
-    position: fixed;
-    bottom: 38px;
-    right: 90px;
-    background: #202122;
-    color: #fff;
-    font-size: 0.8em;
-    padding: 4px 10px;
-    border-radius: 2px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.15s;
-    white-space: nowrap;
-}
-.fab:hover + .fab-tooltip { opacity: 1; }
-</style>
-
-<div id="fab-wrap" style="display:none;">
-    <a href="create.html" class="fab" title="Новол Знань">+</a>
-    <div class="fab-tooltip">Создати Знань</div>
-</div>
 
 </body>
 </html>
