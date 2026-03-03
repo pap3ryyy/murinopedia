@@ -206,6 +206,11 @@
 <script>
 let checkTimer = null
 
+function getRedirectUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('redirect') || 'index.html';
+}
+
 function showStep(name) {
     ['login', 'loading', 'username', 'error'].forEach(s => {
         const el = document.getElementById('step-' + s)
@@ -223,10 +228,11 @@ function showStep(name) {
 }
 
 async function loginWithGoogle() {
+    const currentRedirect = getRedirectUrl();
     const { error } = await supabaseClient.auth.signInWithOAuth({
         provider: 'google',
         options: {
-            redirectTo: 'https://pap3ryyy.github.io/murinopedia/login.html'
+            redirectTo: window.location.origin + window.location.pathname + '?redirect=' + encodeURIComponent(currentRedirect)
         }
     })
     if (error) showError(error.message)
@@ -245,7 +251,7 @@ async function handleSession() {
         .single()
 
     if (existing) {
-        window.location.href = 'index.html'
+        window.location.href = getRedirectUrl()
         return
     }
 
@@ -261,13 +267,13 @@ async function checkUsername() {
     if (val.length < 3) {
         hint.className = 'username-hint'
         hint.textContent = 'От 3 до 20 символов. Только буквы, цифры ич _'
-        return
+        return;
     }
 
     if (!/^[a-zA-Zа-яА-ЯёЁ0-9_]+$/.test(val)) {
         hint.className = 'username-hint error'
         hint.textContent = 'Недопустимые символы — Фог вч позывном'
-        return
+        return;
     }
 
     hint.className = 'username-hint'
@@ -297,7 +303,7 @@ async function submitUsername() {
     if (val.length < 3 || !/^[a-zA-Zа-яА-ЯёЁ0-9_]+$/.test(val)) {
         hint.className = 'username-hint error'
         hint.textContent = 'Проверь позывной — Фог обнаруженол'
-        return
+        return;
     }
 
     const { data: { session } } = await supabaseClient.auth.getSession()
@@ -315,10 +321,10 @@ async function submitUsername() {
         } else {
             showError(error.message)
         }
-        return
+        return;
     }
 
-    window.location.href = 'index.html'
+    window.location.href = getRedirectUrl()
 }
 
 function showError(msg) {
@@ -337,8 +343,8 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
             .single()
 
         if (existing) {
-            window.location.href = 'index.html'
-            return
+            window.location.href = getRedirectUrl()
+            return;
         }
 
         showStep('username')
