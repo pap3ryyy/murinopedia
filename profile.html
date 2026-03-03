@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="icon" type="image/png" href="asset/logo.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль — Муринопедия</title>
+    <link rel="stylesheet" href="css/wiki.css">
+    <style>
+        .profile-card {
+            border: 1px solid #a2a9b1;
+            background: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border: 1px solid #a2a9b1;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: #eaecf0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a2a9b1;
+            font-size: 2em;
+            font-family: serif;
+        }
+
+        .profile-avatar img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .profile-info { flex: 1; }
+
+        .profile-username {
+            font-family: serif;
+            font-size: 1.6em;
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .role-icon {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            cursor: help;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .role-icon-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .role-icon-wrap .tooltip {
+            display: none;
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #202122;
+            color: #fff;
+            font-size: 0.72em;
+            padding: 4px 8px;
+            border-radius: 2px;
+            white-space: nowrap;
+            z-index: 10;
+            font-family: sans-serif;
+            font-weight: normal;
+            pointer-events: none;
+        }
+
+        .role-icon-wrap:hover .tooltip {
+            display: block;
+        }
+
+        .profile-bio {
+            font-size: 0.9em;
+            color: #54595d;
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+
+        .profile-meta {
+            font-size: 0.8em;
+            color: #a2a9b1;
+            margin-top: 8px;
+        }
+
+        .prev-nicks {
+            font-size: 0.8em;
+            color: #a2a9b1;
+            margin-top: 4px;
+        }
+
+        .prev-nicks span {
+            background: #eaecf0;
+            padding: 1px 6px;
+            border-radius: 2px;
+            margin-right: 4px;
+            font-size: 0.95em;
+        }
+
+        .edit-section {
+            border: 1px solid #a2a9b1;
+            background: #fff;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .edit-section h3 {
+            font-family: serif;
+            font-weight: normal;
+            font-size: 1.1em;
+            border-bottom: 1px solid #eaecf0;
+            padding-bottom: 6px;
+            margin: 0 0 14px 0;
+        }
+
+        .edit-field {
+            margin-bottom: 12px;
+        }
+
+        .edit-label {
+            font-size: 0.82em;
+            font-weight: bold;
+            color: #54595d;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .edit-input {
+            width: 100%;
+            padding: 7px 10px;
+            border: 1px solid #a2a9b1;
+            font-size: 0.9em;
+            background: #f8f9fa;
+            color: #202122;
+            outline: none;
+            font-family: sans-serif;
+        }
+
+        .edit-input:focus {
+            border-color: #3366cc;
+            background: #fff;
+        }
+
+        textarea.edit-input {
+            resize: vertical;
+            min-height: 70px;
+            line-height: 1.5;
+        }
+
+        .edit-hint {
+            font-size: 0.78em;
+            color: #a2a9b1;
+            margin-top: 3px;
+        }
+
+        .edit-hint.error { color: #d33; }
+        .edit-hint.success { color: #14866d; }
+
+        .image-tabs {
+            display: flex;
+            border-bottom: 1px solid #a2a9b1;
+            margin-bottom: 8px;
+        }
+
+        .image-tab {
+            padding: 5px 12px;
+            font-size: 0.8em;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            background: none;
+            color: #54595d;
+            margin-bottom: -1px;
+        }
+
+        .image-tab.active {
+            background: #fff;
+            border-color: #a2a9b1;
+            color: #202122;
+            font-weight: bold;
+        }
+
+        .image-tab-content { display: none; }
+        .image-tab-content.active { display: block; }
+
+        .upload-zone {
+            border: 2px dashed #a2a9b1;
+            background: #f8f9fa;
+            padding: 14px;
+            text-align: center;
+            color: #54595d;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: border-color 0.15s;
+        }
+
+        .upload-zone:hover { border-color: #3366cc; }
+
+        .save-bar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 14px;
+        }
+
+        .save-status { font-size: 0.82em; color: #54595d; }
+        .save-status.error { color: #d33; }
+        .save-status.success { color: #14866d; }
+
+        .articles-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .article-row {
+            border: 1px solid #eaecf0;
+            padding: 10px 12px;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .article-row-title {
+            font-family: serif;
+            font-size: 1em;
+            color: #0645ad;
+        }
+
+        .article-row-meta {
+            font-size: 0.78em;
+            color: #a2a9b1;
+        }
+
+        .article-status-badge {
+            font-size: 0.75em;
+            padding: 2px 7px;
+            border-radius: 2px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .badge-published { background: #d4f5e9; color: #14866d; border: 1px solid #14866d; }
+        .badge-pending { background: #fef6e4; color: #c8a850; border: 1px solid #c8a850; }
+
+        .state-box { padding: 40px 20px; text-align: center; border: 1px solid #a2a9b1; background: #f8f9fa; }
+        .state-box-title { font-family: serif; font-size: 1.3em; margin-bottom: 8px; }
+        .state-box.error { border-color: #d33; background: #fee7e6; }
+        .state-box.error .state-box-title { color: #d33; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-area">
+        <img src="asset/logo.png" alt="М.С.В." class="logo-img">
+        <a href="index.html" class="logo-text">Муринопедия</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+        <div class="status-bar">
+            Оперативная обстановка: <span style="color: #d33; font-weight: bold;">СТАБИЛЬНАЯ</span>
+        </div>
+        <div id="header-user" style="font-size:0.85em;color:#54595d;"></div>
+    </div>
+</header>
+
+<div class="container">
+    <main id="main-content">
+        <p style="color:#54595d;">Загружати профиль...</p>
+    </main>
+    <aside>
+        <div class="sidebar-box">
+            <h4>Навигация</h4>
+            <p>
+                <a href="index.html">Главная</a><br>
+                <a href="articles.html">Архив Знань</a>
+            </p>
+        </div>
+        <div class="sidebar-box" style="border-color: #d33; background: #fee7e6;">
+            <h4 style="color:#d33;">Напоминание</h4>
+            <p>Видл слово «Друг»? Ог — мимикрия Фога. Говори <b>Друн</b>.</p>
+        </div>
+    </aside>
+</div>
+
+<footer>
+    Муринопедия — 2026 год. <br>
+    Ч илу доной, пока естч светл. Мурино стояти, Фог дрожати.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+let currentUserId = null
+let currentUser = null
+let profileUser = null
+let isOwnProfile = false
+let avatarUrl = ''
+let nicknameTimer = null
+
+async function init() {
+    const params = new URLSearchParams(window.location.search)
+    const profileId = params.get('id')
+
+    const { data: { session } } = await supabaseClient.auth.getSession()
+    if (session) {
+        currentUserId = session.user.id
+        const { data: me } = await supabaseClient
+            .from('users').select('*').eq('id', session.user.id).single()
+        if (me) {
+            currentUser = me
+            renderHeaderUser(me)
+        }
+    } else {
+        document.getElementById('header-user').innerHTML =
+            `<a href="login.html" style="font-size:0.85em;">Войти</a>`
+    }
+
+    const targetId = profileId || currentUserId
+
+    if (!targetId) {
+        showError('Нрт идентификатора Людич')
+        return
+    }
+
+    const { data: user, error } = await supabaseClient
+        .from('users').select('*').eq('id', targetId).single()
+
+    if (error || !user) {
+        showError('Людич нрт найденол вч реестре')
+        return
+    }
+
+    profileUser = user
+    isOwnProfile = currentUserId === user.id
+
+    await renderProfile()
+}
+
+function renderHeaderUser(user) {
+    document.getElementById('header-user').innerHTML = `
+        <a href="profile.html">${user.username}</a>
+        &nbsp;
+        <button onclick="logout()" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;">Выйти</button>
+    `
+}
+
+function renderBadge(role) {
+    if (role !== 'м.с.в.') return ''
+    return `
+        <span class="role-icon-wrap">
+            <img src="icons/msv.png" class="role-icon" alt="М.С.В.">
+            <span class="tooltip">Официальная сотрудность М.С.В.</span>
+        </span>
+    `
+}
+
+async function renderProfile() {
+    const u = profileUser
+    const joined = new Date(u.created_at).toLocaleDateString('ru-RU')
+    const prevNicks = (u.previous_usernames ?? []).filter(n => n !== u.username)
+
+    const avatarHtml = u.avatar_url
+        ? `<img src="${u.avatar_url}" alt="${u.username}">`
+        : `<div class="profile-avatar" style="width:80px;height:80px;border:1px solid #a2a9b1;background:#eaecf0;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:2em;color:#a2a9b1;">${u.username[0].toUpperCase()}</div>`
+
+    const { data: articles } = await supabaseClient
+        .from('articles').select('id, title, tag, status, created_at')
+        .eq('author', u.username)
+        .order('created_at', { ascending: false })
+
+    document.title = u.username + ' — Муринопедия'
+
+    document.getElementById('main-content').innerHTML = `
+        <h1 style="font-family:serif;font-weight:normal;font-size:1.8em;border-bottom:1px solid #a2a9b1;padding-bottom:5px;margin-bottom:16px;">
+            Людич: ${u.username}
+        </h1>
+
+        <div class="profile-card">
+            <div style="width:80px;height:80px;border:1px solid #a2a9b1;overflow:hidden;flex-shrink:0;background:#eaecf0;">
+                ${u.avatar_url
+                    ? `<img src="${u.avatar_url}" style="width:80px;height:80px;object-fit:cover;display:block;" alt="${u.username}">`
+                    : `<div style="width:80px;height:80px;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:2.2em;color:#a2a9b1;">${u.username[0].toUpperCase()}</div>`
+                }
+            </div>
+            <div class="profile-info">
+                <div class="profile-username">
+                    ${u.username}
+                    ${renderBadge(u.role)}
+                </div>
+                ${u.bio ? `<div class="profile-bio">${u.bio.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>` : '<div class="profile-bio" style="font-style:italic;color:#a2a9b1;">Нрт описания</div>'}
+                <div class="profile-meta">Вч реестре сч: ${joined}</div>
+                ${prevNicks.length > 0 ? `
+                <div class="prev-nicks">
+                    Прошлые позывные: ${prevNicks.map(n => `<span>${n}</span>`).join('')}
+                </div>` : ''}
+            </div>
+        </div>
+
+        ${isOwnProfile ? renderEditSection() : ''}
+
+        <h2 style="font-family:serif;font-weight:normal;font-size:1.3em;border-bottom:1px solid #a2a9b1;padding-bottom:3px;margin-top:24px;">
+            Знань Людич
+        </h2>
+
+        ${renderArticlesList(articles ?? [])}
+    `
+
+    if (isOwnProfile) {
+        avatarUrl = u.avatar_url || ''
+        document.getElementById('avatar-url-input').value = avatarUrl
+    }
+}
+
+function renderEditSection() {
+    return `
+        <div class="edit-section">
+            <h3>Редактировати профиль</h3>
+
+            <div class="edit-field">
+                <label class="edit-label">Аватарка</label>
+                <div style="display:flex;gap:12px;align-items:center;margin-bottom:8px;">
+                    <div id="avatar-preview" style="width:50px;height:50px;border:1px solid #a2a9b1;overflow:hidden;background:#eaecf0;flex-shrink:0;">
+                        ${profileUser.avatar_url
+                            ? `<img src="${profileUser.avatar_url}" style="width:50px;height:50px;object-fit:cover;display:block;">`
+                            : `<div style="width:50px;height:50px;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:1.4em;color:#a2a9b1;">${profileUser.username[0].toUpperCase()}</div>`
+                        }
+                    </div>
+                    <div style="flex:1;">
+                        <div class="image-tabs">
+                            <button class="image-tab active" id="av-tab-url" onclick="switchAvatarTab('url')">URL</button>
+                            <button class="image-tab" id="av-tab-upload" onclick="switchAvatarTab('upload')">Файл</button>
+                        </div>
+                        <div class="image-tab-content active" id="av-content-url">
+                            <input type="text" class="edit-input" id="avatar-url-input" placeholder="https://..." oninput="previewAvatar(this.value)">
+                        </div>
+                        <div class="image-tab-content" id="av-content-upload">
+                            <div class="upload-zone" onclick="document.getElementById('avatar-file').click()">
+                                Выбери PNG / JPG
+                                <input type="file" id="avatar-file" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="uploadAvatar(this)">
+                            </div>
+                            <div class="edit-hint" id="avatar-upload-hint"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="edit-field">
+                <label class="edit-label">Позывной</label>
+                <input type="text" class="edit-input" id="username-input" value="${profileUser.username}" maxlength="20" oninput="checkNewUsername()">
+                <div class="edit-hint" id="username-hint">Старый позывной сохранится вч истории</div>
+            </div>
+
+            <div class="edit-field">
+                <label class="edit-label">О себе</label>
+                <textarea class="edit-input" id="bio-input" maxlength="200" placeholder="Расскажи о себе Людич...">${profileUser.bio ?? ''}</textarea>
+                <div class="edit-hint">Макс. 200 символов</div>
+            </div>
+
+            <div class="save-bar">
+                <button class="btn btn-primary" onclick="saveProfile()">Сохранити</button>
+                <span class="save-status" id="save-status"></span>
+            </div>
+        </div>
+    `
+}
+
+function renderArticlesList(articles) {
+    if (!articles.length) return '<p style="color:#a2a9b1;font-size:0.9em;font-style:italic;">Нрт Знань — Людич ещё нрт писал</p>'
+    return `<div class="articles-list">
+        ${articles.map(a => `
+            <div class="article-row">
+                <div>
+                    <a href="article.html?id=${a.id}" class="article-row-title">${a.title}</a>
+                    <div class="article-row-meta">${a.tag ?? '—'} · ${new Date(a.created_at).toLocaleDateString('ru-RU')}</div>
+                </div>
+                <span class="article-status-badge ${a.status === 'published' ? 'badge-published' : 'badge-pending'}">
+                    ${a.status === 'published' ? 'Опубликовано' : 'На проверке'}
+                </span>
+            </div>
+        `).join('')}
+    </div>`
+}
+
+function switchAvatarTab(tab) {
+    document.getElementById('av-tab-url').classList.toggle('active', tab === 'url')
+    document.getElementById('av-tab-upload').classList.toggle('active', tab === 'upload')
+    document.getElementById('av-content-url').classList.toggle('active', tab === 'url')
+    document.getElementById('av-content-upload').classList.toggle('active', tab === 'upload')
+}
+
+function previewAvatar(url) {
+    avatarUrl = url
+    const preview = document.getElementById('avatar-preview')
+    if (url) {
+        preview.innerHTML = `<img src="${url}" style="width:50px;height:50px;object-fit:cover;display:block;" onerror="this.parentElement.innerHTML='?'">`
+    } else {
+        preview.innerHTML = `<div style="width:50px;height:50px;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:1.4em;color:#a2a9b1;">${profileUser.username[0].toUpperCase()}</div>`
+    }
+}
+
+async function uploadAvatar(input) {
+    const file = input.files[0]
+    if (!file) return
+    const hint = document.getElementById('avatar-upload-hint')
+    hint.className = 'edit-hint'
+    hint.textContent = 'Загружати...'
+
+    const ext = file.name.split('.').pop()
+    const fileName = `avatars/${currentUserId}.${ext}`
+
+    const { error } = await supabaseClient.storage
+        .from('images').upload(fileName, file, { upsert: true })
+
+    if (error) { hint.className = 'edit-hint error'; hint.textContent = 'Смертч-шум: ' + error.message; return }
+
+    const { data: urlData } = supabaseClient.storage.from('images').getPublicUrl(fileName)
+    avatarUrl = urlData.publicUrl + '?t=' + Date.now()
+    hint.className = 'edit-hint success'
+    hint.textContent = 'Загруженол: ' + file.name
+    previewAvatar(avatarUrl)
+}
+
+async function checkNewUsername() {
+    const val = document.getElementById('username-input').value.trim()
+    const hint = document.getElementById('username-hint')
+    clearTimeout(nicknameTimer)
+
+    if (val === profileUser.username) {
+        hint.className = 'edit-hint'
+        hint.textContent = 'Старый позывной сохранится вч истории'
+        return
+    }
+
+    if (val.length < 3) { hint.className = 'edit-hint error'; hint.textContent = 'Минимум 3 символа'; return }
+    if (!/^[a-zA-Zа-яА-ЯёЁ0-9_]+$/.test(val)) { hint.className = 'edit-hint error'; hint.textContent = 'Недопустимые символы'; return }
+
+    hint.className = 'edit-hint'
+    hint.textContent = 'Проверка...'
+
+    nicknameTimer = setTimeout(async () => {
+        const { data } = await supabaseClient.from('users').select('username').eq('username', val).single()
+        if (data) {
+            hint.className = 'edit-hint error'
+            hint.textContent = 'Этот позывной уже занят'
+        } else {
+            hint.className = 'edit-hint success'
+            hint.textContent = 'Позывной свободен'
+        }
+    }, 500)
+}
+
+async function saveProfile() {
+    const msg = document.getElementById('save-status')
+    const newUsername = document.getElementById('username-input').value.trim()
+    const bio = document.getElementById('bio-input').value.trim()
+
+    msg.className = 'save-status'
+    msg.textContent = 'Сохраняти...'
+
+    const updates = { bio, avatar_url: avatarUrl || null }
+
+    if (newUsername !== profileUser.username) {
+        if (newUsername.length < 3 || !/^[a-zA-Zа-яА-ЯёЁ0-9_]+$/.test(newUsername)) {
+            msg.className = 'save-status error'; msg.textContent = 'Нрт — проверь позывной'; return
+        }
+        const { data: taken } = await supabaseClient.from('users').select('username').eq('username', newUsername).single()
+        if (taken) { msg.className = 'save-status error'; msg.textContent = 'Позывной занят'; return }
+
+        const prevList = [...(profileUser.previous_usernames ?? []), profileUser.username]
+        updates.username = newUsername
+        updates.previous_usernames = [...new Set(prevList)]
+    }
+
+    const { error } = await supabaseClient.from('users').update(updates).eq('id', currentUserId)
+
+    if (error) { msg.className = 'save-status error'; msg.textContent = 'Смертч-шум: ' + error.message; return }
+
+    msg.className = 'save-status success'
+    msg.textContent = 'Сохраненол ✓'
+    setTimeout(() => window.location.reload(), 800)
+}
+
+async function logout() {
+    await supabaseClient.auth.signOut()
+    window.location.href = 'login.html'
+}
+
+function showError(msg) {
+    document.getElementById('main-content').innerHTML = `
+        <div class="state-box error">
+            <div class="state-box-title">Смертч-шум</div>
+            <div>${msg}</div><br>
+            <a href="index.html" class="btn btn-secondary">← На главную</a>
+        </div>
+    `
+}
+
+init()
+</script>
+
+</body>
+</html>
