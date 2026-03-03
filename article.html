@@ -360,10 +360,12 @@
 <script>
 let currentUser = null
 let currentUserId = null
+let currentUserPublicId = null
 let currentRole = null
 let articleId = null
 let userCommentLikes = new Set()
 let articleLiked = false
+let authorPublicIds = {}
 
 async function init() {
     const params = new URLSearchParams(window.location.search)
@@ -374,8 +376,12 @@ async function init() {
     if (session) {
         currentUserId = session.user.id
         const { data: user } = await supabaseClient
-            .from('users').select('username, role').eq('id', session.user.id).single()
-        if (user) { currentUser = user.username; currentRole = user.role }
+            .from('users').select('username, role, public_id').eq('id', session.user.id).single()
+        if (user) {
+            currentUser = user.username
+            currentRole = user.role
+            currentUserPublicId = user.public_id
+        }
     }
 
     await loadArticle()
@@ -386,7 +392,7 @@ function renderHeaderUser() {
     const el = document.getElementById('header-user')
     if (!el) return
     if (currentUser) {
-        el.innerHTML = `<span>${currentUser}</span> &nbsp;<button onclick="logout()" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;">Выйти</button>`
+        el.innerHTML = `<a href="profile.html?id=${currentUserPublicId}" style="color:#0645ad;">${currentUser}</a> &nbsp;<button onclick="logout()" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;">Выйти</button>`
     } else {
         el.innerHTML = `<a href="login.html" style="font-size:0.85em;">Войти</a>`
     }
@@ -423,6 +429,13 @@ async function loadArticle() {
         articleLiked = !!alreadyLiked
     }
 
+    // Подгружаем public_id автора для ссылки
+    if (article.author) {
+        const { data: authorData } = await supabaseClient
+            .from('users').select('public_id').eq('username', article.author).single()
+        if (authorData) authorPublicIds[article.author] = authorData.public_id
+    }
+
     document.title = article.title + ' — Муринопедия'
     renderArticle(article)
     await loadUserCommentLikes()
@@ -438,11 +451,15 @@ function renderReviewBadge(article) {
 function renderMetaInfobox(article) {
     const created = new Date(article.created_at).toLocaleDateString('ru-RU')
     const reviewed = article.reviewed_at ? new Date(article.reviewed_at).toLocaleDateString('ru-RU') : '—'
+    const authorPid = authorPublicIds[article.author]
+    const authorHtml = authorPid
+        ? `<a href="profile.html?id=${authorPid}">${article.author ?? 'Аноним'}</a>`
+        : (article.author ?? 'Аноним')
     return `
         <div class="meta-infobox">
             <span class="infobox-title">Сведения о Знань</span>
             <table class="infobox-table">
-                <tr><td>Автор</td><td>${article.author ?? 'Аноним'}</td></tr>
+                <tr><td>Автор</td><td>${authorHtml}</td></tr>
                 <tr><td>Категория</td><td>${article.tag ?? '—'}</td></tr>
                 <tr><td>Создано</td><td>${created}</td></tr>
                 <tr><td>Проверено</td><td>${reviewed}</td></tr>
@@ -609,21 +626,40 @@ async function loadComments() {
         return
     }
 
+    // Подгружаем public_id для всех авторов комментариев
+    const usernames = [...new Set(data.map(c => c.username))]
+    const { data: usersData } = await supabaseClient
+        .from('users').select('username, public_id, avatar_url').in('username', usernames)
+    const userMap = {}
+    if (usersData) usersData.forEach(u => { userMap[u.username] = { pid: u.public_id, avatar: u.avatar_url } })
+
     const roots = data.filter(c => !c.parent_id)
     const replies = data.filter(c => c.parent_id)
     container.innerHTML = roots.map(c => {
-        return renderComment(c) + replies.filter(r => r.parent_id === c.id).map(r => renderComment(r, true)).join('')
+        return renderComment(c, false, userMap) + replies.filter(r => r.parent_id === c.id).map(r => renderComment(r, true, userMap)).join('')
     }).join('')
 }
 
-function renderComment(c, isReply = false) {
+function renderComment(c, isReply = false, userMap = {}) {
     const likeCount = c.likes?.[0]?.count ?? 0
     const liked = userCommentLikes.has(c.id)
     const date = new Date(c.created_at).toLocaleDateString('ru-RU')
+    const udata = userMap[c.username] || {}
+    const pid = udata.pid
+    const avatar = udata.avatar
+    const avatarHtml = `<div style="width:24px;height:24px;border-radius:2px;overflow:hidden;border:1px solid #eaecf0;flex-shrink:0;background:#eaecf0;display:flex;align-items:center;justify-content:center;">${
+        avatar
+            ? `<img src="${avatar}" style="width:24px;height:24px;object-fit:cover;display:block;">`
+            : `<span style="font-size:0.75em;color:#a2a9b1;font-family:serif;">${c.username[0].toUpperCase()}</span>`
+    }</div>`
+    const authorHtml = pid
+        ? `<a href="profile.html?id=${pid}" class="comment-author">${c.username}</a>`
+        : `<span class="comment-author">${c.username}</span>`
     return `
         <div class="comment ${isReply ? 'reply' : ''}" id="comment-${c.id}">
             <div class="comment-header">
-                <span class="comment-author">${c.username}</span>
+                ${avatarHtml}
+                ${authorHtml}
                 <span class="comment-date">${date}</span>
             </div>
             <div class="comment-content">${c.content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
