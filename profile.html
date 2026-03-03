@@ -174,33 +174,6 @@
         .edit-hint.error { color: #d33; }
         .edit-hint.success { color: #14866d; }
 
-        .image-tabs {
-            display: flex;
-            border-bottom: 1px solid #a2a9b1;
-            margin-bottom: 8px;
-        }
-
-        .image-tab {
-            padding: 5px 12px;
-            font-size: 0.8em;
-            cursor: pointer;
-            border: 1px solid transparent;
-            border-bottom: none;
-            background: none;
-            color: #54595d;
-            margin-bottom: -1px;
-        }
-
-        .image-tab.active {
-            background: #fff;
-            border-color: #a2a9b1;
-            color: #202122;
-            font-weight: bold;
-        }
-
-        .image-tab-content { display: none; }
-        .image-tab-content.active { display: block; }
-
         .upload-zone {
             border: 2px dashed #a2a9b1;
             background: #f8f9fa;
@@ -459,7 +432,6 @@ async function renderProfile() {
 
     if (isOwnProfile) {
         avatarUrl = u.avatar_url || ''
-        document.getElementById('avatar-url-input').value = avatarUrl
     }
 }
 
@@ -478,20 +450,11 @@ function renderEditSection() {
                         }
                     </div>
                     <div style="flex:1;">
-                        <div class="image-tabs">
-                            <button class="image-tab active" id="av-tab-url" onclick="switchAvatarTab('url')">URL</button>
-                            <button class="image-tab" id="av-tab-upload" onclick="switchAvatarTab('upload')">Файл</button>
+                        <div class="upload-zone" onclick="document.getElementById('avatar-file').click()">
+                            Выбери PNG / JPG
+                            <input type="file" id="avatar-file" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="uploadAvatar(this)">
                         </div>
-                        <div class="image-tab-content active" id="av-content-url">
-                            <input type="text" class="edit-input" id="avatar-url-input" placeholder="https://..." oninput="previewAvatar(this.value)">
-                        </div>
-                        <div class="image-tab-content" id="av-content-upload">
-                            <div class="upload-zone" onclick="document.getElementById('avatar-file').click()">
-                                Выбери PNG / JPG
-                                <input type="file" id="avatar-file" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="uploadAvatar(this)">
-                            </div>
-                            <div class="edit-hint" id="avatar-upload-hint"></div>
-                        </div>
+                        <div class="edit-hint" id="avatar-upload-hint">Загрузка по внешней ссылке отключена</div>
                     </div>
                 </div>
             </div>
@@ -531,13 +494,6 @@ function renderArticlesList(articles) {
             </div>
         `).join('')}
     </div>`
-}
-
-function switchAvatarTab(tab) {
-    document.getElementById('av-tab-url').classList.toggle('active', tab === 'url')
-    document.getElementById('av-tab-upload').classList.toggle('active', tab === 'upload')
-    document.getElementById('av-content-url').classList.toggle('active', tab === 'url')
-    document.getElementById('av-content-upload').classList.toggle('active', tab === 'upload')
 }
 
 function previewAvatar(url) {
