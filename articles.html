@@ -146,50 +146,7 @@
             padding: 20px 0;
         }
 
-        .fab {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 52px;
-            height: 52px;
-            background: #3366cc;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            font-size: 1.8em;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            transition: background 0.15s;
-            line-height: 1;
-        }
-
-        .fab:hover {
-            background: #2a4b8d;
-            text-decoration: none;
-        }
-
-        .fab-tooltip {
-            position: fixed;
-            bottom: 38px;
-            right: 90px;
-            background: #202122;
-            color: #fff;
-            font-size: 0.8em;
-            padding: 4px 10px;
-            border-radius: 2px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.15s;
-            white-space: nowrap;
-        }
-
-        .fab:hover ~ .fab-tooltip {
-            opacity: 1;
-        }
+        
     </style>
 </head>
 <body>
@@ -214,13 +171,16 @@
             <button class="btn btn-primary" onclick="filterArticles()">Искати</button>
         </div>
 
-        <div class="filter-bar">
-            <button class="filter-btn active" onclick="setFilter('all', this)">Всч</button>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div class="filter-bar" style="margin-bottom:0;">
+                <button class="filter-btn active" onclick="setFilter('all', this)">Всч</button>
             <button class="filter-btn" onclick="setFilter('Локация', this)">Локации</button>
             <button class="filter-btn" onclick="setFilter('Сущность', this)">Сущности</button>
             <button class="filter-btn" onclick="setFilter('История', this)">История</button>
             <button class="filter-btn" onclick="setFilter('Язык', this)">Язык</button>
-            <button class="filter-btn" onclick="setFilter('М.С.В.', this)">М.С.В.</button>
+                <button class="filter-btn" onclick="setFilter('М.С.В.', this)">М.С.В.</button>
+            </div>
+            <a href="createarticle.html" class="btn btn-primary" id="create-btn" style="display:none;white-space:nowrap;">+ Создати Знань</a>
         </div>
 
         <div class="articles-count" id="articles-count"></div>
@@ -243,8 +203,7 @@
     </aside>
 </div>
 
-<a href="create.html" class="fab" id="fab" style="display:none;">+</a>
-<div class="fab-tooltip">Создати Знань</div>
+
 
 <footer>
     Муринопедия — 2026 год. <br>
@@ -259,7 +218,7 @@ let currentFilter = 'all'
 
 async function init() {
     const { data: { session } } = await supabaseClient.auth.getSession()
-    if (session) document.getElementById('fab').style.display = 'flex'
+    if (session) { document.getElementById('fab').style.display = 'flex'; document.getElementById('create-btn').style.display = 'inline-block'; }
     await loadArticles()
 }
 
