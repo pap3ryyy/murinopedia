@@ -215,11 +215,22 @@
 <script>
 let allArticles = []
 let currentFilter = 'all'
+let currentRole = null
 
 async function init() {
     const { data: { session } } = await supabaseClient.auth.getSession()
-    if (session) { const btn = document.getElementById('create-btn'); if (btn) btn.style.display = 'inline-block'; }
+    if (session) {
+        const btn = document.getElementById('create-btn')
+        if (btn) btn.style.display = 'inline-block'
+        const { data: user } = await supabaseClient
+            .from('users').select('role').eq('id', session.user.id).single()
+        if (user) currentRole = user.role
+    }
     await loadArticles()
+}
+
+function isMsv() {
+    return ['м.с.в.проверкость', 'м.с.в.содрунник', 'м.с.в.основательность'].includes(currentRole)
 }
 
 async function loadArticles() {
@@ -227,11 +238,17 @@ async function loadArticles() {
     const statsEl = document.getElementById('sidebar-stats')
 
     try {
-        const { data, error } = await supabaseClient
+        let query = supabaseClient
             .from('articles')
             .select('*')
             .eq('status', 'published')
             .order('created_at', { ascending: false })
+
+        if (!isMsv()) {
+            query = query.eq('private', false)
+        }
+
+        const { data, error } = await query
 
         if (error) throw error
 
@@ -278,7 +295,7 @@ function renderArticles(data) {
     grid.className = 'articles-grid'
     grid.innerHTML = data.map(article => `
         <a href="article.html?id=${article.id}" class="article-card">
-            <div class="article-card-tag">${article.tag ?? ''}</div>
+            <div class="article-card-tag">${article.tag ?? ''}${article.private ? ' &nbsp;<span style="color:#d33;font-size:0.85em;">🔒 Приватное</span>' : ''}</div>
             <div class="article-card-title">${article.title}</div>
             <div class="article-card-desc">${article.description ?? ''}</div>
             <div class="article-card-meta">Автор: ${article.author ?? 'Аноним'}</div>
