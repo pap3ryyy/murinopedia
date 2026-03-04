@@ -260,8 +260,18 @@ function renderBadges() {
                     <input type="text" class="form-input" id="badge-name" placeholder="М.С.В., Первый Людич...">
                 </div>
                 <div class="form-field">
-                    <label class="form-label">URL иконки (из папки icons/)</label>
-                    <input type="text" class="form-input" id="badge-icon" placeholder="icons/msv.png">
+                    <label class="form-label">Иконка (PNG)</label>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <div id="badge-icon-preview" style="width:36px;height:36px;border:1px solid #a2a9b1;background:#eaecf0;display:flex;align-items:center;justify-content:center;font-size:0.7em;color:#a2a9b1;flex-shrink:0;">нрт</div>
+                        <div style="flex:1;">
+                            <div style="display:flex;gap:6px;margin-bottom:4px;">
+                                <button type="button" class="btn btn-secondary" style="font-size:0.8em;padding:4px 10px;" onclick="document.getElementById('badge-icon-file').click()">Загрузити PNG</button>
+                                <input type="file" id="badge-icon-file" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="uploadBadgeIcon(this)">
+                            </div>
+                            <input type="text" class="form-input" id="badge-icon" placeholder="или вставь URL иконки..." oninput="previewBadgeIcon(this.value)" style="font-size:0.82em;">
+                        </div>
+                    </div>
+                    <div class="edit-hint" id="badge-icon-hint"></div>
                 </div>
             </div>
             <div class="form-field">
@@ -441,6 +451,38 @@ async function loadUsers() {
             </tbody>
         </table>
     `
+}
+
+async function uploadBadgeIcon(input) {
+    const file = input.files[0]
+    if (!file) return
+    const hint = document.getElementById('badge-icon-hint')
+    hint.style.color = '#54595d'
+    hint.textContent = 'Загружати...'
+
+    const ext = file.name.split('.').pop()
+    const fileName = 'badges/' + Date.now() + '.' + ext
+
+    const { error } = await supabaseClient.storage
+        .from('images').upload(fileName, file, { upsert: true })
+
+    if (error) { hint.style.color = '#d33'; hint.textContent = 'Смертч-шум: ' + error.message; return }
+
+    const { data: urlData } = supabaseClient.storage.from('images').getPublicUrl(fileName)
+    document.getElementById('badge-icon').value = urlData.publicUrl
+    previewBadgeIcon(urlData.publicUrl)
+    hint.style.color = '#14866d'
+    hint.textContent = 'Загруженол: ' + file.name
+}
+
+function previewBadgeIcon(url) {
+    const preview = document.getElementById('badge-icon-preview')
+    if (!preview) return
+    if (url) {
+        preview.innerHTML = '<img src="' + url + '" style="width:36px;height:36px;object-fit:contain;" onerror="this.parentElement.textContent=String.fromCharCode(63)">'
+    } else {
+        preview.textContent = 'нрт'
+    }
 }
 
 async function logout() {
