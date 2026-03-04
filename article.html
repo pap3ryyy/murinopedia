@@ -415,7 +415,7 @@ async function loadArticle() {
         .from('articles').select('*').eq('id', articleId).single()
 
     if (error || !article) { showError('Знань нрт найденол — возможно Фог скрылость его'); return }
-    if (article.status !== 'published' && currentRole !== 'м.с.в.') {
+    if (article.status !== 'published' && !isMsv()) {
         showError('Это Знань ещё нач проверке вч М.С.В.')
         return
     }
@@ -680,8 +680,8 @@ function renderComment(c, isReply = false, userMap = {}) {
             <div class="comment-actions">
                 <button class="comment-btn ${liked ? 'liked' : ''}" onclick="toggleCommentLike(${c.id})">▲ ${likeCount}</button>
                 ${currentUser && !isReply ? `<button class="comment-btn" onclick="toggleReplyForm(${c.id})">Ответити</button>` : ''}
-                ${canDelete() && !c.deleted ? `<button class="comment-btn" style="color:#d33;" onclick="deleteComment(${c.id})">Удалити</button>` : ''}
-                ${!c.deleted && currentUserId === c.user_id ? `<button class="comment-btn" style="color:#a2a9b1;" onclick="deleteComment(${c.id}, true)">Удалити своё</button>` : ''}
+                ${canDelete() && !c.deleted ? `<button class="comment-btn" style="color:#d33;" onclick="deleteComment(${c.id}, false)">Удалити</button>` : ''}
+                ${!c.deleted && c.user_id === currentUserId ? `<button class="comment-btn" style="color:#a2a9b1;" onclick="deleteComment(${c.id}, true)">Удалити своё</button>` : ''}
             </div>
             ${currentUser && !isReply ? `
             <div class="reply-form" id="reply-form-${c.id}">
