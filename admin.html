@@ -433,7 +433,7 @@ async function loadUsers() {
                         <td style="color:#a2a9b1;font-size:0.85em;">${new Date(u.created_at).toLocaleDateString('ru-RU')}</td>
                         <td>
                             ${u.id !== adminUserId ? `
-                                <button class="btn btn-danger" style="font-size:0.78em;padding:3px 8px;" onclick="deleteUser('${u.id}', '${u.username}')">Удалити</button>
+                                <span style="font-size:0.8em;color:#a2a9b1;">—</span>
                             ` : '<span style="font-size:0.8em;color:#a2a9b1;">это ты</span>'}
                         </td>
                     </tr>
@@ -441,13 +441,6 @@ async function loadUsers() {
             </tbody>
         </table>
     `
-}
-
-async function deleteUser(userId, username) {
-    if (!confirm(`Удалити аккаунт "${username}" навсегда? Все статьи и комментарии останутся.`)) return
-    const { error } = await supabaseClient.from('users').delete().eq('id', userId)
-    if (error) { alert('Смертч-шум: ' + error.message); return }
-    loadUsers()
 }
 
 async function logout() {
