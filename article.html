@@ -242,7 +242,7 @@
             font-size: 0.85em;
         }
 
-        .comment-author { font-weight: bold; color: #0645ad; display: inline-flex; align-items: center; gap: 4px; }
+        .comment-author { font-weight: bold; color: #0645ad; }
         .comment-date { color: #a2a9b1; }
 
         .comment-content {
@@ -317,13 +317,6 @@
             margin-right: 8px;
             vertical-align: middle;
         }
-
-        /* ИКОНКИ НИКА */
-        .badge-icon { width: 16px; height: 16px; object-fit: contain; vertical-align: middle; }
-        .role-icon { width: 14px; height: 14px; object-fit: contain; }
-        .badge-wrap { position: relative; display: inline-flex; align-items: center; cursor: help; margin-left: 2px; }
-        .badge-tip { display: none; position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%); background: #202122; color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 2px; white-space: nowrap; z-index: 100; pointer-events: none; font-family: sans-serif; font-weight: normal; }
-        .badge-wrap:hover .badge-tip { display: block; }
     </style>
 </head>
 <body>
@@ -369,14 +362,17 @@ let currentUser = null
 let currentUserId = null
 let currentUserPublicId = null
 let currentRole = null
+
+function isMsv() {
+    return ['м.с.в.проверкость', 'м.с.в.содрунник', 'м.с.в.основательность'].includes(currentRole)
+}
+function canDelete() {
+    return ['м.с.в.содрунник', 'м.с.в.основательность'].includes(currentRole)
+}
 let articleId = null
 let userCommentLikes = new Set()
 let articleLiked = false
 let authorPublicIds = {}
-
-// Глобальные хранилища значков
-let authorBadges = []
-let commentsBadges = {}
 
 async function init() {
     const params = new URLSearchParams(window.location.search)
@@ -414,20 +410,6 @@ async function logout() {
     window.location.href = 'login.html'
 }
 
-// Рендер иконок (без ссылок)
-function getRoleIconHtml(role) {
-    if (role !== 'м.с.в.') return ''
-    return `<span class="badge-wrap"><img src="icons/msv.png" class="role-icon" alt="М.С.В."><span class="badge-tip">Сотрудность М.С.В.</span></span>`
-}
-
-function getBadgesHtml(badges) {
-    if (!badges || badges.length === 0) return ''
-    return badges.map(b => {
-        const info = b.badges || b
-        return `<span class="badge-wrap"><img src="${info.icon_url}" class="badge-icon"><span class="badge-tip">${info.name}</span></span>`
-    }).join('')
-}
-
 async function loadArticle() {
     const { data: article, error } = await supabaseClient
         .from('articles').select('*').eq('id', articleId).single()
@@ -454,15 +436,11 @@ async function loadArticle() {
         articleLiked = !!alreadyLiked
     }
 
-    // Подгружаем инфу автора статьи
+    // Подгружаем public_id автора для ссылки
     if (article.author) {
-        const { data: aData } = await supabaseClient
-            .from('users').select('id, public_id, role').eq('username', article.author).single()
-        if (aData) {
-            authorPublicIds[article.author] = { pid: aData.public_id, role: aData.role }
-            const { data: b } = await supabaseClient.from('user_badges').select('badges(name, icon_url)').eq('user_id', aData.id)
-            authorBadges = b || []
-        }
+        const { data: authorData } = await supabaseClient
+            .from('users').select('public_id').eq('username', article.author).single()
+        if (authorData) authorPublicIds[article.author] = authorData.public_id
     }
 
     document.title = article.title + ' — Муринопедия'
@@ -480,13 +458,10 @@ function renderReviewBadge(article) {
 function renderMetaInfobox(article) {
     const created = new Date(article.created_at).toLocaleDateString('ru-RU')
     const reviewed = article.reviewed_at ? new Date(article.reviewed_at).toLocaleDateString('ru-RU') : '—'
-    const aData = authorPublicIds[article.author]
-    
-    // Иконки выводятся ПОСЛЕ закрытия тега ссылки <a>, чтобы клик по ним не работал как переход
-    const authorHtml = aData
-        ? `<a href="profile.html?id=${aData.pid}">${article.author}</a>${getRoleIconHtml(aData.role)}${getBadgesHtml(authorBadges)}`
+    const authorPid = authorPublicIds[article.author]
+    const authorHtml = authorPid
+        ? `<a href="profile.html?id=${authorPid}">${article.author ?? 'Аноним'}</a>`
         : (article.author ?? 'Аноним')
-
     return `
         <div class="meta-infobox">
             <span class="infobox-title">Сведения о Знань</span>
@@ -541,7 +516,8 @@ function renderContent(content, imageUrl) {
 }
 
 function renderArticle(article) {
-    const isMsv = currentRole === 'м.с.в.'
+    const isMsv = isMsv()
+    const _canDelete = canDelete()
 
     document.getElementById('main-content').innerHTML = `
         <h1 style="font-family:serif;font-weight:normal;font-size:2em;border-bottom:1px solid #a2a9b1;padding-bottom:5px;margin-bottom:10px;">
@@ -551,8 +527,8 @@ function renderArticle(article) {
 
         ${isMsv ? `
         <div class="article-actions">
-            <button class="btn btn-secondary" onclick="togglePin(${article.pinned})">${article.pinned ? 'Открепити' : 'Закрепити'}</button>
-            <button class="btn btn-danger" onclick="deleteArticle()">Удалити Знань</button>
+            ${_canDelete ? `<button class="btn btn-secondary" onclick="togglePin(${article.pinned})">${article.pinned ? 'Открепити' : 'Закрепити'}</button>` : ''}
+            ${_canDelete ? `<button class="btn btn-danger" onclick="deleteArticle()">Удалити Знань</button>` : ''}
             ${article.status === 'pending' ? `<button class="btn btn-primary" onclick="publishArticle()">Опубликовати</button>` : ''}
         </div>
         ` : ''}
@@ -598,14 +574,18 @@ async function toggleArticleLike() {
     const countEl = document.getElementById('likes-count')
 
     if (articleLiked) {
-        await supabaseClient.from('article_likes').delete().eq('article_id', articleId).eq('user_id', currentUserId)
+        await supabaseClient.from('article_likes').delete()
+            .eq('article_id', articleId).eq('user_id', currentUserId)
         articleLiked = false
     } else {
         await supabaseClient.from('article_likes').insert({ article_id: articleId, user_id: currentUserId })
         articleLiked = true
     }
 
-    const newCount = articleLiked ? (parseInt(countEl.textContent) || 0) + 1 : Math.max((parseInt(countEl.textContent) || 1) - 1, 0)
+    const newCount = articleLiked
+        ? (parseInt(countEl.textContent) || 0) + 1
+        : Math.max((parseInt(countEl.textContent) || 1) - 1, 0)
+
     await supabaseClient.from('articles').update({ likes_count: newCount }).eq('id', articleId)
     btn.className = `like-btn ${articleLiked ? 'liked' : ''}`
     btn.textContent = `▲ ${articleLiked ? 'Лайк поставленол' : 'Поставити лайк'}`
@@ -613,19 +593,23 @@ async function toggleArticleLike() {
 }
 
 async function togglePin(currentlyPinned) {
-    if (currentRole !== 'м.с.в.') return
+    if (!canDelete()) return
     await supabaseClient.from('articles').update({ pinned: !currentlyPinned }).eq('id', articleId)
     window.location.reload()
 }
 
 async function publishArticle() {
-    if (currentRole !== 'м.с.в.') return
-    await supabaseClient.from('articles').update({ status: 'published', reviewed_by: currentUser, reviewed_at: new Date().toISOString() }).eq('id', articleId)
+    if (!isMsv()) return
+    await supabaseClient.from('articles').update({
+        status: 'published',
+        reviewed_by: currentUser,
+        reviewed_at: new Date().toISOString()
+    }).eq('id', articleId)
     window.location.reload()
 }
 
 async function deleteArticle() {
-    if (currentRole !== 'м.с.в.') return
+    if (!canDelete()) return
     if (!confirm('Удалити это Знань навсегда?')) return
     await supabaseClient.from('articles').delete().eq('id', articleId)
     window.location.href = 'articles.html'
@@ -650,24 +634,12 @@ async function loadComments() {
         return
     }
 
+    // Подгружаем public_id для всех авторов комментариев
     const usernames = [...new Set(data.map(c => c.username))]
     const { data: usersData } = await supabaseClient
-        .from('users').select('id, username, public_id, avatar_url, role').in('username', usernames)
-    
+        .from('users').select('username, public_id, avatar_url').in('username', usernames)
     const userMap = {}
-    const userIds = []
-    if (usersData) usersData.forEach(u => { 
-        userMap[u.username] = { pid: u.public_id, avatar: u.avatar_url, role: u.role, id: u.id }
-        userIds.push(u.id)
-    })
-
-    // Грузим значки всех участников обсуждения
-    const { data: bData } = await supabaseClient.from('user_badges').select('user_id, badges(name, icon_url)').in('user_id', userIds)
-    commentsBadges = {}
-    if (bData) bData.forEach(b => {
-        if (!commentsBadges[b.user_id]) commentsBadges[b.user_id] = []
-        commentsBadges[b.user_id].push(b)
-    })
+    if (usersData) usersData.forEach(u => { userMap[u.username] = { pid: u.public_id, avatar: u.avatar_url } })
 
     const roots = data.filter(c => !c.parent_id)
     const replies = data.filter(c => c.parent_id)
@@ -677,30 +649,48 @@ async function loadComments() {
 }
 
 function renderComment(c, isReply = false, userMap = {}) {
+    if (c.deleted) {
+        return `<div class="comment ${isReply ? 'reply' : ''}" style="opacity:0.5;font-style:italic;color:#a2a9b1;">
+            <div class="comment-header"><span class="comment-date">${new Date(c.created_at).toLocaleDateString('ru-RU')}</span></div>
+            <div class="comment-content">[сообщенность удалена]</div>
+        </div>`
+    }
     const likeCount = c.likes?.[0]?.count ?? 0
     const liked = userCommentLikes.has(c.id)
     const date = new Date(c.created_at).toLocaleDateString('ru-RU')
     const udata = userMap[c.username] || {}
-    
+    const pid = udata.pid
+    const avatar = udata.avatar
     const avatarHtml = `<div style="width:24px;height:24px;border-radius:2px;overflow:hidden;border:1px solid #eaecf0;flex-shrink:0;background:#eaecf0;display:flex;align-items:center;justify-content:center;">${
-        udata.avatar ? `<img src="${udata.avatar}" style="width:24px;height:24px;object-fit:cover;display:block;">` : `<span style="font-size:0.75em;color:#a2a9b1;font-family:serif;">${c.username[0].toUpperCase()}</span>`
+        avatar
+            ? `<img src="${avatar}" style="width:24px;height:24px;object-fit:cover;display:block;">`
+            : `<span style="font-size:0.75em;color:#a2a9b1;font-family:serif;">${c.username[0].toUpperCase()}</span>`
     }</div>`
-
-    // Иконки ВНЕ ссылки <a>
-    const authorHtml = udata.pid
-        ? `<a href="profile.html?id=${udata.pid}" class="comment-author">${c.username}</a>${getRoleIconHtml(udata.role)}${getBadgesHtml(commentsBadges[udata.id])}`
+    const authorHtml = pid
+        ? `<a href="profile.html?id=${pid}" class="comment-author">${c.username}</a>`
         : `<span class="comment-author">${c.username}</span>`
-
     return `
         <div class="comment ${isReply ? 'reply' : ''}" id="comment-${c.id}">
-            <div class="comment-header">${avatarHtml}${authorHtml}<span class="comment-date">${date}</span></div>
+            <div class="comment-header">
+                ${avatarHtml}
+                ${authorHtml}
+                <span class="comment-date">${date}</span>
+            </div>
             <div class="comment-content">${c.content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
             <div class="comment-actions">
                 <button class="comment-btn ${liked ? 'liked' : ''}" onclick="toggleCommentLike(${c.id})">▲ ${likeCount}</button>
                 ${currentUser && !isReply ? `<button class="comment-btn" onclick="toggleReplyForm(${c.id})">Ответити</button>` : ''}
-                ${currentRole === 'м.с.в.' ? `<button class="comment-btn" style="color:#d33;" onclick="deleteComment(${c.id})">Удалити</button>` : ''}
+                ${canDelete() && !c.deleted ? `<button class="comment-btn" style="color:#d33;" onclick="deleteComment(${c.id})">Удалити</button>` : ''}
+                ${!c.deleted && currentUserId === c.user_id ? `<button class="comment-btn" style="color:#a2a9b1;" onclick="deleteComment(${c.id}, true)">Удалити своё</button>` : ''}
             </div>
-            ${currentUser && !isReply ? `<div class="reply-form" id="reply-form-${c.id}"><textarea placeholder="Ответ Людич..."></textarea><div class="reply-form-actions"><button class="btn btn-primary" style="font-size:0.8em;padding:4px 10px;" onclick="submitComment(${c.id})">Отправити</button><button class="btn btn-secondary" style="font-size:0.8em;padding:4px 10px;" onclick="toggleReplyForm(${c.id})">Отменити</button></div></div>` : ''}
+            ${currentUser && !isReply ? `
+            <div class="reply-form" id="reply-form-${c.id}">
+                <textarea placeholder="Ответ Людич..."></textarea>
+                <div class="reply-form-actions">
+                    <button class="btn btn-primary" style="font-size:0.8em;padding:4px 10px;" onclick="submitComment(${c.id})">Отправити</button>
+                    <button class="btn btn-secondary" style="font-size:0.8em;padding:4px 10px;" onclick="toggleReplyForm(${c.id})">Отменити</button>
+                </div>
+            </div>` : ''}
         </div>
     `
 }
@@ -725,29 +715,55 @@ async function toggleCommentLike(commentId) {
 
 async function submitComment(parentId) {
     if (!currentUser) return
-    let text = parentId ? document.getElementById('reply-form-' + parentId)?.querySelector('textarea')?.value?.trim() : document.getElementById('new-comment')?.value?.trim()
+    let text
+    if (parentId) {
+        const form = document.getElementById('reply-form-' + parentId)
+        text = form?.querySelector('textarea')?.value?.trim()
+    } else {
+        text = document.getElementById('new-comment')?.value?.trim()
+    }
     if (!text) return
 
-    await supabaseClient.from('comments').insert({ article_id: articleId, user_id: currentUserId, username: currentUser, content: text, parent_id: parentId || null })
+    await supabaseClient.from('comments').insert({
+        article_id: articleId,
+        user_id: currentUserId,
+        username: currentUser,
+        content: text,
+        parent_id: parentId || null
+    })
+
     if (parentId) {
-        const f = document.getElementById('reply-form-' + parentId); if (f) { f.querySelector('textarea').value = ''; f.classList.remove('visible') }
+        const form = document.getElementById('reply-form-' + parentId)
+        if (form) { form.querySelector('textarea').value = ''; form.classList.remove('visible') }
     } else {
-        const el = document.getElementById('new-comment'); if (el) el.value = ''
+        const el = document.getElementById('new-comment')
+        if (el) el.value = ''
     }
     await loadComments()
 }
 
-async function deleteComment(commentId) {
-    if (currentRole !== 'м.с.в.') return
-    await supabaseClient.from('comments').delete().eq('id', commentId)
+async function deleteComment(commentId, isOwn = false) {
+    if (!isOwn && !canDelete()) return
+    if (isOwn) {
+        await supabaseClient.from('comments').update({ content: '[сообщенность удалена]', deleted: true }).eq('id', commentId)
+    } else {
+        await supabaseClient.from('comments').delete().eq('id', commentId)
+    }
     await loadComments()
 }
 
 function showError(msg) {
-    document.getElementById('main-content').innerHTML = `<div class="state-box error"><div class="state-box-title">Смертч-шум</div><div>${msg}</div><br><a href="articles.html" class="btn btn-secondary">← Вернуться вч Архив</a></div>`
+    document.getElementById('main-content').innerHTML = `
+        <div class="state-box error">
+            <div class="state-box-title">Смертч-шум</div>
+            <div>${msg}</div><br>
+            <a href="articles.html" class="btn btn-secondary">← Вернуться вч Архив</a>
+        </div>
+    `
 }
 
 init()
 </script>
+
 </body>
 </html>
