@@ -376,6 +376,7 @@ let authorPublicIds = {}
 let authorData = {}
 
 async function init() {
+    console.log('init start')
     const params = new URLSearchParams(window.location.search)
     articleId = params.get('id')
     if (!articleId) { showError('Нрт идентификатора Знань'); return }
@@ -437,27 +438,18 @@ async function loadArticle() {
         articleLiked = !!alreadyLiked
     }
 
-    // Подгружаем данные автора
+    // Подгружаем данные автора одним запросом
     if (article.author) {
         const { data: aData } = await supabaseClient
-            .from('users').select('public_id, banner_url, avatar_url, name_color, title')
+            .from('users').select('id, public_id, banner_url, avatar_url, name_color, title')
             .eq('username', article.author).single()
         if (aData) {
             authorPublicIds[article.author] = aData.public_id
-            authorData = aData
-        }
-
-        // Значки автора
-        if (authorData && authorPublicIds[article.author]) {
-            const { data: authorUser } = await supabaseClient
-                .from('users').select('id').eq('username', article.author).single()
-            if (authorUser) {
-                const { data: badges } = await supabaseClient
-                    .from('user_badges')
-                    .select('badges(id, name, description, icon_url)')
-                    .eq('user_id', authorUser.id)
-                authorData.badges = badges ?? []
-            }
+            const { data: badges } = await supabaseClient
+                .from('user_badges')
+                .select('badges(id, name, description, icon_url)')
+                .eq('user_id', aData.id)
+            authorData = { ...aData, badges: badges ?? [] }
         }
     }
 
@@ -523,5 +515,297 @@ function renderContentInfobox(article) {
 
 function renderContent(content, imageUrl) {
     if (!content) return ''
+    // Сначала обрабатываем markdown-синтаксис ДО экранирования
     let html = content
-        .replace(/^> (.+)$/gm, '
+        .replace(/^> (.+)$/gm, '~~BQ~~$1~~END~~')
+        .replace(/^## (.+)$/gm, '~~H2~~$1~~END~~')
+        .replace(/^### (.+)$/gm, '~~H3~~$1~~END~~')
+        .replace(/\*\*(.+?)\*\*/g, '~~ST~~$1~~ENDST~~')
+        .replace(/\*(.+?)\*/g, '~~EM~~$1~~ENDEM~~')
+    // Теперь экранируем
+    html = html
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/&lt;image&gt;/g, imageUrl
+            ? `<img class="content-image" src="${imageUrl}" alt="Картинка">`
+            : `<div class="inline-image-placeholder">Нрт картинки дляч этого тега</div>`)
+    // Восстанавливаем HTML теги
+    html = html
+        .replace(/~~BQ~~(.+?)~~END~~/g, '<blockquote>$1</blockquote>')
+        .replace(/~~H2~~(.+?)~~END~~/g, '<h2>$1</h2>')
+        .replace(/~~H3~~(.+?)~~END~~/g, '<h3>$1</h3>')
+        .replace(/~~ST~~(.+?)~~ENDST~~/g, '<strong>$1</strong>')
+        .replace(/~~EM~~(.+?)~~ENDEM~~/g, '<em>$1</em>')
+
+    return html.split('\n').map(line => {
+        if (/^<(h2|h3|blockquote|img|div)/.test(line)) return line
+        if (line.trim() === '') return '<br>'
+        return `<p>${line}</p>`
+    }).join('')
+}
+
+function renderArticle(article) {
+    const userIsMsv = isMsv()
+    const _canDelete = canDelete()
+
+    document.getElementById('main-content').innerHTML = `
+        <h1 style="font-family:serif;font-weight:normal;font-size:2em;border-bottom:1px solid #a2a9b1;padding-bottom:5px;margin-bottom:10px;">
+            ${article.pinned ? '<span class="pinned-badge">📌 Закреплено</span>' : ''}
+            ${article.title}
+        </h1>
+
+        ${userIsMsv ? `
+        <div class="article-actions">
+            ${_canDelete ? `<button class="btn btn-secondary" onclick="togglePin(${article.pinned})">${article.pinned ? 'Открепити' : 'Закрепити'}</button>` : ''}
+            ${_canDelete ? `<button class="btn btn-danger" onclick="deleteArticle()">Удалити Знань</button>` : ''}
+            ${article.status === 'pending' ? `<button class="btn btn-primary" onclick="publishArticle()">Опубликовати</button>` : ''}
+        </div>
+        ` : ''}
+
+        <div class="article-content clearfix">
+            ${renderMetaInfobox(article)}
+            ${renderContentInfobox(article)}
+            ${renderContent(article.content, article.image_url)}
+        </div>
+
+        <div class="like-bar">
+            <button class="like-btn ${articleLiked ? 'liked' : ''}" id="like-btn" onclick="toggleArticleLike()">
+                ▲ ${articleLiked ? 'Лайк поставленол' : 'Поставити лайк'}
+            </button>
+            <span class="views-count" id="likes-count">${article.likes_count ?? 0} лайков</span>
+            <span class="views-count">· ${(article.views_count ?? 0) + 1} просмотров</span>
+        </div>
+
+        <div class="comments-section" id="comments-section">
+            <h2>Обсуждение Знань</h2>
+            ${renderCommentForm()}
+            <div id="comments-list"><p class="no-comments">Загружати обсуждение...</p></div>
+        </div>
+    `
+}
+
+function renderCommentForm() {
+    if (!currentUser) return `<div class="login-prompt">Дляч участия вч обсуждении необходима идентификация. <a href="login.html">Войти вч систему</a></div>`
+    return `
+        <div class="comment-form">
+            <textarea id="new-comment" placeholder="Пиши своё Знань вч обсуждение..."></textarea>
+            <div class="comment-form-actions">
+                <button class="btn btn-primary" onclick="submitComment(null)">Отправити</button>
+                <span style="font-size:0.8em;color:#54595d;">Пишешь как: <b>${currentUser}</b></span>
+            </div>
+        </div>
+    `
+}
+
+async function toggleArticleLike() {
+    if (!currentUserId) { window.location.href = 'login.html'; return }
+    const btn = document.getElementById('like-btn')
+    const countEl = document.getElementById('likes-count')
+
+    if (articleLiked) {
+        await supabaseClient.from('article_likes').delete()
+            .eq('article_id', articleId).eq('user_id', currentUserId)
+        articleLiked = false
+    } else {
+        await supabaseClient.from('article_likes').insert({ article_id: articleId, user_id: currentUserId })
+        articleLiked = true
+    }
+
+    const newCount = articleLiked
+        ? (parseInt(countEl.textContent) || 0) + 1
+        : Math.max((parseInt(countEl.textContent) || 1) - 1, 0)
+
+    await supabaseClient.from('articles').update({ likes_count: newCount }).eq('id', articleId)
+    btn.className = `like-btn ${articleLiked ? 'liked' : ''}`
+    btn.textContent = `▲ ${articleLiked ? 'Лайк поставленол' : 'Поставити лайк'}`
+    countEl.textContent = `${newCount} лайков`
+}
+
+async function togglePin(currentlyPinned) {
+    if (!canDelete()) return
+    await supabaseClient.from('articles').update({ pinned: !currentlyPinned }).eq('id', articleId)
+    window.location.reload()
+}
+
+async function publishArticle() {
+    if (!isMsv()) return
+    await supabaseClient.from('articles').update({
+        status: 'published',
+        reviewed_by: currentUser,
+        reviewed_at: new Date().toISOString()
+    }).eq('id', articleId)
+    window.location.reload()
+}
+
+async function deleteArticle() {
+    if (!canDelete()) return
+    if (!confirm('Удалити это Знань навсегда?')) return
+    await supabaseClient.from('articles').delete().eq('id', articleId)
+    window.location.href = 'articles.html'
+}
+
+async function loadUserCommentLikes() {
+    if (!currentUserId) return
+    const { data } = await supabaseClient.from('likes').select('comment_id').eq('user_id', currentUserId)
+    if (data) data.forEach(l => userCommentLikes.add(l.comment_id))
+}
+
+async function loadComments() {
+    const { data, error } = await supabaseClient
+        .from('comments').select('*, likes(count)')
+        .eq('article_id', articleId).order('created_at', { ascending: true })
+
+    const container = document.getElementById('comments-list')
+    if (!container) return
+    if (error) { container.innerHTML = '<p style="color:#d33;">Смертч-шум вч обсуждении</p>'; return }
+    if (!data || data.length === 0) {
+        container.innerHTML = '<p class="no-comments">Нрт обсуждения — будь первым Людич</p>'
+        return
+    }
+
+    // Подгружаем public_id для всех авторов комментариев
+    const usernames = [...new Set(data.map(c => c.username))]
+    const { data: usersData } = await supabaseClient
+        .from('users').select('username, public_id, avatar_url, banner_url, name_color').in('username', usernames)
+    const userMap = {}
+    if (usersData) usersData.forEach(u => { userMap[u.username] = { pid: u.public_id, avatar: u.avatar_url, banner: u.banner_url, nameColor: u.name_color } })
+
+    const roots = data.filter(c => !c.parent_id)
+    const replies = data.filter(c => c.parent_id)
+    container.innerHTML = roots.map(c => {
+        return renderComment(c, false, userMap) + replies.filter(r => r.parent_id === c.id).map(r => renderComment(r, true, userMap)).join('')
+    }).join('')
+}
+
+function renderComment(c, isReply = false, userMap = {}) {
+    const udata = userMap[c.username] || {}
+    const commentAuthorBanner = udata.banner || ''
+    const commentBannerStyle = commentAuthorBanner
+        ? `background-image:url('${commentAuthorBanner}');background-size:100% 100%;background-repeat:no-repeat;`
+        : ''
+    if (c.deleted) {
+        return `<div class="comment ${isReply ? 'reply' : ''}" style="opacity:0.5;font-style:italic;color:#a2a9b1;">
+            <div class="comment-header"><span class="comment-date">${new Date(c.created_at).toLocaleDateString('ru-RU')}</span></div>
+            <div class="comment-content">[сообщенность удалена]</div>
+        </div>`
+    }
+    const likeCount = c.likes?.[0]?.count ?? 0
+    const liked = userCommentLikes.has(c.id)
+    const date = new Date(c.created_at).toLocaleDateString('ru-RU')
+    const pid = udata.pid
+    const avatar = udata.avatar
+    const avatarHtml = `<div style="width:24px;height:24px;border-radius:2px;overflow:hidden;border:1px solid #eaecf0;flex-shrink:0;background:#eaecf0;display:flex;align-items:center;justify-content:center;">${
+        avatar
+            ? `<img src="${avatar}" style="width:24px;height:24px;object-fit:cover;display:block;">`
+            : `<span style="font-size:0.75em;color:#a2a9b1;font-family:serif;">${c.username[0].toUpperCase()}</span>`
+    }</div>`
+    const nc = udata.nameColor ? `color:${udata.nameColor};` : ''
+    const authorHtml = pid
+        ? `<a href="profile.html?id=${pid}" class="comment-author" style="${nc}">${c.username}</a>`
+        : `<span class="comment-author" style="${nc}">${c.username}</span>`
+    return `
+        <div class="comment ${isReply ? 'reply' : ''}" id="comment-${c.id}" style="${commentBannerStyle}">
+            <div class="comment-header">
+                ${avatarHtml}
+                ${authorHtml}
+                <span class="comment-date">${date}</span>
+            </div>
+            <div class="comment-content">${c.content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+            <div class="comment-actions">
+                <button class="comment-btn ${liked ? 'liked' : ''}" onclick="toggleCommentLike(${c.id})">▲ ${likeCount}</button>
+                ${currentUser && !isReply ? `<button class="comment-btn" onclick="toggleReplyForm(${c.id})">Ответити</button>` : ''}
+                ${canDelete() && !c.deleted ? `<button class="comment-btn" style="color:#d33;" onclick="deleteComment(${c.id}, false)">Удалити</button>` : ''}
+                ${!c.deleted && c.user_id === currentUserId ? `<button class="comment-btn" style="color:#a2a9b1;" onclick="deleteComment(${c.id}, true)">Удалити своё</button>` : ''}
+            </div>
+            ${currentUser && !isReply ? `
+            <div class="reply-form" id="reply-form-${c.id}">
+                <textarea placeholder="Ответ Людич..."></textarea>
+                <div class="reply-form-actions">
+                    <button class="btn btn-primary" style="font-size:0.8em;padding:4px 10px;" onclick="submitComment(${c.id})">Отправити</button>
+                    <button class="btn btn-secondary" style="font-size:0.8em;padding:4px 10px;" onclick="toggleReplyForm(${c.id})">Отменити</button>
+                </div>
+            </div>` : ''}
+        </div>
+    `
+}
+
+function toggleReplyForm(commentId) {
+    const form = document.getElementById('reply-form-' + commentId)
+    if (form) form.classList.toggle('visible')
+}
+
+async function toggleCommentLike(commentId) {
+    if (!currentUserId) { window.location.href = 'login.html'; return }
+    const liked = userCommentLikes.has(commentId)
+    if (liked) {
+        await supabaseClient.from('likes').delete().eq('comment_id', commentId).eq('user_id', currentUserId)
+        userCommentLikes.delete(commentId)
+    } else {
+        await supabaseClient.from('likes').insert({ comment_id: commentId, user_id: currentUserId })
+        userCommentLikes.add(commentId)
+    }
+    await loadComments()
+}
+
+async function submitComment(parentId) {
+    if (!currentUser) return
+    let text
+    if (parentId) {
+        const form = document.getElementById('reply-form-' + parentId)
+        text = form?.querySelector('textarea')?.value?.trim()
+    } else {
+        text = document.getElementById('new-comment')?.value?.trim()
+    }
+    if (!text) return
+
+    await supabaseClient.from('comments').insert({
+        article_id: articleId,
+        user_id: currentUserId,
+        username: currentUser,
+        content: text,
+        parent_id: parentId || null
+    })
+
+    if (parentId) {
+        const form = document.getElementById('reply-form-' + parentId)
+        if (form) { form.querySelector('textarea').value = ''; form.classList.remove('visible') }
+    } else {
+        const el = document.getElementById('new-comment')
+        if (el) el.value = ''
+    }
+    await loadComments()
+}
+
+async function deleteComment(commentId, isOwn = false) {
+    console.log('[deleteComment] id:', commentId, 'isOwn:', isOwn, 'role:', currentRole, 'canDelete:', canDelete(), 'currentUserId:', currentUserId)
+    if (!isOwn && !canDelete()) {
+        console.log('[deleteComment] blocked — no permission')
+        return
+    }
+    if (isOwn) {
+        const { error } = await supabaseClient.from('comments')
+            .update({ content: '[сообщенность удалена]', deleted: true })
+            .eq('id', commentId)
+        console.log('[deleteComment] soft delete error:', error)
+    } else {
+        const { error } = await supabaseClient.from('comments')
+            .delete().eq('id', commentId)
+        console.log('[deleteComment] hard delete error:', error)
+    }
+    await loadComments()
+}
+
+function showError(msg) {
+    document.getElementById('main-content').innerHTML = `
+        <div class="state-box error">
+            <div class="state-box-title">Смертч-шум</div>
+            <div>${msg}</div><br>
+            <a href="articles.html" class="btn btn-secondary">← Вернуться вч Архив</a>
+        </div>
+    `
+}
+
+init()
+</script>
+
+</body>
+</html>
