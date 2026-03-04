@@ -441,9 +441,16 @@ async function init() {
 
     // Apply profile bg
     if (user.profile_bg) {
-        document.querySelector('.container main').style.background = user.profile_bg
+        const main = document.querySelector('.container main')
+        if (user.profile_bg.startsWith('url(')) {
+            main.style.backgroundImage = user.profile_bg
+            main.style.backgroundSize = 'cover'
+            main.style.backgroundPosition = 'center'
+        } else {
+            main.style.background = user.profile_bg
+        }
         const isDark = ['#1a1a2e','#0f3460'].includes(user.profile_bg)
-        if (isDark) document.querySelector('.container main').style.color = '#eaecf0'
+        if (isDark) main.style.color = '#eaecf0'
     }
 
     await renderProfile()
@@ -642,7 +649,13 @@ function renderEditSection() {
                 </div>
                 <div class="edit-field" style="margin-top:14px;">
                     <label class="edit-label">Фон профиля</label>
-                    <div class="color-row" id="bg-options"></div>
+                    <div class="color-row" id="bg-options" style="margin-bottom:8px;"></div>
+                    <div style="display:flex;gap:8px;align-items:center;margin-top:6px;">
+                        <button class="btn btn-secondary" style="font-size:0.82em;" onclick="document.getElementById('bg-gif-file').click()">Загрузити GIF фон</button>
+                        <input type="file" id="bg-gif-file" accept="image/gif,image/png,image/jpeg" style="display:none;" onchange="uploadBgGif(this)">
+                        <span style="font-size:0.78em;color:#54595d;" id="bg-gif-hint"></span>
+                    </div>
+                    <div id="bg-gif-preview" style="margin-top:6px;"></div>
                 </div>
             </div>
 
@@ -679,9 +692,10 @@ function initColorSwatches() {
     if (!container) return
     container.innerHTML = NAME_COLORS.map(c => `
         <div class="color-swatch ${selectedNameColor === c.value ? 'selected' : ''}"
-             style="background:${c.color || '#f8f9fa'};${!c.value ? 'border:1px solid #a2a9b1;' : ''}"
+             style="background:${c.color || '#f8f9fa'};border:2px solid ${selectedNameColor === c.value ? '#202122' : '#a2a9b1'};"
              title="${c.label}"
              onclick="selectNameColor('${c.value}', this)">
+            <span style="font-size:0.6em;color:${c.value ? '#fff' : '#202122'};text-shadow:0 0 2px rgba(0,0,0,0.5);pointer-events:none;">А</span>
         </div>
     `).join('')
 }
@@ -717,9 +731,10 @@ function initBgOptions() {
     if (!container) return
     container.innerHTML = BG_OPTIONS.map(b => `
         <div class="color-swatch ${selectedBg === b.value ? 'selected' : ''}"
-             style="background:${b.color || '#fff'};${!b.value ? 'border:1px solid #a2a9b1;' : ''}"
+             style="background:${b.color || '#fff'};border:2px solid ${selectedBg === b.value ? '#202122' : '#a2a9b1'};display:flex;align-items:center;justify-content:center;"
              title="${b.label}"
              onclick="selectBg('${b.value}', this)">
+            <span style="font-size:0.55em;color:${['#1a1a2e','#0f3460'].includes(b.color) ? '#fff' : '#202122'};pointer-events:none;text-shadow:0 0 2px rgba(255,255,255,0.5);">${b.label.substring(0,3)}</span>
         </div>
     `).join('')
 }
@@ -795,6 +810,32 @@ async function checkNewUsername() {
         if (data) { hint.className = 'edit-hint error'; hint.textContent = 'Этот позывной уже занят' }
         else { hint.className = 'edit-hint success'; hint.textContent = 'Позывной свободен' }
     }, 500)
+}
+
+async function uploadBgGif(input) {
+    const file = input.files[0]
+    if (!file) return
+    const hint = document.getElementById('bg-gif-hint')
+    hint.style.color = '#54595d'; hint.textContent = 'Загружати...'
+
+    const ext = file.name.split('.').pop()
+    const fileName = 'backgrounds/' + currentUserId + '_' + Date.now() + '.' + ext
+
+    const { error } = await supabaseClient.storage
+        .from('images').upload(fileName, file, { upsert: true })
+
+    if (error) { hint.style.color = '#d33'; hint.textContent = 'Смертч-шум: ' + error.message; return }
+
+    const { data: urlData } = supabaseClient.storage.from('images').getPublicUrl(fileName)
+    const url = urlData.publicUrl + '?t=' + Date.now()
+    selectedBg = 'url(' + url + ')'
+
+    document.getElementById('bg-gif-preview').innerHTML =
+        '<img src="' + url + '" style="max-height:60px;max-width:200px;object-fit:cover;border:1px solid #a2a9b1;">'
+    hint.style.color = '#14866d'; hint.textContent = 'Загруженол ✓'
+
+    // Deselect color swatches
+    document.querySelectorAll('#bg-options .color-swatch').forEach(s => s.classList.remove('selected'))
 }
 
 async function saveProfile() {
