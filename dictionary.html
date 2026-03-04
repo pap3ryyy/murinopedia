@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="icon" type="image/png" href="asset/logo.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Муринский Словарь — Муринопедия</title>
+    <link rel="stylesheet" href="css/wiki.css">
+    <style>
+        .article-infobox {
+            float: right;
+            clear: right;
+            margin: 0 0 20px 20px;
+            background: #f8f9fa;
+            border: 1px solid #a2a9b1;
+            font-size: 0.9em;
+            min-width: 180px;
+            max-width: 260px;
+        }
+
+        .infobox-title {
+            background: #cee0f2;
+            text-align: center;
+            font-weight: bold;
+            padding: 6px;
+            display: block;
+            font-size: 1em;
+            font-family: serif;
+        }
+
+        .infobox-image {
+            width: 100%;
+            overflow: hidden;
+            max-height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eaecf0;
+        }
+
+        .infobox-image img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .infobox-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .infobox-table td {
+            padding: 4px 8px;
+            vertical-align: top;
+            border-top: 1px solid #eaecf0;
+            font-size: 0.88em;
+        }
+
+        .infobox-table td:first-child {
+            font-weight: bold;
+            color: #54595d;
+            white-space: nowrap;
+            width: 42%;
+        }
+
+        .meta-infobox {
+            float: right;
+            clear: right;
+            margin: 0 0 20px 20px;
+            background: #f8f9fa;
+            border: 1px solid #a2a9b1;
+            font-size: 0.85em;
+            min-width: 180px;
+            max-width: 260px;
+        }
+
+        .meta-infobox .infobox-title {
+            background: #eaecf0;
+            color: #54595d;
+            font-size: 0.9em;
+        }
+
+        .review-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .review-badge.verified { background: #d4f5e9; color: #14866d; border: 1px solid #14866d; }
+        .review-badge.msv { background: #cee0f2; color: #3366cc; border: 1px solid #3366cc; }
+        .review-badge.pending { background: #fef6e4; color: #c8a850; border: 1px solid #c8a850; }
+
+        .article-content { line-height: 1.7; }
+
+        .article-content h2 {
+            font-family: serif;
+            font-weight: normal;
+            font-size: 1.4em;
+            border-bottom: 1px solid #a2a9b1;
+            padding-bottom: 3px;
+            margin-top: 24px;
+        }
+
+        .article-content h3 {
+            font-family: serif;
+            font-size: 1.15em;
+            margin-top: 18px;
+        }
+
+        .dict-wrap {
+            border: 1px solid #a2a9b1;
+            background: #f8f9fa;
+            margin: 16px 0;
+            font-size: 0.9em;
+        }
+        .dict-header {
+            background: #cee0f2;
+            padding: 8px 14px;
+            font-family: serif;
+            font-size: 1.05em;
+            border-bottom: 1px solid #a2a9b1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dict-search {
+            padding: 4px 8px;
+            border: 1px solid #a2a9b1;
+            font-size: 0.85em;
+            background: #fff;
+            outline: none;
+            width: 180px;
+        }
+        .dict-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .dict-table th {
+            background: #eaecf0;
+            border-bottom: 1px solid #a2a9b1;
+            padding: 6px 12px;
+            text-align: left;
+            font-size: 0.85em;
+            color: #54595d;
+        }
+        .dict-table td {
+            padding: 6px 12px;
+            border-bottom: 1px solid #eaecf0;
+            vertical-align: middle;
+        }
+        .dict-table tr:last-child td { border-bottom: none; }
+        .dict-table tr:hover td { background: #f0f4ff; }
+        .dict-add-form {
+            padding: 12px 14px;
+            border-top: 2px solid #a2a9b1;
+            background: #fff;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .dict-input {
+            padding: 5px 8px;
+            border: 1px solid #a2a9b1;
+            font-size: 0.88em;
+            background: #f8f9fa;
+            outline: none;
+            width: 160px;
+        }
+        .dict-input:focus { border-color: #3366cc; background: #fff; }
+        .dict-status { font-size: 0.8em; color: #54595d; }
+        .dict-pending-row td { background: #fef6e4 !important; color: #7a6000; }
+        .dict-rejected-row td { background: #fee7e6 !important; color: #d33; }
+        .dict-msv-actions { display: flex; gap: 6px; }
+
+        .article-codeblock {
+            margin: 12px 0;
+            border: 1px solid #3d3d5c;
+            border-radius: 2px;
+            overflow-x: auto;
+        }
+
+        .article-content blockquote {
+            border-left: 3px solid #a2a9b1;
+            margin: 12px 0 12px 20px;
+            padding: 4px 12px;
+            color: #54595d;
+            font-style: italic;
+        }
+
+        .article-content .content-image {
+            max-width: 100%;
+            max-height: 500px;
+            width: auto;
+            height: auto;
+            border: 1px solid #a2a9b1;
+            margin: 12px 0;
+            display: block;
+            object-fit: contain;
+        }
+
+        .article-content .inline-image-placeholder {
+            border: 2px dashed #a2a9b1;
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #54595d;
+            font-size: 0.85em;
+            margin: 10px 0;
+        }
+
+        .article-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 20px;
+            padding-top: 12px;
+            border-top: 1px solid #eaecf0;
+            flex-wrap: wrap;
+        }
+
+        .like-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+            padding: 12px 0;
+            border-top: 1px solid #eaecf0;
+            font-size: 0.9em;
+            color: #54595d;
+        }
+
+        .like-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border: 1px solid #a2a9b1;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-size: 0.9em;
+            border-radius: 2px;
+            color: #202122;
+            transition: background 0.1s;
+        }
+
+        .like-btn:hover { background: #eaecf0; }
+
+        .like-btn.liked {
+            background: #cee0f2;
+            border-color: #3366cc;
+            color: #3366cc;
+            font-weight: bold;
+        }
+
+        .views-count { color: #a2a9b1; font-size: 0.85em; }
+
+        .comments-section {
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 2px solid #a2a9b1;
+        }
+
+        .comments-section h2 {
+            font-family: serif;
+            font-weight: normal;
+            font-size: 1.3em;
+            margin-bottom: 16px;
+        }
+
+        .comment-form { margin-bottom: 24px; }
+
+        .comment-form textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #a2a9b1;
+            font-size: 0.9em;
+            background: #f8f9fa;
+            color: #202122;
+            outline: none;
+            font-family: sans-serif;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .comment-form textarea:focus { border-color: #3366cc; background: #fff; }
+
+        .comment-form-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+            align-items: center;
+        }
+
+        .comment {
+            border-left: 3px solid #eaecf0;
+            padding: 10px 14px;
+            margin-bottom: 14px;
+            background: #f8f9fa;
+        }
+
+        .comment.reply {
+            margin-left: 24px;
+            border-left-color: #cee0f2;
+            background: #f0f4ff;
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+            font-size: 0.85em;
+        }
+
+        .comment-author { font-weight: bold; color: #0645ad; }
+        .comment-date { color: #a2a9b1; }
+
+        .comment-content {
+            font-size: 0.9em;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .comment-actions { display: flex; gap: 12px; font-size: 0.8em; }
+
+        .comment-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #54595d;
+            padding: 0;
+            font-size: 0.85em;
+        }
+
+        .comment-btn:hover { color: #0645ad; }
+        .comment-btn.liked { color: #3366cc; font-weight: bold; }
+
+        .reply-form { margin-top: 10px; display: none; }
+        .reply-form.visible { display: block; }
+
+        .reply-form textarea {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #a2a9b1;
+            font-size: 0.85em;
+            background: #fff;
+            color: #202122;
+            outline: none;
+            font-family: sans-serif;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .reply-form textarea:focus { border-color: #3366cc; }
+        .reply-form-actions { display: flex; gap: 6px; margin-top: 4px; }
+
+        .no-comments { color: #54595d; font-size: 0.9em; font-style: italic; }
+
+        .login-prompt {
+            background: #f8f9fa;
+            border: 1px solid #a2a9b1;
+            padding: 12px;
+            font-size: 0.9em;
+            color: #54595d;
+        }
+
+        .state-box {
+            padding: 40px 20px;
+            text-align: center;
+            border: 1px solid #a2a9b1;
+            background: #f8f9fa;
+        }
+
+        .state-box-title { font-family: serif; font-size: 1.3em; margin-bottom: 8px; }
+
+        .state-box.error { border-color: #d33; background: #fee7e6; }
+        .state-box.error .state-box-title { color: #d33; }
+
+        .pinned-badge {
+            display: inline-block;
+            background: #fef6e4;
+            border: 1px solid #c8a850;
+            color: #c8a850;
+            font-size: 0.7em;
+            padding: 2px 8px;
+            font-weight: bold;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-area">
+        <img src="asset/logo.png" alt="М.С.В." class="logo-img">
+        <a href="index.html" class="logo-text">Муринопедия</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+        <div class="status-bar">
+            Оперативная обстановка: <span style="color: #d33; font-weight: bold;">СТАБИЛЬНАЯ</span>
+        </div>
+        <div id="header-user" style="font-size:0.85em;color:#54595d;"></div>
+    </div>
+</header>
+
+<div class="container">
+    <main id="main-content">
+        <p style="color:#54595d;">Загружати Знань...</p>
+    </main>
+    <aside>
+        <div class="sidebar-box">
+            <h4>Навигация</h4>
+            <p><a href="index.html">← Главная</a></p>
+        </div>
+        <div class="sidebar-box" style="border-color: #d33; background: #fee7e6;">
+            <h4 style="color:#d33;">Напоминание</h4>
+            <p>Видл слово «Друг»? Ог — мимикрия Фога. Говори <b>Друн</b>.</p>
+        </div>
+    </aside>
+</div>
+
+<footer>
+    Муринопедия — 2026 год. <br>
+    Ч илу доной, пока естч светл. Мурино стояти, Фог дрожати.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+let currentUser = null
+let currentUserId = null
+let currentUserPublicId = null
+let currentRole = null
+
+function isMsv() {
+    return ['м.с.в.проверкость', 'м.с.в.содрунник', 'м.с.в.основательность'].includes(currentRole)
+}
+function canDelete() {
+    return ['м.с.в.содрунник', 'м.с.в.основательность'].includes(currentRole)
+}
+let articleId = null
+let userCommentLikes = new Set()
+let articleLiked = false
+let authorPublicIds = {}
+let authorData = {}
+
+async function init() {
+    console.log('init start')
+    const params = new URLSearchParams(window.location.search)
+    articleId = params.get('id')
+    if (!articleId) { showError('Нрт идентификатора Знань'); return }
+
+    const { data: { session } } = await supabaseClient.auth.getSession()
+    if (session) {
+        currentUserId = session.user.id
+        const { data: user } = await supabaseClient
+            .from('users').select('username, role, public_id').eq('id', session.user.id).single()
+        if (user) {
+            currentUser = user.username
+            currentRole = user.role
+            currentUserPublicId = user.public_id
+        }
+    }
+
+    await loadArticle()
+    renderHeaderUser()
+}
+
+function renderHeaderUser() {
+    const el = document.getElementById('header-user')
+    if (!el) return
+    if (currentUser) {
+        el.innerHTML = `<a href="profile.html?id=${currentUserPublicId}" style="color:#0645ad;">${currentUser}</a> &nbsp;<button onclick="logout()" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;">Выйти</button>`
+    } else {
+        el.innerHTML = `<a href="login.html" style="font-size:0.85em;">Войти</a>`
+    }
+}
+
+// ─── DICTIONARY ──────────────────────────────────────────
+async function loadDictionary() {
+    const el = document.getElementById('murino-dictionary')
+    if (!el) return
+
+    const { data: words } = await supabaseClient
+        .from('dictionary')
+        .select('*')
+        .order('created_at', { ascending: true })
+
+    const approved = (words ?? []).filter(w => w.status === 'approved')
+    const myPending = (words ?? []).filter(w => w.status === 'pending' && w.author_id === currentUserId)
+    const myRejected = (words ?? []).filter(w => w.status === 'rejected' && w.author_id === currentUserId)
+    const allPending = (words ?? []).filter(w => w.status === 'pending')
+
+    const canModerate = currentRole === 'м.с.в.основательность'
+
+    const visibleToMe = [
+        ...approved,
+        ...myPending,
+        ...myRejected,
+        ...(canModerate ? allPending.filter(w => w.author_id !== currentUserId) : [])
+    ].filter((w, i, arr) => arr.findIndex(x => x.id === w.id) === i)
+
+    el.innerHTML = `
+        <div class="dict-header">
+            <span>📖 Муринский Словарь <span style="font-size:0.8em;color:#54595d;">(${approved.length} слов)</span></span>
+            <input type="text" class="dict-search" placeholder="Поиск..." oninput="filterDict(this.value)">
+        </div>
+        <table class="dict-table" id="dict-table">
+            <thead><tr><th>Русский</th><th>Муринский</th><th>Автор</th>${canModerate ? '<th>Действия</th>' : ''}</tr></thead>
+            <tbody id="dict-body">
+                ${visibleToMe.map(w => renderDictRow(w, canModerate)).join('')}
+            </tbody>
+        </table>
+        ${currentUser ? `
+        <div class="dict-add-form">
+            <input type="text" class="dict-input" id="dict-ru" placeholder="Русское слово" maxlength="40">
+            <input type="text" class="dict-input" id="dict-mu" placeholder="Муринское слово" maxlength="40">
+            <button class="btn btn-primary" style="font-size:0.85em;" onclick="submitDictWord()">Предложити</button>
+            <span class="dict-status" id="dict-status"></span>
+        </div>` : `<div class="dict-add-form"><span style="font-size:0.85em;color:#54595d;"><a href="login.html">Войди</a> чтобы предложить слово</span></div>`}
+    `
+}
+
+function renderDictRow(w, canModerate) {
+    let rowClass = ''
+    let ruText = w.russian
+    let muText = w.murino
+    let extra = ''
+
+    if (w.status === 'pending') {
+        rowClass = 'dict-pending-row'
+        extra = ' <span style="font-size:0.75em;">(на проверке)</span>'
+    } else if (w.status === 'rejected') {
+        rowClass = 'dict-rejected-row'
+        extra = ` <span style="font-size:0.75em;">— отклоненол${w.reject_reason ? ': ' + w.reject_reason : ''}</span>`
+    }
+
+    return `<tr class="${rowClass}" id="drow-${w.id}">
+        <td>${ruText}${w.status !== 'approved' && !canModerate ? extra : ''}</td>
+        <td>${muText}</td>
+        <td style="color:#a2a9b1;font-size:0.82em;">${w.author_username ?? '—'}</td>
+        ${canModerate ? `<td>
+            ${w.status === 'pending' ? `
+                <div class="dict-msv-actions">
+                    <button class="btn btn-primary" style="font-size:0.75em;padding:2px 8px;" onclick="approveWord(${w.id})">Принять</button>
+                    <button class="btn btn-danger" style="font-size:0.75em;padding:2px 8px;" onclick="rejectWord(${w.id})">Отклонить</button>
+                </div>
+            ` : `<span style="font-size:0.8em;color:#a2a9b1;">${w.status}</span>`}
+        </td>` : ''}
+    </tr>`
+}
+
+function filterDict(q) {
+    const rows = document.querySelectorAll('#dict-body tr')
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase()
+        row.style.display = text.includes(q.toLowerCase()) ? '' : 'none'
+    })
+}
+
+async function submitDictWord() {
+    const ru = document.getElementById('dict-ru')?.value.trim()
+    const mu = document.getElementById('dict-mu')?.value.trim()
+    const status = document.getElementById('dict-status')
+    if (!ru || !mu) { status.style.color = '#d33'; status.textContent = 'Заполни оба поля'; return }
+    if (!currentUserId) { status.style.color = '#d33'; status.textContent = 'Нрт идентификации'; return }
+
+    status.style.color = '#54595d'; status.textContent = 'Отправляти...'
+
+    const { error } = await supabaseClient.from('dictionary').insert({
+        russian: ru,
+        murino: mu,
+        author_id: currentUserId,
+        author_username: currentUser,
+        status: 'pending'
+    })
+
+    if (error) { status.style.color = '#d33'; status.textContent = 'Смертч-шум: ' + error.message; return }
+
+    status.style.color = '#14866d'; status.textContent = 'Предложенол — ждёт проверки М.С.В.'
+    document.getElementById('dict-ru').value = ''
+    document.getElementById('dict-mu').value = ''
+    await loadDictionary()
+}
+
+async function approveWord(id) {
+    await supabaseClient.from('dictionary').update({ status: 'approved' }).eq('id', id)
+    await loadDictionary()
+}
+
+async function rejectWord(id) {
+    const reason = prompt('Причина отклонения (необязательно):') ?? ''
+    await supabaseClient.from('dictionary').update({ status: 'rejected', reject_reason: reason || null }).eq('id', id)
+    await loadDictionary()
+}
+
+async function logout() {
+    await supabaseClient.auth.signOut()
+    window.location.href = 'login.html'
+}
+
+async function loadArticle() {
+    const { data: article, error } = await supabaseClient
+        .from('articles').select('*').eq('id', articleId).single()
+
+    if (error || !article) { showError('Знань нрт найденол — возможно Фог скрылость его'); return }
+    if (article.status !== 'published' && !isMsv()) {
+        showError('Это Знань ещё нач проверке вч М.С.В.')
+        return
+    }
+
+    if (currentUserId) {
+        const { error: viewError } = await supabaseClient.from('article_views')
+            .upsert({ article_id: articleId, user_id: currentUserId }, { onConflict: 'article_id,user_id', ignoreDuplicates: true })
+        if (!viewError) {
+            await supabaseClient.from('articles')
+                .update({ views_count: (article.views_count ?? 0) + 1 }).eq('id', articleId)
+        }
+    }
+
+    if (currentUserId) {
+        const { data: alreadyLiked } = await supabaseClient
+            .from('article_likes').select('article_id')
+            .eq('article_id', articleId).eq('user_id', currentUserId).single()
+        articleLiked = !!alreadyLiked
+    }
+
+    // Подгружаем данные автора одним запросом
+    if (article.author) {
+        const { data: aData } = await supabaseClient
+            .from('users').select('id, public_id, banner_url, avatar_url, name_color, title')
+            .eq('username', article.author).single()
+        if (aData) {
+            authorPublicIds[article.author] = aData.public_id
+            const { data: badges } = await supabaseClient
+                .from('user_badges')
+                .select('badges(id, name, description, icon_url)')
+                .eq('user_id', aData.id)
+            authorData = { ...aData, badges: badges ?? [] }
+        }
+    }
+
+    document.title = article.title + ' — Муринопедия'
+
+    renderArticle(article)
+    if (document.getElementById('murino-dictionary')) {
+        await loadDictionary()
+    }
+    await loadUserCommentLikes()
+    await loadComments()
+}
+
+function renderReviewBadge(article) {
+    if (article.status === 'pending') return `<span class="review-badge pending">На проверке</span>`
+    if (article.reviewed_by) return `<span class="review-badge verified">Проверена — ${article.reviewed_by}</span>`
+    return `<span class="review-badge msv">Опубликована без проверки (М.С.В.)</span>`
+}
+
+function renderMetaInfobox(article) {
+    const created = new Date(article.created_at).toLocaleDateString('ru-RU')
+    const reviewed = article.reviewed_at ? new Date(article.reviewed_at).toLocaleDateString('ru-RU') : '—'
+    const authorPid = authorPublicIds[article.author]
+    const badges = (authorData.badges ?? []).map(ub => {
+        const b = ub.badges
+        return `<span style="position:relative;display:inline-flex;align-items:center;margin-left:3px;" class="badge-wrap">
+            <img src="${b.icon_url}" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;cursor:help;" title="${b.description ?? b.name}">
+        </span>`
+    }).join('')
+    const nameColor = authorData.name_color ? `color:${authorData.name_color};` : ''
+    const authorHtml = authorPid
+        ? `<a href="profile.html?id=${authorPid}" style="${nameColor}">${article.author ?? 'Аноним'}</a>${badges}`
+        : `${article.author ?? 'Аноним'}${badges}`
+    return `
+        <div class="meta-infobox">
+            <span class="infobox-title">Сведения о Знань</span>
+            <table class="infobox-table">
+                <tr><td>Автор</td><td>${authorHtml}</td></tr>
+                <tr><td>Категория</td><td>${article.tag ?? '—'}</td></tr>
+                <tr><td>Создано</td><td>${created}</td></tr>
+                <tr><td>Проверено</td><td>${reviewed}</td></tr>
+                <tr><td>Статус</td><td>${renderReviewBadge(article)}</td></tr>
+                <tr><td>Просмотры</td><td>${(article.views_count ?? 0) + 1}</td></tr>
+                <tr><td>Лайки</td><td>${article.likes_count ?? 0}</td></tr>
+            </table>
+        </div>
+    `
+}
+
+function renderContentInfobox(article) {
+    const fields = article.infobox ?? []
+    const hasCover = article.cover_url
+    const hasFields = fields.length > 0
+    if (!hasCover && !hasFields) return ''
+    return `
+        <div class="article-infobox">
+            <span class="infobox-title">${article.title}</span>
+            ${hasCover ? `<div class="infobox-image"><img src="${article.cover_url}" alt="${article.title}"></div>` : ''}
+            ${hasFields ? `
+            <table class="infobox-table">
+                ${fields.map(f => `<tr><td>${f.label}</td><td>${f.value}</td></tr>`).join('')}
+            </table>` : ''}
+        </div>
+    `
+}
+
+function renderContent(content, imageUrl, codeBlocks) {
+    codeBlocks = codeBlocks || []
+    if (!content) return ''
+    // Сначала обрабатываем markdown-синтаксис ДО экранирования
+    let html = content
+        .replace(/^> (.+)$/gm, '~~BQ~~$1~~END~~')
+        .replace(/^## (.+)$/gm, '~~H2~~$1~~END~~')
+        .replace(/^### (.+)$/gm, '~~H3~~$1~~END~~')
+        .replace(/\*\*(.+?)\*\*/g, '~~ST~~$1~~ENDST~~')
+        .replace(/\*(.+?)\*/g, '~~EM~~$1~~ENDEM~~')
+    // Теперь экранируем
+    html = html
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/&lt;image&gt;/g, imageUrl
+            ? `<img class="content-image" src="${imageUrl}" alt="Картинка">`
+            : `<div class="inline-image-placeholder">Нрт картинки дляч этого тега</div>`)
+    // Словарь только в статье 27
+    if (String(articleId) === '27') {
+        html = html.replace(/<dictionary>/g, '<div id="murino-dictionary" class="dict-wrap"><div style="padding:20px;text-align:center;color:#a2a9b1;font-size:0.85em;">Загружати словарь...</div></div>')
+    }
+
+    // Вставляем кодблоки
+    codeBlocks.forEach(b => {
+        if (!b.name || !b.content) return
+        const tag = new RegExp('<' + b.name + '>', 'g')
+        html = html.replace(tag, '<div class="article-codeblock">' + b.content + '</div>')
+    })
+
+    // Восстанавливаем HTML теги
+    html = html
+        .replace(/~~BQ~~(.+?)~~END~~/g, '<blockquote>$1</blockquote>')
+        .replace(/~~H2~~(.+?)~~END~~/g, '<h2>$1</h2>')
+        .replace(/~~H3~~(.+?)~~END~~/g, '<h3>$1</h3>')
+        .replace(/~~ST~~(.+?)~~ENDST~~/g, '<strong>$1</strong>')
+        .replace(/~~EM~~(.+?)~~ENDEM~~/g, '<em>$1</em>')
+
+    return html.split('\n').map(line => {
+        if (/^<(h2|h3|blockquote|img|div)/.test(line)) return line
+        if (line.trim() === '') return '<br>'
+        return `<p>${line}</p>`
+    }).join('')
+}
+
+function renderArticle(article) {
+    const userIsMsv = isMsv()
+    const _canDelete = canDelete()
+
+    document.getElementById('main-content').innerHTML = `
+        <h1 style="font-family:serif;font-weight:normal;font-size:2em;border-bottom:1px solid #a2a9b1;padding-bottom:5px;margin-bottom:10px;">
+            ${article.pinned ? '<span class="pinned-badge">📌 Закреплено</span>' : ''}
+            ${article.title}
+        </h1>
+
+        ${userIsMsv ? `
+        <div class="article-actions">
+            ${_canDelete ? `<button class="btn btn-secondary" onclick="togglePin(${article.pinned})">${article.pinned ? 'Открепити' : 'Закрепити'}</button>` : ''}
+            ${_canDelete ? `<button class="btn btn-danger" onclick="deleteArticle()">Удалити Знань</button>` : ''}
+            ${article.status === 'pending' ? `<button class="btn btn-primary" onclick="publishArticle()">Опубликовати</button>` : ''}
+        </div>
+        ` : ''}
+
+        <div class="article-content clearfix">
+            ${renderMetaInfobox(article)}
+            ${renderContentInfobox(article)}
+            ${renderContent(article.content, article.image_url, article.code_blocks)}
+        </div>
+
+        <div class="like-bar">
+            <button class="like-btn ${articleLiked ? 'liked' : ''}" id="like-btn" onclick="toggleArticleLike()">
+                ▲ ${articleLiked ? 'Лайк поставленол' : 'Поставити лайк'}
+            </button>
+            <span class="views-count" id="likes-count">${article.likes_count ?? 0} лайков</span>
+            <span class="views-count">· ${(article.views_count ?? 0) + 1} просмотров</span>
+        </div>
+
+        <div class="comments-section" id="comments-section">
+            <h2>Обсуждение Знань</h2>
+            ${renderCommentForm()}
+            <div id="comments-list"><p class="no-comments">Загружати обсуждение...</p></div>
+        </div>
+    `
+}
+
+function renderCommentForm() {
+    if (!currentUser) return `<div class="login-prompt">Дляч участия вч обсуждении необходима идентификация. <a href="login.html">Войти вч систему</a></div>`
+    return `
+        <div class="comment-form">
+            <textarea id="new-comment" placeholder="Пиши своё Знань вч обсуждение..."></textarea>
+            <div class="comment-form-actions">
+                <button class="btn btn-primary" onclick="submitComment(null)">Отправити</button>
+                <span style="font-size:0.8em;color:#54595d;">Пишешь как: <b>${currentUser}</b></span>
+            </div>
+        </div>
+    `
+}
+
+async function toggleArticleLike() {
+    if (!currentUserId) { window.location.href = 'login.html'; return }
+    const btn = document.getElementById('like-btn')
+    const countEl = document.getElementById('likes-count')
+
+    if (articleLiked) {
+        await supabaseClient.from('article_likes').delete()
+            .eq('article_id', articleId).eq('user_id', currentUserId)
+        articleLiked = false
+    } else {
+        await supabaseClient.from('article_likes').insert({ article_id: articleId, user_id: currentUserId })
+        articleLiked = true
+    }
+
+    const newCount = articleLiked
+        ? (parseInt(countEl.textContent) || 0) + 1
+        : Math.max((parseInt(countEl.textContent) || 1) - 1, 0)
+
+    await supabaseClient.from('articles').update({ likes_count: newCount }).eq('id', articleId)
+    btn.className = `like-btn ${articleLiked ? 'liked' : ''}`
+    btn.textContent = `▲ ${articleLiked ? 'Лайк поставленол' : 'Поставити лайк'}`
+    countEl.textContent = `${newCount} лайков`
+}
+
+async function togglePin(currentlyPinned) {
+    if (!canDelete()) return
+    await supabaseClient.from('articles').update({ pinned: !currentlyPinned }).eq('id', articleId)
+    window.location.reload()
+}
+
+async function publishArticle() {
+    if (!isMsv()) return
+    await supabaseClient.from('articles').update({
+        status: 'published',
+        reviewed_by: currentUser,
+        reviewed_at: new Date().toISOString()
+    }).eq('id', articleId)
+    window.location.reload()
+}
+
+async function deleteArticle() {
+    if (!canDelete()) return
+    if (!confirm('Удалити это Знань навсегда?')) return
+    await supabaseClient.from('articles').delete().eq('id', articleId)
+    window.location.href = 'articles.html'
+}
+
+async function loadUserCommentLikes() {
+    if (!currentUserId) return
+    const { data } = await supabaseClient.from('likes').select('comment_id').eq('user_id', currentUserId)
+    if (data) data.forEach(l => userCommentLikes.add(l.comment_id))
+}
+
+async function loadComments() {
+    const { data, error } = await supabaseClient
+        .from('comments').select('*, likes(count)')
+        .eq('article_id', articleId).order('created_at', { ascending: true })
+
+    const container = document.getElementById('comments-list')
+    if (!container) return
+    if (error) { container.innerHTML = '<p style="color:#d33;">Смертч-шум вч обсуждении</p>'; return }
+    if (!data || data.length === 0) {
+        container.innerHTML = '<p class="no-comments">Нрт обсуждения — будь первым Людич</p>'
+        return
+    }
+
+    // Подгружаем public_id для всех авторов комментариев
+    const usernames = [...new Set(data.map(c => c.username))]
+    const { data: usersData } = await supabaseClient
+        .from('users').select('username, public_id, avatar_url, banner_url, name_color').in('username', usernames)
+    const userMap = {}
+    if (usersData) usersData.forEach(u => { userMap[u.username] = { pid: u.public_id, avatar: u.avatar_url, banner: u.banner_url, nameColor: u.name_color } })
+
+    const roots = data.filter(c => !c.parent_id)
+    const replies = data.filter(c => c.parent_id)
+    container.innerHTML = roots.map(c => {
+        return renderComment(c, false, userMap) + replies.filter(r => r.parent_id === c.id).map(r => renderComment(r, true, userMap)).join('')
+    }).join('')
+}
+
+function renderComment(c, isReply = false, userMap = {}) {
+    const udata = userMap[c.username] || {}
+    const commentAuthorBanner = udata.banner || ''
+    const commentBannerStyle = commentAuthorBanner
+        ? `background-image:url('${commentAuthorBanner}');background-size:100% 100%;background-repeat:no-repeat;`
+        : ''
+    if (c.deleted) {
+        return `<div class="comment ${isReply ? 'reply' : ''}" style="opacity:0.5;font-style:italic;color:#a2a9b1;">
+            <div class="comment-header"><span class="comment-date">${new Date(c.created_at).toLocaleDateString('ru-RU')}</span></div>
+            <div class="comment-content">[сообщенность удалена]</div>
+        </div>`
+    }
+    const likeCount = c.likes?.[0]?.count ?? 0
+    const liked = userCommentLikes.has(c.id)
+    const date = new Date(c.created_at).toLocaleDateString('ru-RU')
+    const pid = udata.pid
+    const avatar = udata.avatar
+    const avatarHtml = `<div style="width:24px;height:24px;border-radius:2px;overflow:hidden;border:1px solid #eaecf0;flex-shrink:0;background:#eaecf0;display:flex;align-items:center;justify-content:center;">${
+        avatar
+            ? `<img src="${avatar}" style="width:24px;height:24px;object-fit:cover;display:block;">`
+            : `<span style="font-size:0.75em;color:#a2a9b1;font-family:serif;">${c.username[0].toUpperCase()}</span>`
+    }</div>`
+    const nc = udata.nameColor ? `color:${udata.nameColor};` : ''
+    const authorHtml = pid
+        ? `<a href="profile.html?id=${pid}" class="comment-author" style="${nc}">${c.username}</a>`
+        : `<span class="comment-author" style="${nc}">${c.username}</span>`
+    return `
+        <div class="comment ${isReply ? 'reply' : ''}" id="comment-${c.id}" style="${commentBannerStyle}">
+            <div class="comment-header">
+                ${avatarHtml}
+                ${authorHtml}
+                <span class="comment-date">${date}</span>
+            </div>
+            <div class="comment-content">${c.content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+            <div class="comment-actions">
+                <button class="comment-btn ${liked ? 'liked' : ''}" onclick="toggleCommentLike(${c.id})">▲ ${likeCount}</button>
+                ${currentUser && !isReply ? `<button class="comment-btn" onclick="toggleReplyForm(${c.id})">Ответити</button>` : ''}
+                ${canDelete() && !c.deleted ? `<button class="comment-btn" style="color:#d33;" onclick="deleteComment(${c.id}, false)">Удалити</button>` : ''}
+                ${!c.deleted && c.user_id === currentUserId ? `<button class="comment-btn" style="color:#a2a9b1;" onclick="deleteComment(${c.id}, true)">Удалити своё</button>` : ''}
+            </div>
+            ${currentUser && !isReply ? `
+            <div class="reply-form" id="reply-form-${c.id}">
+                <textarea placeholder="Ответ Людич..."></textarea>
+                <div class="reply-form-actions">
+                    <button class="btn btn-primary" style="font-size:0.8em;padding:4px 10px;" onclick="submitComment(${c.id})">Отправити</button>
+                    <button class="btn btn-secondary" style="font-size:0.8em;padding:4px 10px;" onclick="toggleReplyForm(${c.id})">Отменити</button>
+                </div>
+            </div>` : ''}
+        </div>
+    `
+}
+
+function toggleReplyForm(commentId) {
+    const form = document.getElementById('reply-form-' + commentId)
+    if (form) form.classList.toggle('visible')
+}
+
+async function toggleCommentLike(commentId) {
+    if (!currentUserId) { window.location.href = 'login.html'; return }
+    const liked = userCommentLikes.has(commentId)
+    if (liked) {
+        await supabaseClient.from('likes').delete().eq('comment_id', commentId).eq('user_id', currentUserId)
+        userCommentLikes.delete(commentId)
+    } else {
+        await supabaseClient.from('likes').insert({ comment_id: commentId, user_id: currentUserId })
+        userCommentLikes.add(commentId)
+    }
+    await loadComments()
+}
+
+async function submitComment(parentId) {
+    if (!currentUser) return
+    let text
+    if (parentId) {
+        const form = document.getElementById('reply-form-' + parentId)
+        text = form?.querySelector('textarea')?.value?.trim()
+    } else {
+        text = document.getElementById('new-comment')?.value?.trim()
+    }
+    if (!text) return
+
+    await supabaseClient.from('comments').insert({
+        article_id: articleId,
+        user_id: currentUserId,
+        username: currentUser,
+        content: text,
+        parent_id: parentId || null
+    })
+
+    if (parentId) {
+        const form = document.getElementById('reply-form-' + parentId)
+        if (form) { form.querySelector('textarea').value = ''; form.classList.remove('visible') }
+    } else {
+        const el = document.getElementById('new-comment')
+        if (el) el.value = ''
+    }
+    await loadComments()
+}
+
+async function deleteComment(commentId, isOwn = false) {
+    console.log('[deleteComment] id:', commentId, 'isOwn:', isOwn, 'role:', currentRole, 'canDelete:', canDelete(), 'currentUserId:', currentUserId)
+    if (!isOwn && !canDelete()) {
+        console.log('[deleteComment] blocked — no permission')
+        return
+    }
+    if (isOwn) {
+        const { error } = await supabaseClient.from('comments')
+            .update({ content: '[сообщенность удалена]', deleted: true })
+            .eq('id', commentId)
+        console.log('[deleteComment] soft delete error:', error)
+    } else {
+        const { error } = await supabaseClient.from('comments')
+            .delete().eq('id', commentId)
+        console.log('[deleteComment] hard delete error:', error)
+    }
+    await loadComments()
+}
+
+function showError(msg) {
+    document.getElementById('main-content').innerHTML = `
+        <div class="state-box error">
+            <div class="state-box-title">Смертч-шум</div>
+            <div>${msg}</div><br>
+            <a href="articles.html" class="btn btn-secondary">← Вернуться вч Архив</a>
+        </div>
+    `
+}
+
+init()
+</script>
+
+</body>
+</html>
