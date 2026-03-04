@@ -446,11 +446,49 @@ async function init() {
             main.style.backgroundImage = user.profile_bg
             main.style.backgroundSize = '100% 100%'
             main.style.backgroundRepeat = 'no-repeat'
+            main.style.backgroundAttachment = 'local'
+            // Делаем карточки полупрозрачными
+            const style = document.createElement('style')
+            style.textContent = \`
+                #main-content .edit-section,
+                #main-content .pinned-article-card,
+                #main-content .article-row,
+                #main-content .profile-head {
+                    background: rgba(255,255,255,0.75) !important;
+                    backdrop-filter: blur(4px);
+                }
+                #main-content h2 {
+                    background: rgba(255,255,255,0.6);
+                    padding: 4px 8px;
+                    backdrop-filter: blur(4px);
+                }
+                #main-content .profile-banner-placeholder {
+                    display: none;
+                }
+            \`
+            document.head.appendChild(style)
         } else {
             main.style.background = user.profile_bg
         }
         const isDark = ['#1a1a2e','#0f3460'].includes(user.profile_bg)
-        if (isDark) main.style.color = '#eaecf0'
+        if (isDark) {
+            main.style.color = '#eaecf0'
+            const style = document.createElement('style')
+            style.textContent = \`
+                #main-content .article-row,
+                #main-content .pinned-article-card {
+                    background: rgba(255,255,255,0.08) !important;
+                    border-color: rgba(255,255,255,0.15) !important;
+                }
+                #main-content .article-row-title { color: #90b4f5 !important; }
+                #main-content .article-row-meta,
+                #main-content .profile-meta,
+                #main-content .profile-bio,
+                #main-content .profile-title { color: #a0aec0 !important; }
+                #main-content h2 { border-color: rgba(255,255,255,0.2) !important; color: #eaecf0; }
+            \`
+            document.head.appendChild(style)
+        }
     }
 
     await renderProfile()
