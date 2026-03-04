@@ -119,7 +119,7 @@
         <h3 id="grant-modal-title">Выдати значок</h3>
         <div class="user-select-list" id="grant-user-list"></div>
         <div style="display:flex;gap:8px;">
-            <button class="btn btn-primary" onclick="confirmGrant()">Выдати</button>
+            <button class="btn btn-primary" id="grant-confirm-btn" onclick="confirmGrant()">Выдати</button>
             <button class="btn btn-secondary" onclick="closeGrantModal()">Отменити</button>
         </div>
         <div style="font-size:0.82em;color:#54595d;margin-top:8px;" id="grant-status"></div>
@@ -297,6 +297,7 @@ function renderBadges() {
                         <div class="badge-info-desc">${b.description ?? '—'}</div>
                         <div class="badge-actions">
                             <button class="btn btn-primary" style="font-size:0.78em;padding:3px 8px;" onclick="openGrantModal(${b.id}, '${b.name.replace(/'/g,"\\'")}')">Выдати</button>
+                            <button class="btn btn-secondary" style="font-size:0.78em;padding:3px 8px;" onclick="openRevokeModal(${b.id}, '${b.name.replace(/'/g,"\\'")}')">Снять</button>
                             <button class="btn btn-danger" style="font-size:0.78em;padding:3px 8px;" onclick="deleteBadge(${b.id})">Удалити</button>
                         </div>
                     </div>
@@ -332,11 +333,65 @@ async function deleteBadge(id) {
     await loadBadges()
 }
 
+async function openRevokeModal(badgeId, badgeName) {
+    grantBadgeId = badgeId
+    selectedUserId = null
+    document.getElementById('grant-modal-title').textContent = 'Снять значок: ' + badgeName
+    document.getElementById('grant-status').textContent = ''
+
+    const [usersRes, grantedRes] = await Promise.all([
+        supabaseClient.from('users').select('id, username, public_id').order('username'),
+        supabaseClient.from('user_badges').select('user_id').eq('badge_id', badgeId)
+    ])
+
+    const hasBadge = new Set((grantedRes.data ?? []).map(r => r.user_id))
+    const usersWithBadge = (usersRes.data ?? []).filter(u => hasBadge.has(u.id))
+
+    const list = document.getElementById('grant-user-list')
+    if (usersWithBadge.length === 0) {
+        list.innerHTML = '<div style="padding:12px;font-size:0.88em;color:#a2a9b1;">Нрт Людич сч этим значком</div>'
+    } else {
+        list.innerHTML = usersWithBadge.map(u => `
+            <div class="user-select-item" id="uitem-${u.id}" onclick="selectUser('${u.id}')">
+                <span>${u.username}</span>
+            </div>
+        `).join('')
+    }
+
+    document.getElementById('grant-confirm-btn').textContent = 'Снять'
+    document.getElementById('grant-confirm-btn').onclick = confirmRevoke
+    document.getElementById('grant-modal').classList.add('visible')
+}
+
+async function confirmRevoke() {
+    const status = document.getElementById('grant-status')
+    if (!selectedUserId) { status.style.color = '#d33'; status.textContent = 'Выбери Людич'; return }
+
+    status.style.color = '#54595d'; status.textContent = 'Снимаем...'
+
+    const { error } = await supabaseClient.from('user_badges')
+        .delete()
+        .eq('user_id', selectedUserId)
+        .eq('badge_id', grantBadgeId)
+
+    if (error) {
+        status.style.color = '#d33'
+        status.textContent = 'Смертч-шум: ' + error.message
+        return
+    }
+
+    status.style.color = '#14866d'
+    status.textContent = 'Значок снят ✓'
+    setTimeout(closeGrantModal, 1000)
+}
+
 async function openGrantModal(badgeId, badgeName) {
     grantBadgeId = badgeId
     selectedUserId = null
     document.getElementById('grant-modal-title').textContent = 'Выдати значок: ' + badgeName
     document.getElementById('grant-status').textContent = ''
+    document.getElementById('grant-confirm-btn').textContent = 'Выдати'
+    document.getElementById('grant-confirm-btn').onclick = confirmGrant
 
     const [usersRes, grantedRes] = await Promise.all([
         supabaseClient.from('users').select('id, username, public_id').order('username'),
