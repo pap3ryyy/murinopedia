@@ -147,7 +147,7 @@ async function init() {
     if (!session) return showDenied('Нрт идентификации')
 
     const { data: user } = await supabaseClient.from('users').select('*').eq('id', session.user.id).single()
-    if (!user || user.role !== 'м.с.в.') return showDenied('Доступ только дляч М.С.В.')
+    if (!user || !['м.с.в.основательность', 'м.с.в.содрунник'].includes(user.role)) return showDenied('Доступ только дляч М.С.В.')
 
     adminUser = user.username
     adminUserId = user.id
@@ -425,14 +425,15 @@ async function loadUsers() {
                     <tr>
                         <td style="color:#a2a9b1;">${u.public_id ?? '—'}</td>
                         <td><a href="profile.html?id=${u.public_id}">${u.username}</a></td>
-                        <td><span class="role-badge ${u.role === 'м.с.в.' ? 'msv' : 'ludich'}">${u.role}</span></td>
+                        <td><span class="role-badge ${
+                            u.role === 'м.с.в.основательность' ? 'msv' :
+                            u.role === 'м.с.в.содрунник' ? 'msv' :
+                            u.role === 'м.с.в.проверкость' ? 'msv' : 'ludich'
+                        }">${u.role}</span></td>
                         <td style="color:#a2a9b1;font-size:0.85em;">${new Date(u.created_at).toLocaleDateString('ru-RU')}</td>
                         <td>
                             ${u.id !== adminUserId ? `
-                                <button class="btn btn-secondary" style="font-size:0.78em;padding:3px 8px;" onclick="setRole('${u.id}', '${u.role === 'м.с.в.' ? 'людич' : 'м.с.в.'}')">
-                                    ${u.role === 'м.с.в.' ? 'Снять М.С.В.' : 'Сделать М.С.В.'}
-                                </button>
-                                <button class="btn btn-danger" style="font-size:0.78em;padding:3px 8px;" onclick="deleteUser('${u.id}')">Удалити</button>
+                                <button class="btn btn-danger" style="font-size:0.78em;padding:3px 8px;" onclick="deleteUser('${u.id}', '${u.username}')">Удалити</button>
                             ` : '<span style="font-size:0.8em;color:#a2a9b1;">это ты</span>'}
                         </td>
                     </tr>
@@ -442,13 +443,8 @@ async function loadUsers() {
     `
 }
 
-async function setRole(userId, role) {
-    await supabaseClient.from('users').update({ role }).eq('id', userId)
-    loadUsers()
-}
-
-async function deleteUser(userId) {
-    if (!confirm('Удалити аккаунт навсегда?')) return
+async function deleteUser(userId, username) {
+    if (!confirm(`Удалити аккаунт "${username}" навсегда? Все статьи и комментарии останутся.`)) return
     const { error } = await supabaseClient.from('users').delete().eq('id', userId)
     if (error) { alert('Смертч-шум: ' + error.message); return }
     loadUsers()
