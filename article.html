@@ -373,6 +373,7 @@ let articleId = null
 let userCommentLikes = new Set()
 let articleLiked = false
 let authorPublicIds = {}
+let authorData = {}
 
 async function init() {
     const params = new URLSearchParams(window.location.search)
@@ -436,14 +437,53 @@ async function loadArticle() {
         articleLiked = !!alreadyLiked
     }
 
-    // Подгружаем public_id автора для ссылки
+    // Подгружаем данные автора
     if (article.author) {
-        const { data: authorData } = await supabaseClient
-            .from('users').select('public_id').eq('username', article.author).single()
-        if (authorData) authorPublicIds[article.author] = authorData.public_id
+        const { data: aData } = await supabaseClient
+            .from('users').select('public_id, banner_url, avatar_url, name_color, title')
+            .eq('username', article.author).single()
+        if (aData) {
+            authorPublicIds[article.author] = aData.public_id
+            authorData = aData
+        }
+
+        // Значки автора
+        if (authorData && authorPublicIds[article.author]) {
+            const { data: authorUser } = await supabaseClient
+                .from('users').select('id').eq('username', article.author).single()
+            if (authorUser) {
+                const { data: badges } = await supabaseClient
+                    .from('user_badges')
+                    .select('badges(id, name, description, icon_url)')
+                    .eq('user_id', authorUser.id)
+                authorData.badges = badges ?? []
+            }
+        }
     }
 
     document.title = article.title + ' — Муринопедия'
+
+    if (authorData.banner_url) {
+        const s = document.createElement('style')
+        s.textContent = [
+            '#comments-section .comment,',
+            '#comments-section .comment.reply {',
+            '    background: rgba(255,255,255,0.82) !important;',
+            '    backdrop-filter: blur(4px);',
+            '}',
+            '#comments-section .comment-form textarea,',
+            '#comments-section .login-prompt {',
+            '    background: rgba(255,255,255,0.85) !important;',
+            '}',
+            '#comments-section h2 {',
+            '    background: rgba(255,255,255,0.7);',
+            '    padding: 4px 8px;',
+            '    backdrop-filter: blur(4px);',
+            '}'
+        ].join(' ')
+        document.head.appendChild(s)
+    }
+
     renderArticle(article)
     await loadUserCommentLikes()
     await loadComments()
@@ -459,9 +499,16 @@ function renderMetaInfobox(article) {
     const created = new Date(article.created_at).toLocaleDateString('ru-RU')
     const reviewed = article.reviewed_at ? new Date(article.reviewed_at).toLocaleDateString('ru-RU') : '—'
     const authorPid = authorPublicIds[article.author]
+    const badges = (authorData.badges ?? []).map(ub => {
+        const b = ub.badges
+        return `<span style="position:relative;display:inline-flex;align-items:center;margin-left:3px;" class="badge-wrap">
+            <img src="${b.icon_url}" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;cursor:help;" title="${b.description ?? b.name}">
+        </span>`
+    }).join('')
+    const nameColor = authorData.name_color ? `color:${authorData.name_color};` : ''
     const authorHtml = authorPid
-        ? `<a href="profile.html?id=${authorPid}">${article.author ?? 'Аноним'}</a>`
-        : (article.author ?? 'Аноним')
+        ? `<a href="profile.html?id=${authorPid}" style="${nameColor}">${article.author ?? 'Аноним'}</a>${badges}`
+        : `${article.author ?? 'Аноним'}${badges}`
     return `
         <div class="meta-infobox">
             <span class="infobox-title">Сведения о Знань</span>
@@ -547,7 +594,7 @@ function renderArticle(article) {
             <span class="views-count">· ${(article.views_count ?? 0) + 1} просмотров</span>
         </div>
 
-        <div class="comments-section">
+        <div class="comments-section" id="comments-section" ${authorData.banner_url ? `style="background-image:url('${authorData.banner_url}');background-size:100% 100%;background-repeat:no-repeat;border-radius:2px;padding:16px;"` : ''}>
             <h2>Обсуждение Знань</h2>
             ${renderCommentForm()}
             <div id="comments-list"><p class="no-comments">Загружати обсуждение...</p></div>
