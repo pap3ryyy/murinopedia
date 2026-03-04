@@ -6,6 +6,28 @@
     <title>Муринопедия — Свободная энциклопедия Мурино</title>
     <link rel="icon" type="image/png" href="asset/logo.ico">
     <link rel="stylesheet" href="css/wiki.css">
+    <style>
+        .fog-error {
+            background: #fee7e6;
+            border: 1px solid #d33;
+            border-left: 5px solid #d33;
+            padding: 16px 20px;
+            margin: 20px 0;
+            display: none;
+        }
+        .fog-error h3 {
+            color: #d33;
+            font-family: serif;
+            font-weight: normal;
+            margin: 0 0 6px 0;
+            font-size: 1.1em;
+        }
+        .fog-error p {
+            margin: 0;
+            font-size: 0.88em;
+            color: #54595d;
+        }
+    </style>
 </head>
 <body>
 
@@ -15,7 +37,7 @@
         <a href="index.html" class="logo-text">Муринопедия</a>
     </div>
     <div style="display:flex;align-items:center;gap:12px;">
-        <div class="status-bar">
+        <div class="status-bar" id="db-status">
             Оперативная обстановка: <span style="color: #d33; font-weight: bold;">СТАБИЛЬНАЯ</span>
         </div>
         <div id="nav-user-zone" style="font-size:0.85em;color:#54595d;"></div>
@@ -23,8 +45,12 @@
 </header>
 
 <div class="container">
-
     <main>
+        <div class="fog-error" id="fog-error">
+            <h3>Серверность нрт отвечати</h3>
+            <p>Сайтость не может достучатись кч серверности. Возможно Фог атаковалость наши серверности — ожидайте, М.С.В. уже вч пути.</p>
+        </div>
+
         <h1>Заглавная страница</h1>
 
         <div class="info-box">
@@ -101,7 +127,8 @@
             </p>
             <div id="msv-nav" style="display:none; border-top: 1px solid #eaecf0; padding-top: 10px; margin-top: 10px;">
                 <b>М.С.В.</b><br>
-                <a href="admin.html">Штаб М.С.В.</a><br>
+                <a href="admin.html" id="nav-admin" style="display:none;">Штаб М.С.В.</a><br>
+                <a href="review.html" id="nav-review" style="display:none;">Проверка Знань</a><br>
                 <a href="createarticle.html">Создати Знань</a>
             </div>
         </div>
@@ -138,6 +165,10 @@
 <script src="js/config.js"></script>
 <script>
 async function init() {
+    // Проверка базы данных
+    const dbOk = await checkDb()
+    if (!dbOk) return
+
     const { data: { session } } = await supabaseClient.auth.getSession()
 
     if (session) {
@@ -154,9 +185,19 @@ async function init() {
 
             document.getElementById('create-btn').style.display = 'inline-block'
 
-            if (user.role === 'м.с.в.') {
-                const msvNav = document.getElementById('msv-nav')
-                if (msvNav) msvNav.style.display = 'block'
+            const role = user.role
+            const isMsv = role !== 'людич'
+
+            if (isMsv) {
+                document.getElementById('msv-nav').style.display = 'block'
+
+                // Проверкость видит только review, содрунник и основательность — всё
+                if (role === 'м.с.в.проверкость') {
+                    document.getElementById('nav-review').style.display = 'inline'
+                } else if (role === 'м.с.в.содрунник' || role === 'м.с.в.основательность') {
+                    document.getElementById('nav-admin').style.display = 'inline'
+                    document.getElementById('nav-review').style.display = 'inline'
+                }
             }
         }
     } else {
@@ -165,6 +206,31 @@ async function init() {
     }
 
     await loadStats()
+}
+
+async function checkDb() {
+    try {
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 5000)
+
+        const { error } = await supabaseClient
+            .from('articles')
+            .select('id', { count: 'exact', head: true })
+            .limit(1)
+            .abortSignal(controller.signal)
+
+        clearTimeout(timeout)
+
+        if (error) throw error
+        return true
+    } catch (e) {
+        document.getElementById('fog-error').style.display = 'block'
+        document.getElementById('db-status').innerHTML =
+            'Оперативная обстановка: <span style="color: #d33; font-weight: bold;">ФОГ-АТАКА</span>'
+        document.getElementById('archive-stats').innerHTML =
+            '<h4>Статистика</h4><p style="color:#d33;font-size:0.85em;">Серверность нрт доступна</p>'
+        return false
+    }
 }
 
 async function loadStats() {
@@ -176,7 +242,7 @@ async function loadStats() {
         .eq('status', 'published')
 
     if (error) {
-        statsEl.innerHTML = '<h4>Архив</h4><p style="font-size:0.85em;color:#54595d;">Ошибка загрузки</p>'
+        statsEl.innerHTML = '<h4>Архив</h4><p style="font-size:0.85em;color:#d33;">Ошибка загрузки</p>'
         return
     }
 
