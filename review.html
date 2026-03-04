@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="icon" type="image/png" href="asset/logo.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проверка Знань — Муринопедия</title>
+    <link rel="stylesheet" href="css/wiki.css">
+    <style>
+        .pending-list { display: flex; flex-direction: column; gap: 16px; }
+        .pending-card { border: 1px solid #a2a9b1; background: #f8f9fa; padding: 16px; }
+        .pending-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+        .pending-card-title { font-family: serif; font-size: 1.2em; font-weight: normal; }
+        .pending-card-tag { font-size: 0.75em; color: #54595d; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; }
+        .pending-card-meta { font-size: 0.82em; color: #54595d; margin-bottom: 8px; }
+        .pending-card-content { font-size: 0.85em; color: #54595d; background: #fff; border: 1px solid #eaecf0; padding: 10px; max-height: 120px; overflow-y: auto; margin-bottom: 12px; line-height: 1.5; white-space: pre-wrap; }
+        .pending-card-actions { display: flex; gap: 8px; align-items: center; }
+        .action-status { font-size: 0.82em; }
+        .action-status.success { color: #14866d; }
+        .action-status.error { color: #d33; }
+        .empty-state { text-align: center; padding: 40px 20px; color: #54595d; font-style: italic; }
+        .access-denied { text-align: center; padding: 80px 20px; }
+        .access-denied h2 { font-family: serif; font-weight: normal; color: #d33; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-area">
+        <img src="asset/logo.png" alt="М.С.В." class="logo-img">
+        <a href="index.html" class="logo-text">Муринопедия</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+        <div class="status-bar">
+            Оперативная обстановка: <span style="color: #d33; font-weight: bold;">СТАБИЛЬНАЯ</span>
+        </div>
+        <div id="header-user" style="font-size:0.85em;color:#54595d;"></div>
+    </div>
+</header>
+
+<div class="container">
+    <main id="main-content">
+        <p style="color:#54595d;">Проверка доступа...</p>
+    </main>
+    <aside>
+        <div class="sidebar-box">
+            <h4>Проверка Знань</h4>
+            <p>Здесч находятся статьи ожидающие проверки М.С.В. Проверяй внимательно — Фог пролезет вч любую щель.</p>
+        </div>
+        <div class="sidebar-box">
+            <h4>Навигация</h4>
+            <p>
+                <a href="index.html">Главная</a><br>
+                <a href="articles.html">Архив Знань</a>
+            </p>
+        </div>
+        <div class="sidebar-box" style="border-color: #d33; background: #fee7e6;">
+            <h4 style="color:#d33;">Напоминание</h4>
+            <p>Видл слово «Друг»? Ог — мимикрия Фога. Говори <b>Друн</b>.</p>
+        </div>
+    </aside>
+</div>
+
+<footer>
+    Муринопедия — 2026 год.<br>
+    Ч илу доной, пока естч светл. Мурино стояти, Фог дрожати.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+const ALLOWED_ROLES = ['м.с.в.проверкость', 'м.с.в.содрунник', 'м.с.в.основательность']
+let reviewerName = null
+let reviewerPublicId = null
+
+async function init() {
+    const { data: { session } } = await supabaseClient.auth.getSession()
+    if (!session) { showDenied('Нрт идентификации — войди вч систему'); return }
+
+    const { data: user } = await supabaseClient
+        .from('users').select('username, role, public_id').eq('id', session.user.id).single()
+
+    if (!user || !ALLOWED_ROLES.includes(user.role)) {
+        showDenied('Доступ только дляч М.С.В. Проверкости ич выше')
+        return
+    }
+
+    reviewerName = user.username
+    reviewerPublicId = user.public_id
+
+    document.getElementById('header-user').innerHTML = `
+        <a href="profile.html?id=${reviewerPublicId}" style="color:#0645ad;">${reviewerName}</a>
+        &nbsp;
+        <button onclick="logout()" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;">Выйти</button>
+    `
+
+    renderPage()
+    await loadPending()
+}
+
+function renderPage() {
+    document.getElementById('main-content').innerHTML = `
+        <h1 style="font-family:serif;font-weight:normal;font-size:1.8em;border-bottom:1px solid #a2a9b1;padding-bottom:5px;margin-bottom:20px;">
+            Проверка Знань
+        </h1>
+        <div id="pending-list"><p style="color:#54595d;">Загружати...</p></div>
+    `
+}
+
+async function loadPending() {
+    const { data, error } = await supabaseClient
+        .from('articles').select('*')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: true })
+
+    const container = document.getElementById('pending-list')
+    if (error) { container.innerHTML = '<p style="color:#d33;">Смертч-шум при загрузке</p>'; return }
+    if (!data || data.length === 0) {
+        container.innerHTML = '<div class="empty-state">Нрт статей нач проверке — Архив чистч</div>'
+        return
+    }
+
+    container.innerHTML = '<div class="pending-list">' + data.map(a => `
+        <div class="pending-card" id="pcard-${a.id}">
+            <div class="pending-card-header">
+                <div>
+                    <div class="pending-card-tag">${a.tag ?? '—'}</div>
+                    <div class="pending-card-title">${a.title}</div>
+                </div>
+                <a href="article.html?id=${a.id}" target="_blank" class="btn btn-secondary" style="font-size:0.8em;white-space:nowrap;">Открыти →</a>
+            </div>
+            <div class="pending-card-meta">
+                Автор: <b>${a.author ?? 'Аноним'}</b> &nbsp;·&nbsp; ${new Date(a.created_at).toLocaleDateString('ru-RU')}
+            </div>
+            ${a.description ? '<div style="font-size:0.88em;color:#202122;margin-bottom:8px;">' + a.description + '</div>' : ''}
+            <div class="pending-card-content">${(a.content ?? '').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+            <div class="pending-card-actions">
+                <button class="btn btn-primary" onclick="approveArticle(${a.id})">Принять</button>
+                <span class="action-status" id="pstatus-${a.id}"></span>
+            </div>
+        </div>
+    `).join('') + '</div>'
+}
+
+async function approveArticle(id) {
+    const msg = document.getElementById('pstatus-' + id)
+    msg.className = 'action-status'
+    msg.textContent = 'Обрабатываем...'
+
+    const { error } = await supabaseClient.from('articles').update({
+        status: 'published',
+        reviewed_by: reviewerName,
+        reviewed_at: new Date().toISOString()
+    }).eq('id', id)
+
+    if (error) {
+        msg.className = 'action-status error'
+        msg.textContent = 'Смертч-шум: ' + error.message
+        return
+    }
+
+    const card = document.getElementById('pcard-' + id)
+    if (card) { card.style.opacity = '0.4'; card.style.pointerEvents = 'none' }
+    msg.className = 'action-status success'
+    msg.textContent = 'Знань опубликовано ✓'
+}
+
+function showDenied(msg) {
+    document.getElementById('main-content').innerHTML = `
+        <div class="access-denied">
+            <h2>Доступ закрытч</h2>
+            <p>${msg}</p>
+            <a href="index.html" class="btn btn-secondary">На главную</a>
+        </div>
+    `
+}
+
+async function logout() {
+    await supabaseClient.auth.signOut()
+    window.location.href = 'login.html'
+}
+
+init()
+</script>
+
+</body>
+</html>
