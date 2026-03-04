@@ -258,6 +258,13 @@
 
         .access-denied { text-align: center; padding: 60px 20px; }
         .access-denied h2 { font-family: serif; font-weight: normal; color: #d33; }
+        .code-block-wrap { border: 1px solid #a2a9b1; background: #fff; padding: 12px; margin-bottom: 10px; }
+        .code-block-header { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+        .code-block-name { padding: 5px 8px; border: 1px solid #a2a9b1; font-size: 0.85em; background: #f8f9fa; color: #202122; outline: none; width: 160px; font-family: monospace; }
+        .code-block-name:focus { border-color: #3366cc; }
+        .code-block-textarea { width: 100%; padding: 8px; border: 1px solid #a2a9b1; font-family: monospace; font-size: 0.82em; background: #1e1e2e; color: #cdd6f4; outline: none; resize: vertical; min-height: 120px; line-height: 1.5; box-sizing: border-box; }
+        .code-block-textarea:focus { border-color: #3366cc; }
+        .code-block-tag { font-family: monospace; font-size: 0.8em; background: #eaecf0; padding: 2px 6px; border-radius: 2px; color: #54595d; }
     </style>
 </head>
 <body>
@@ -287,6 +294,7 @@
 let currentUser = null
 let currentRole = null
 let infoboxFields = []
+let codeBlocks = []
 let coverUrl = ''
 let contentImageUrl = ''
 
@@ -348,6 +356,15 @@ function renderEditor() {
             <div id="infobox-fields"></div>
             <button class="btn btn-secondary" onclick="addInfoboxField()" style="margin-top:8px;">+ Добавить поле</button>
         </div>
+
+        ${isFounder ? `
+        <div class="infobox-section" id="code-section">
+            <h3>Кодблоки <span style="font-size:0.8em;color:#a2a9b1;">(только основательность)</span></h3>
+            <div style="font-size:0.82em;color:#54595d;margin-bottom:10px;">Вставляй в текст через &lt;code1&gt;, &lt;code2&gt; и т.д. Макс. 4 блока.</div>
+            <div id="code-blocks-list"></div>
+            <button class="btn btn-secondary" onclick="addCodeBlock()" style="margin-top:8px;" id="add-code-btn">+ Добавить блок</button>
+        </div>
+        ` : ''}
 
         <div class="image-section">
             <h3>Картинки</h3>
@@ -539,7 +556,8 @@ async function submitArticle() {
         status,
         cover_url: coverUrl || null,
         image_url: contentImageUrl || null,
-        infobox: infoboxFields.filter(f => f.label || f.value)
+        infobox: infoboxFields.filter(f => f.label || f.value),
+        code_blocks: codeBlocks.filter(b => b.name && b.content)
     }).select().single()
 
     if (error) {
@@ -551,6 +569,48 @@ async function submitArticle() {
     msg.className = 'status-msg success'
     msg.textContent = 'Знань отправленол!'
     setTimeout(() => { window.location.href = 'article.html?id=' + data.id }, 1000)
+}
+
+function addCodeBlock() {
+    if (codeBlocks.length >= 4) return
+    const idx = codeBlocks.length + 1
+    codeBlocks.push({ name: 'code' + idx, content: '' })
+    renderCodeBlocks()
+    if (codeBlocks.length >= 4) {
+        document.getElementById('add-code-btn').style.display = 'none'
+    }
+}
+
+function removeCodeBlock(i) {
+    codeBlocks.splice(i, 1)
+    renderCodeBlocks()
+    const btn = document.getElementById('add-code-btn')
+    if (btn) btn.style.display = 'inline-block'
+}
+
+function renderCodeBlocks() {
+    const container = document.getElementById('code-blocks-list')
+    if (!container) return
+    container.innerHTML = codeBlocks.map((b, i) => `
+        <div class="code-block-wrap">
+            <div class="code-block-header">
+                <span style="font-size:0.82em;color:#54595d;">Имя:</span>
+                <input type="text" class="code-block-name" value="${b.name}"
+                    placeholder="code1"
+                    oninput="codeBlocks[${i}].name = this.value.replace(/[^a-zA-Z0-9]/g,''); renderCodeBlockTag(${i})">
+                <span class="code-block-tag" id="cb-tag-${i}">&lt;${b.name}&gt;</span>
+                <button class="btn-remove" onclick="removeCodeBlock(${i})">Удалить</button>
+            </div>
+            <textarea class="code-block-textarea"
+                placeholder="Вставь HTML код сюда..."
+                oninput="codeBlocks[${i}].content = this.value">${b.content}</textarea>
+        </div>
+    `).join('')
+}
+
+function renderCodeBlockTag(i) {
+    const tag = document.getElementById('cb-tag-' + i)
+    if (tag) tag.textContent = '<' + (codeBlocks[i].name || 'code' + (i+1)) + '>'
 }
 
 init()
