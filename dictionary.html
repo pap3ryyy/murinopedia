@@ -450,9 +450,7 @@ let authorData = {}
 
 async function init() {
     console.log('init start')
-    const params = new URLSearchParams(window.location.search)
-    articleId = params.get('id')
-    if (!articleId) { showError('Нрт идентификатора Знань'); return }
+    articleId = '27'
 
     const { data: { session } } = await supabaseClient.auth.getSession()
     if (session) {
