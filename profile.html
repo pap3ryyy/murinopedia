@@ -7,43 +7,64 @@
     <title>Профиль — Муринопедия</title>
     <link rel="stylesheet" href="css/wiki.css">
     <style>
-        .profile-card {
-            border: 1px solid #a2a9b1;
-            background: #f8f9fa;
-            padding: 20px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 20px;
-            align-items: flex-start;
-        }
-
-        .profile-avatar {
-            width: 80px;
-            height: 80px;
-            border: 1px solid #a2a9b1;
+        .profile-banner {
+            width: 100%;
+            height: 140px;
             object-fit: cover;
-            flex-shrink: 0;
+            display: block;
             background: #eaecf0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #a2a9b1;
-            font-size: 2em;
-            font-family: serif;
+            border-bottom: 1px solid #a2a9b1;
         }
 
-        .profile-avatar img {
-            width: 80px;
-            height: 80px;
+        .profile-banner-placeholder {
+            width: 100%;
+            height: 140px;
+            background: linear-gradient(135deg, #eaecf0 0%, #cee0f2 100%);
+            border-bottom: 1px solid #a2a9b1;
+        }
+
+        .profile-head {
+            display: flex;
+            gap: 16px;
+            align-items: flex-end;
+            padding: 0 0 16px 0;
+            border-bottom: 1px solid #eaecf0;
+            margin-bottom: 16px;
+            margin-top: -32px;
+            position: relative;
+        }
+
+        .profile-avatar-wrap {
+            width: 72px;
+            height: 72px;
+            flex-shrink: 0;
+            border: 3px solid #fff;
+            overflow: hidden;
+            background: #eaecf0;
+            position: relative;
+        }
+
+        .profile-avatar-wrap img {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
             display: block;
         }
 
-        .profile-info { flex: 1; }
+        .profile-avatar-initial {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: serif;
+            font-size: 2em;
+            color: #a2a9b1;
+        }
 
         .profile-username {
             font-family: serif;
-            font-size: 1.6em;
+            font-size: 1.5em;
             font-weight: normal;
             display: flex;
             align-items: center;
@@ -51,13 +72,33 @@
             flex-wrap: wrap;
         }
 
-        .role-icon {
-            width: 18px;
-            height: 18px;
-            object-fit: contain;
-            cursor: help;
-            position: relative;
-            flex-shrink: 0;
+        .profile-title {
+            font-size: 0.82em;
+            color: #54595d;
+            margin-top: 2px;
+            font-style: italic;
+        }
+
+        .profile-bio {
+            font-size: 0.9em;
+            color: #54595d;
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+
+        .profile-meta {
+            font-size: 0.8em;
+            color: #a2a9b1;
+            margin-top: 6px;
+        }
+
+        .prev-nicks span {
+            background: #eaecf0;
+            padding: 1px 6px;
+            border-radius: 2px;
+            margin-right: 4px;
+            font-size: 0.8em;
+            color: #54595d;
         }
 
         .role-icon-wrap {
@@ -79,42 +120,12 @@
             border-radius: 2px;
             white-space: nowrap;
             z-index: 10;
-            font-family: sans-serif;
-            font-weight: normal;
             pointer-events: none;
         }
 
-        .role-icon-wrap:hover .tooltip {
-            display: block;
-        }
+        .role-icon-wrap:hover .tooltip { display: block; }
 
-        .profile-bio {
-            font-size: 0.9em;
-            color: #54595d;
-            margin-top: 6px;
-            line-height: 1.5;
-        }
-
-        .profile-meta {
-            font-size: 0.8em;
-            color: #a2a9b1;
-            margin-top: 8px;
-        }
-
-        .prev-nicks {
-            font-size: 0.8em;
-            color: #a2a9b1;
-            margin-top: 4px;
-        }
-
-        .prev-nicks span {
-            background: #eaecf0;
-            padding: 1px 6px;
-            border-radius: 2px;
-            margin-right: 4px;
-            font-size: 0.95em;
-        }
-
+        /* Edit section */
         .edit-section {
             border: 1px solid #a2a9b1;
             background: #fff;
@@ -131,9 +142,36 @@
             margin: 0 0 14px 0;
         }
 
-        .edit-field {
-            margin-bottom: 12px;
+        .edit-tabs {
+            display: flex;
+            border-bottom: 1px solid #a2a9b1;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
         }
+
+        .edit-tab {
+            padding: 5px 14px;
+            font-size: 0.82em;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            background: none;
+            color: #54595d;
+            margin-bottom: -1px;
+        }
+
+        .edit-tab.active {
+            background: #fff;
+            border-color: #a2a9b1;
+            color: #202122;
+            font-weight: bold;
+            border-bottom: 1px solid #fff;
+        }
+
+        .edit-tab-content { display: none; }
+        .edit-tab-content.active { display: block; }
+
+        .edit-field { margin-bottom: 12px; }
 
         .edit-label {
             font-size: 0.82em;
@@ -152,12 +190,10 @@
             color: #202122;
             outline: none;
             font-family: sans-serif;
+            box-sizing: border-box;
         }
 
-        .edit-input:focus {
-            border-color: #3366cc;
-            background: #fff;
-        }
+        .edit-input:focus { border-color: #3366cc; background: #fff; }
 
         textarea.edit-input {
             resize: vertical;
@@ -165,44 +201,81 @@
             line-height: 1.5;
         }
 
-        .edit-hint {
-            font-size: 0.78em;
-            color: #a2a9b1;
-            margin-top: 3px;
-        }
-
+        .edit-hint { font-size: 0.78em; color: #a2a9b1; margin-top: 3px; }
         .edit-hint.error { color: #d33; }
         .edit-hint.success { color: #14866d; }
 
-        .upload-zone {
-            border: 2px dashed #a2a9b1;
-            background: #f8f9fa;
-            padding: 14px;
-            text-align: center;
-            color: #54595d;
-            cursor: pointer;
-            font-size: 0.85em;
-            transition: border-color 0.15s;
+        .upload-btn-wrap {
+            display: flex;
+            gap: 8px;
+            align-items: center;
         }
 
-        .upload-zone:hover { border-color: #3366cc; }
+        .color-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .color-swatch {
+            width: 28px;
+            height: 28px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .color-swatch:hover, .color-swatch.selected { border-color: #202122; }
+
+        .border-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .border-option {
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7em;
+            color: #54595d;
+            border: 1px solid #eaecf0;
+            background: #f8f9fa;
+        }
+
+        .border-option:hover, .border-option.selected { border-color: #3366cc; background: #f0f4ff; }
+
+        .border-option .av-demo {
+            width: 32px;
+            height: 32px;
+            background: #cee0f2;
+            font-family: serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1em;
+        }
 
         .save-bar {
             display: flex;
             gap: 10px;
             align-items: center;
             margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid #eaecf0;
         }
 
-        .save-status { font-size: 0.82em; color: #54595d; }
+        .save-status { font-size: 0.82em; }
         .save-status.error { color: #d33; }
         .save-status.success { color: #14866d; }
 
-        .articles-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        /* Articles */
+        .articles-list { display: flex; flex-direction: column; gap: 10px; }
 
         .article-row {
             border: 1px solid #eaecf0;
@@ -214,27 +287,26 @@
             gap: 12px;
         }
 
-        .article-row-title {
-            font-family: serif;
-            font-size: 1em;
-            color: #0645ad;
+        .article-row-title { font-family: serif; font-size: 1em; color: #0645ad; }
+        .article-row-meta { font-size: 0.78em; color: #a2a9b1; }
+
+        .badge-published { background: #d4f5e9; color: #14866d; border: 1px solid #14866d; font-size: 0.75em; padding: 2px 7px; border-radius: 2px; font-weight: bold; white-space: nowrap; }
+        .badge-pending { background: #fef6e4; color: #c8a850; border: 1px solid #c8a850; font-size: 0.75em; padding: 2px 7px; border-radius: 2px; font-weight: bold; white-space: nowrap; }
+
+        .pinned-article-card {
+            border: 1px solid #c8a850;
+            background: #fef6e4;
+            padding: 12px;
+            margin-bottom: 16px;
         }
 
-        .article-row-meta {
-            font-size: 0.78em;
-            color: #a2a9b1;
-        }
-
-        .article-status-badge {
+        .pinned-article-card .label {
             font-size: 0.75em;
-            padding: 2px 7px;
-            border-radius: 2px;
-            font-weight: bold;
-            white-space: nowrap;
+            color: #c8a850;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
         }
-
-        .badge-published { background: #d4f5e9; color: #14866d; border: 1px solid #14866d; }
-        .badge-pending { background: #fef6e4; color: #c8a850; border: 1px solid #c8a850; }
 
         .state-box { padding: 40px 20px; text-align: center; border: 1px solid #a2a9b1; background: #f8f9fa; }
         .state-box-title { font-family: serif; font-size: 1.3em; margin-bottom: 8px; }
@@ -277,7 +349,7 @@
 </div>
 
 <footer>
-    Муринопедия — 2026 год. <br>
+    Муринопедия — 2026 год.<br>
     Ч илу доной, пока естч светл. Мурино стояти, Фог дрожати.
 </footer>
 
@@ -288,24 +360,50 @@ let currentUserId = null
 let currentUser = null
 let profileUser = null
 let isOwnProfile = false
-let avatarUrl = ''
+let isMsvUser = false
 let nicknameTimer = null
+let selectedAvatarUrl = ''
+let selectedBannerUrl = ''
+let selectedNameColor = ''
+let selectedBorderStyle = ''
+let selectedBg = ''
+let selectedPinnedId = null
+let userArticles = []
 
-document.addEventListener('mouseover', e => {
-    const wrap = e.target.closest('.badge-wrap')
-    if (wrap) {
-        const tip = wrap.querySelector('.badge-tip')
-        if (tip) tip.style.display = 'block'
-    }
-})
+const MSV_ROLES = ['м.с.в.проверкость', 'м.с.в.содрунник', 'м.с.в.основательность']
 
-document.addEventListener('mouseout', e => {
-    const wrap = e.target.closest('.badge-wrap')
-    if (wrap) {
-        const tip = wrap.querySelector('.badge-tip')
-        if (tip) tip.style.display = 'none'
-    }
-})
+const NAME_COLORS = [
+    { value: '', label: 'Обычный', color: '#202122' },
+    { value: '#3366cc', label: 'Синий', color: '#3366cc' },
+    { value: '#d33', label: 'Красный', color: '#d33' },
+    { value: '#14866d', label: 'Зелёный', color: '#14866d' },
+    { value: '#c8a850', label: 'Золотой', color: '#c8a850' },
+    { value: '#9b59b6', label: 'Фиолетовый', color: '#9b59b6' },
+    { value: '#e67e22', label: 'Оранжевый', color: '#e67e22' },
+    { value: '#e91e8c', label: 'Розовый', color: '#e91e8c' },
+]
+
+const BORDER_STYLES = [
+    { value: '', label: 'Нет' },
+    { value: '3px solid #3366cc', label: 'Синий' },
+    { value: '3px solid #d33', label: 'Красный' },
+    { value: '3px solid #c8a850', label: 'Золото' },
+    { value: '3px solid #14866d', label: 'Зелёный' },
+    { value: '3px solid #9b59b6', label: 'Фиолет' },
+    { value: '3px solid #202122', label: 'Чёрный' },
+    { value: '3px dashed #c8a850', label: 'Пунктир' },
+]
+
+const BG_OPTIONS = [
+    { value: '', label: 'Белый' },
+    { value: '#f0f4ff', label: 'Голубой' },
+    { value: '#f0fff0', label: 'Зелёный' },
+    { value: '#fef6e4', label: 'Жёлтый' },
+    { value: '#fee7e6', label: 'Красный' },
+    { value: '#f5f0ff', label: 'Фиолет' },
+    { value: '#1a1a2e', label: 'Тёмный' },
+    { value: '#0f3460', label: 'Ночной' },
+]
 
 async function init() {
     const params = new URLSearchParams(window.location.search)
@@ -318,6 +416,7 @@ async function init() {
             .from('users').select('*').eq('id', session.user.id).single()
         if (me) {
             currentUser = me
+            isMsvUser = MSV_ROLES.includes(me.role)
             renderHeaderUser(me)
         }
     } else {
@@ -325,53 +424,52 @@ async function init() {
             `<a href="login.html" style="font-size:0.85em;">Войти</a>`
     }
 
-    if (!profileId && !currentUserId) {
-        showError('Нрт идентификатора Людич')
-        return
-    }
-
     let userQuery = supabaseClient.from('users').select('*')
     if (profileId) {
         userQuery = userQuery.eq('public_id', profileId)
-    } else {
+    } else if (currentUserId) {
         userQuery = userQuery.eq('id', currentUserId)
+    } else {
+        showError('Нрт идентификатора Людич'); return
     }
 
     const { data: user, error } = await userQuery.single()
-
-    if (error || !user) {
-        showError('Людич нрт найденол вч реестре')
-        return
-    }
+    if (error || !user) { showError('Людич нрт найденол вч реестре'); return }
 
     profileUser = user
     isOwnProfile = currentUserId === user.id
+
+    // Apply profile bg
+    if (user.profile_bg) {
+        document.querySelector('.container main').style.background = user.profile_bg
+        const isDark = ['#1a1a2e','#0f3460'].includes(user.profile_bg)
+        if (isDark) document.querySelector('.container main').style.color = '#eaecf0'
+    }
 
     await renderProfile()
 }
 
 function renderHeaderUser(user) {
     document.getElementById('header-user').innerHTML = `
-        <a href="profile.html?id=${user.public_id}">${user.username}</a>
+        <a href="profile.html?id=${user.public_id}" style="color:#0645ad;">${user.username}</a>
         &nbsp;
         <button onclick="logout()" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;">Выйти</button>
     `
 }
 
-function renderBadge(role) {
-    if (role !== 'м.с.в.') return ''
-    return `
-        <span class="role-icon-wrap">
-            <img src="icons/msv.png" class="role-icon" alt="М.С.В.">
-            <span class="tooltip">Официальная сотрудность М.С.В.</span>
-        </span>
-    `
+function renderBadges(userBadges) {
+    if (!userBadges || userBadges.length === 0) return ''
+    return userBadges.map(ub => {
+        const b = ub.badges
+        return `<span class="role-icon-wrap">
+            <img src="${b.icon_url}" style="width:20px;height:20px;object-fit:contain;cursor:help;" alt="${b.name}">
+            <span class="tooltip">${b.description ?? b.name}</span>
+        </span>`
+    }).join('')
 }
 
 async function renderProfile() {
     const u = profileUser
-    const joined = new Date(u.created_at).toLocaleDateString('ru-RU')
-    const prevNicks = (u.previous_usernames ?? []).filter(n => n !== u.username)
 
     const { data: userBadges } = await supabaseClient
         .from('user_badges')
@@ -384,92 +482,181 @@ async function renderProfile() {
         .eq('author', u.username)
         .order('created_at', { ascending: false })
 
+    userArticles = articles ?? []
+
+    let pinnedArticle = null
+    if (u.pinned_article_id) {
+        const { data: pa } = await supabaseClient
+            .from('articles').select('id, title, description, tag')
+            .eq('id', u.pinned_article_id).eq('status', 'published').single()
+        pinnedArticle = pa
+    }
+
     document.title = u.username + ' — Муринопедия'
 
-    document.getElementById('main-content').innerHTML = `
-        <h1 style="font-family:serif;font-weight:normal;font-size:1.8em;border-bottom:1px solid #a2a9b1;padding-bottom:5px;margin-bottom:16px;">
-            Людич: ${u.username}
-        </h1>
+    const isDark = ['#1a1a2e','#0f3460'].includes(u.profile_bg)
+    const textColor = isDark ? '#eaecf0' : '#202122'
+    const mutedColor = isDark ? '#a0aec0' : '#54595d'
 
-        <div class="profile-card">
-            <div style="width:80px;height:80px;border:1px solid #a2a9b1;overflow:hidden;flex-shrink:0;background:#eaecf0;">
+    const joined = new Date(u.created_at).toLocaleDateString('ru-RU')
+    const prevNicks = (u.previous_usernames ?? []).filter(n => n !== u.username)
+    const nameColor = u.name_color || textColor
+    const borderStyle = u.avatar_border || '3px solid #fff'
+
+    document.getElementById('main-content').innerHTML = `
+        ${u.banner_url
+            ? `<img src="${u.banner_url}" class="profile-banner" alt="Баннер">`
+            : `<div class="profile-banner-placeholder"></div>`
+        }
+
+        <div class="profile-head">
+            <div class="profile-avatar-wrap" style="border: ${borderStyle};">
                 ${u.avatar_url
-                    ? `<img src="${u.avatar_url}" style="width:80px;height:80px;object-fit:cover;display:block;" alt="${u.username}">`
-                    : `<div style="width:80px;height:80px;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:2.2em;color:#a2a9b1;">${u.username[0].toUpperCase()}</div>`
+                    ? `<img src="${u.avatar_url}" alt="${u.username}">`
+                    : `<div class="profile-avatar-initial">${u.username[0].toUpperCase()}</div>`
                 }
             </div>
-            <div class="profile-info">
+            <div style="flex:1;padding-bottom:4px;">
                 <div class="profile-username">
-                    ${u.username}
-                    ${renderBadge(u.role)}
+                    <span style="color:${nameColor};">${u.username}</span>
+                    ${renderBadges(userBadges)}
                 </div>
-                <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">
-                    ${(userBadges ?? []).map(ub => {
-                        const b = ub.badges
-                        return `<span style="position:relative;display:inline-flex;align-items:center;" class="badge-wrap">
-                            <img src="${b.icon_url}" style="width:20px;height:20px;object-fit:contain;cursor:help;" title="${b.description ?? b.name}" onerror="this.style.display='none'">
-                            <span style="display:none;position:absolute;bottom:26px;left:50%;transform:translateX(-50%);background:#202122;color:#fff;font-size:0.7em;padding:3px 8px;border-radius:2px;white-space:nowrap;z-index:10;pointer-events:none;" class="badge-tip">${b.description ?? b.name}</span>
-                        </span>`
-                    }).join('')}
-                </div>
-                ${u.bio ? `<div class="profile-bio">${u.bio.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>` : '<div class="profile-bio" style="font-style:italic;color:#a2a9b1;">Нрт описания</div>'}
-                <div class="profile-meta">Вч реестре сч: ${joined}</div>
-                ${prevNicks.length > 0 ? `
-                <div class="prev-nicks">
-                    Прошлые позывные: ${prevNicks.map(n => `<span>${n}</span>`).join('')}
-                </div>` : ''}
+                ${u.title ? `<div class="profile-title" style="color:${mutedColor};">${u.title}</div>` : ''}
+                ${u.bio ? `<div class="profile-bio" style="color:${mutedColor};">${u.bio.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>` : ''}
+                <div class="profile-meta" style="color:${mutedColor};">Вч реестре сч: ${joined}</div>
+                ${prevNicks.length > 0 ? `<div class="prev-nicks" style="margin-top:4px;font-size:0.8em;color:${mutedColor};">Прошлые: ${prevNicks.map(n => `<span>${n}</span>`).join('')}</div>` : ''}
             </div>
         </div>
 
         ${isOwnProfile ? renderEditSection() : ''}
 
-        <h2 style="font-family:serif;font-weight:normal;font-size:1.3em;border-bottom:1px solid #a2a9b1;padding-bottom:3px;margin-top:24px;">
+        ${pinnedArticle ? `
+        <div class="pinned-article-card">
+            <div class="label">📌 Закреплённое Знань</div>
+            <a href="article.html?id=${pinnedArticle.id}" style="font-family:serif;font-size:1.1em;">${pinnedArticle.title}</a>
+            ${pinnedArticle.description ? `<div style="font-size:0.85em;color:#54595d;margin-top:4px;">${pinnedArticle.description}</div>` : ''}
+        </div>` : ''}
+
+        <h2 style="font-family:serif;font-weight:normal;font-size:1.3em;border-bottom:1px solid #a2a9b1;padding-bottom:3px;margin-top:20px;">
             Знань Людич
         </h2>
-
-        ${renderArticlesList(articles ?? [])}
+        ${renderArticlesList(userArticles)}
     `
 
     if (isOwnProfile) {
-        avatarUrl = u.avatar_url || ''
+        selectedAvatarUrl = u.avatar_url || ''
+        selectedBannerUrl = u.banner_url || ''
+        selectedNameColor = u.name_color || ''
+        selectedBorderStyle = u.avatar_border || ''
+        selectedBg = u.profile_bg || ''
+        selectedPinnedId = u.pinned_article_id || null
+        initColorSwatches()
+        initBorderOptions()
+        initBgOptions()
+        initPinnedSelect()
     }
 }
 
 function renderEditSection() {
+    const canCustomize = isOwnProfile && (isMsvUser || true) // все могут редактировать базовое
+    const canStyle = isOwnProfile && isMsvUser // только МСВ — стили
+
     return `
         <div class="edit-section">
             <h3>Редактировати профиль</h3>
+            <div class="edit-tabs">
+                <button class="edit-tab active" onclick="switchEditTab('basic', this)">Основное</button>
+                <button class="edit-tab" onclick="switchEditTab('avatar', this)">Аватар</button>
+                ${canStyle ? `
+                <button class="edit-tab" onclick="switchEditTab('banner', this)">Баннер</button>
+                <button class="edit-tab" onclick="switchEditTab('style', this)">Стиль</button>
+                <button class="edit-tab" onclick="switchEditTab('pinned', this)">Закреплённое</button>
+                ` : ''}
+            </div>
 
-            <div class="edit-field">
-                <label class="edit-label">Аватарка</label>
-                <div style="display:flex;gap:12px;align-items:center;margin-bottom:8px;">
-                    <div id="avatar-preview" style="width:50px;height:50px;border:1px solid #a2a9b1;overflow:hidden;background:#eaecf0;flex-shrink:0;">
-                        ${profileUser.avatar_url
-                            ? `<img src="${profileUser.avatar_url}" style="width:50px;height:50px;object-fit:cover;display:block;">`
-                            : `<div style="width:50px;height:50px;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:1.4em;color:#a2a9b1;">${profileUser.username[0].toUpperCase()}</div>`
-                        }
-                    </div>
-                    <div style="flex:1;">
-                        <div class="upload-zone" onclick="document.getElementById('avatar-file').click()">
-                            Выбери PNG / JPG
-                            <input type="file" id="avatar-file" accept="image/png,image/jpeg,image/webp" style="display:none;" onchange="uploadAvatar(this)">
-                        </div>
-                        <div class="edit-hint" id="avatar-upload-hint">Загрузка по внешней ссылке отключена</div>
-                    </div>
+            <!-- BASIC -->
+            <div class="edit-tab-content active" id="etab-basic">
+                <div class="edit-field">
+                    <label class="edit-label">Позывной</label>
+                    <input type="text" class="edit-input" id="username-input" value="${profileUser.username}" maxlength="20" oninput="checkNewUsername()">
+                    <div class="edit-hint" id="username-hint">Старый позывной сохранится вч истории</div>
+                </div>
+                <div class="edit-field">
+                    <label class="edit-label">Титул</label>
+                    <input type="text" class="edit-input" id="title-input" value="${profileUser.title ?? ''}" maxlength="50" placeholder="Основательность Муринопедии...">
+                    <div class="edit-hint">До 50 символов — отображается под ником</div>
+                </div>
+                <div class="edit-field">
+                    <label class="edit-label">О себе</label>
+                    <textarea class="edit-input" id="bio-input" maxlength="200" placeholder="Расскажи о себе Людич...">${profileUser.bio ?? ''}</textarea>
+                    <div class="edit-hint">Макс. 200 символов</div>
                 </div>
             </div>
 
-            <div class="edit-field">
-                <label class="edit-label">Позывной</label>
-                <input type="text" class="edit-input" id="username-input" value="${profileUser.username}" maxlength="20" oninput="checkNewUsername()">
-                <div class="edit-hint" id="username-hint">Старый позывной сохранится вч истории</div>
+            <!-- AVATAR -->
+            <div class="edit-tab-content" id="etab-avatar">
+                <div class="edit-field">
+                    <label class="edit-label">Аватарка (PNG, JPG, GIF)</label>
+                    <div style="display:flex;gap:12px;align-items:center;">
+                        <div id="avatar-preview" style="width:64px;height:64px;overflow:hidden;background:#eaecf0;flex-shrink:0;border:${profileUser.avatar_border || '3px solid #eaecf0'};">
+                            ${profileUser.avatar_url
+                                ? `<img src="${profileUser.avatar_url}" style="width:64px;height:64px;object-fit:cover;display:block;">`
+                                : `<div style="width:64px;height:64px;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:1.8em;color:#a2a9b1;">${profileUser.username[0].toUpperCase()}</div>`
+                            }
+                        </div>
+                        <div>
+                            <button class="btn btn-secondary" style="font-size:0.85em;" onclick="document.getElementById('avatar-file').click()">Загрузити файл</button>
+                            <input type="file" id="avatar-file" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none;" onchange="uploadImage('avatar', this)">
+                            <div class="edit-hint" id="avatar-hint">Поддерживаются GIF для анимации</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="edit-field">
+                    <label class="edit-label">Рамка аватарки</label>
+                    <div class="border-row" id="border-options"></div>
+                </div>
             </div>
 
-            <div class="edit-field">
-                <label class="edit-label">О себе</label>
-                <textarea class="edit-input" id="bio-input" maxlength="200" placeholder="Расскажи о себе Людич...">${profileUser.bio ?? ''}</textarea>
-                <div class="edit-hint">Макс. 200 символов</div>
+            <!-- BANNER (MSV only) -->
+            ${isMsvUser ? `
+            <div class="edit-tab-content" id="etab-banner">
+                <div class="edit-field">
+                    <label class="edit-label">Баннер профиля (PNG, JPG, GIF)</label>
+                    <div id="banner-preview" style="width:100%;height:80px;overflow:hidden;background:#eaecf0;margin-bottom:8px;">
+                        ${profileUser.banner_url
+                            ? `<img src="${profileUser.banner_url}" style="width:100%;height:80px;object-fit:cover;display:block;">`
+                            : `<div style="width:100%;height:80px;background:linear-gradient(135deg,#eaecf0,#cee0f2);"></div>`
+                        }
+                    </div>
+                    <button class="btn btn-secondary" style="font-size:0.85em;" onclick="document.getElementById('banner-file').click()">Загрузити баннер</button>
+                    <input type="file" id="banner-file" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none;" onchange="uploadImage('banner', this)">
+                    <div class="edit-hint" id="banner-hint">Рекомендуемый размер: 1200×200px</div>
+                </div>
             </div>
+
+            <!-- STYLE (MSV only) -->
+            <div class="edit-tab-content" id="etab-style">
+                <div class="edit-field">
+                    <label class="edit-label">Цвет ника</label>
+                    <div class="color-row" id="color-swatches"></div>
+                </div>
+                <div class="edit-field" style="margin-top:14px;">
+                    <label class="edit-label">Фон профиля</label>
+                    <div class="color-row" id="bg-options"></div>
+                </div>
+            </div>
+
+            <!-- PINNED (MSV only) -->
+            <div class="edit-tab-content" id="etab-pinned">
+                <div class="edit-field">
+                    <label class="edit-label">Закреплённое Знань</label>
+                    <select class="edit-input" id="pinned-select">
+                        <option value="">— Не закреплено —</option>
+                    </select>
+                    <div class="edit-hint">Отображается в профиле вверху</div>
+                </div>
+            </div>
+            ` : ''}
 
             <div class="save-bar">
                 <button class="btn btn-primary" onclick="saveProfile()">Сохранити</button>
@@ -477,6 +664,176 @@ function renderEditSection() {
             </div>
         </div>
     `
+}
+
+function switchEditTab(name, btn) {
+    document.querySelectorAll('.edit-tab').forEach(t => t.classList.remove('active'))
+    document.querySelectorAll('.edit-tab-content').forEach(t => t.classList.remove('active'))
+    btn.classList.add('active')
+    const tab = document.getElementById('etab-' + name)
+    if (tab) tab.classList.add('active')
+}
+
+function initColorSwatches() {
+    const container = document.getElementById('color-swatches')
+    if (!container) return
+    container.innerHTML = NAME_COLORS.map(c => `
+        <div class="color-swatch ${selectedNameColor === c.value ? 'selected' : ''}"
+             style="background:${c.color || '#f8f9fa'};${!c.value ? 'border:1px solid #a2a9b1;' : ''}"
+             title="${c.label}"
+             onclick="selectNameColor('${c.value}', this)">
+        </div>
+    `).join('')
+}
+
+function selectNameColor(value, el) {
+    selectedNameColor = value
+    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'))
+    el.classList.add('selected')
+}
+
+function initBorderOptions() {
+    const container = document.getElementById('border-options')
+    if (!container) return
+    container.innerHTML = BORDER_STYLES.map(b => `
+        <div class="border-option ${selectedBorderStyle === b.value ? 'selected' : ''}"
+             title="${b.label}"
+             onclick="selectBorder('${b.value}', this)">
+            <div class="av-demo" style="${b.value ? 'border:' + b.value + ';' : 'border:3px solid #eaecf0;'}">А</div>
+        </div>
+    `).join('')
+}
+
+function selectBorder(value, el) {
+    selectedBorderStyle = value
+    document.querySelectorAll('.border-option').forEach(s => s.classList.remove('selected'))
+    el.classList.add('selected')
+    const preview = document.getElementById('avatar-preview')
+    if (preview) preview.style.border = value || '3px solid #eaecf0'
+}
+
+function initBgOptions() {
+    const container = document.getElementById('bg-options')
+    if (!container) return
+    container.innerHTML = BG_OPTIONS.map(b => `
+        <div class="color-swatch ${selectedBg === b.value ? 'selected' : ''}"
+             style="background:${b.color || '#fff'};${!b.value ? 'border:1px solid #a2a9b1;' : ''}"
+             title="${b.label}"
+             onclick="selectBg('${b.value}', this)">
+        </div>
+    `).join('')
+}
+
+function selectBg(value, el) {
+    selectedBg = value
+    document.querySelectorAll('#bg-options .color-swatch').forEach(s => s.classList.remove('selected'))
+    el.classList.add('selected')
+}
+
+function initPinnedSelect() {
+    const sel = document.getElementById('pinned-select')
+    if (!sel) return
+    const published = userArticles.filter(a => a.status === 'published')
+    published.forEach(a => {
+        const opt = document.createElement('option')
+        opt.value = a.id
+        opt.textContent = a.title
+        if (a.id === selectedPinnedId) opt.selected = true
+        sel.appendChild(opt)
+    })
+}
+
+async function uploadImage(type, input) {
+    const file = input.files[0]
+    if (!file) return
+    const hintId = type + '-hint'
+    const hint = document.getElementById(hintId)
+    if (hint) { hint.className = 'edit-hint'; hint.textContent = 'Загружати...' }
+
+    const ext = file.name.split('.').pop()
+    const folder = type === 'avatar' ? 'avatars' : 'banners'
+    const fileName = folder + '/' + currentUserId + '_' + Date.now() + '.' + ext
+
+    const { error } = await supabaseClient.storage
+        .from('images').upload(fileName, file, { upsert: true })
+
+    if (error) {
+        if (hint) { hint.className = 'edit-hint error'; hint.textContent = 'Смертч-шум: ' + error.message }
+        return
+    }
+
+    const { data: urlData } = supabaseClient.storage.from('images').getPublicUrl(fileName)
+    const url = urlData.publicUrl + '?t=' + Date.now()
+
+    if (type === 'avatar') {
+        selectedAvatarUrl = url
+        const preview = document.getElementById('avatar-preview')
+        if (preview) preview.innerHTML = `<img src="${url}" style="width:64px;height:64px;object-fit:cover;display:block;">`
+    } else {
+        selectedBannerUrl = url
+        const preview = document.getElementById('banner-preview')
+        if (preview) preview.innerHTML = `<img src="${url}" style="width:100%;height:80px;object-fit:cover;display:block;">`
+    }
+
+    if (hint) { hint.className = 'edit-hint success'; hint.textContent = 'Загруженол ✓' }
+}
+
+async function checkNewUsername() {
+    const val = document.getElementById('username-input').value.trim()
+    const hint = document.getElementById('username-hint')
+    clearTimeout(nicknameTimer)
+
+    if (val === profileUser.username) {
+        hint.className = 'edit-hint'; hint.textContent = 'Старый позывной сохранится вч истории'; return
+    }
+    if (val.length < 3) { hint.className = 'edit-hint error'; hint.textContent = 'Минимум 3 символа'; return }
+    if (!/^[a-zA-Zа-яА-ЯёЁ0-9_]+$/.test(val)) { hint.className = 'edit-hint error'; hint.textContent = 'Недопустимые символы'; return }
+
+    hint.className = 'edit-hint'; hint.textContent = 'Проверка...'
+    nicknameTimer = setTimeout(async () => {
+        const { data } = await supabaseClient.from('users').select('username').eq('username', val).single()
+        if (data) { hint.className = 'edit-hint error'; hint.textContent = 'Этот позывной уже занят' }
+        else { hint.className = 'edit-hint success'; hint.textContent = 'Позывной свободен' }
+    }, 500)
+}
+
+async function saveProfile() {
+    const msg = document.getElementById('save-status')
+    const newUsername = document.getElementById('username-input')?.value.trim()
+    const bio = document.getElementById('bio-input')?.value.trim()
+    const title = document.getElementById('title-input')?.value.trim()
+    const pinnedSel = document.getElementById('pinned-select')
+    const pinnedId = pinnedSel ? (pinnedSel.value || null) : selectedPinnedId
+
+    msg.className = 'save-status'; msg.textContent = 'Сохраняти...'
+
+    const updates = {
+        bio: bio || null,
+        title: title || null,
+        avatar_url: selectedAvatarUrl || null,
+        banner_url: selectedBannerUrl || null,
+        name_color: selectedNameColor || null,
+        avatar_border: selectedBorderStyle || null,
+        profile_bg: selectedBg || null,
+        pinned_article_id: pinnedId || null
+    }
+
+    if (newUsername && newUsername !== profileUser.username) {
+        if (newUsername.length < 3 || !/^[a-zA-Zа-яА-ЯёЁ0-9_]+$/.test(newUsername)) {
+            msg.className = 'save-status error'; msg.textContent = 'Нрт — проверь позывной'; return
+        }
+        const { data: taken } = await supabaseClient.from('users').select('username').eq('username', newUsername).single()
+        if (taken) { msg.className = 'save-status error'; msg.textContent = 'Позывной занят'; return }
+        const prevList = [...new Set([...(profileUser.previous_usernames ?? []), profileUser.username])]
+        updates.username = newUsername
+        updates.previous_usernames = prevList
+    }
+
+    const { error } = await supabaseClient.from('users').update(updates).eq('id', currentUserId)
+    if (error) { msg.className = 'save-status error'; msg.textContent = 'Смертч-шум: ' + error.message; return }
+
+    msg.className = 'save-status success'; msg.textContent = 'Сохраненол ✓'
+    setTimeout(() => window.location.reload(), 700)
 }
 
 function renderArticlesList(articles) {
@@ -488,104 +845,12 @@ function renderArticlesList(articles) {
                     <a href="article.html?id=${a.id}" class="article-row-title">${a.title}</a>
                     <div class="article-row-meta">${a.tag ?? '—'} · ${new Date(a.created_at).toLocaleDateString('ru-RU')}</div>
                 </div>
-                <span class="article-status-badge ${a.status === 'published' ? 'badge-published' : 'badge-pending'}">
+                <span class="${a.status === 'published' ? 'badge-published' : 'badge-pending'}">
                     ${a.status === 'published' ? 'Опубликовано' : 'На проверке'}
                 </span>
             </div>
         `).join('')}
     </div>`
-}
-
-function previewAvatar(url) {
-    avatarUrl = url
-    const preview = document.getElementById('avatar-preview')
-    if (url) {
-        preview.innerHTML = `<img src="${url}" style="width:50px;height:50px;object-fit:cover;display:block;" onerror="this.parentElement.innerHTML='?'">`
-    } else {
-        preview.innerHTML = `<div style="width:50px;height:50px;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:1.4em;color:#a2a9b1;">${profileUser.username[0].toUpperCase()}</div>`
-    }
-}
-
-async function uploadAvatar(input) {
-    const file = input.files[0]
-    if (!file) return
-    const hint = document.getElementById('avatar-upload-hint')
-    hint.className = 'edit-hint'
-    hint.textContent = 'Загружати...'
-
-    const ext = file.name.split('.').pop()
-    const fileName = `avatars/${currentUserId}.${ext}`
-
-    const { error } = await supabaseClient.storage
-        .from('images').upload(fileName, file, { upsert: true })
-
-    if (error) { hint.className = 'edit-hint error'; hint.textContent = 'Смертч-шум: ' + error.message; return }
-
-    const { data: urlData } = supabaseClient.storage.from('images').getPublicUrl(fileName)
-    avatarUrl = urlData.publicUrl + '?t=' + Date.now()
-    hint.className = 'edit-hint success'
-    hint.textContent = 'Загруженол: ' + file.name
-    previewAvatar(avatarUrl)
-}
-
-async function checkNewUsername() {
-    const val = document.getElementById('username-input').value.trim()
-    const hint = document.getElementById('username-hint')
-    clearTimeout(nicknameTimer)
-
-    if (val === profileUser.username) {
-        hint.className = 'edit-hint'
-        hint.textContent = 'Старый позывной сохранится вч истории'
-        return
-    }
-
-    if (val.length < 3) { hint.className = 'edit-hint error'; hint.textContent = 'Минимум 3 символа'; return }
-    if (!/^[a-zA-Zа-яА-ЯёЁ0-9_]+$/.test(val)) { hint.className = 'edit-hint error'; hint.textContent = 'Недопустимые символы'; return }
-
-    hint.className = 'edit-hint'
-    hint.textContent = 'Проверка...'
-
-    nicknameTimer = setTimeout(async () => {
-        const { data } = await supabaseClient.from('users').select('username').eq('username', val).single()
-        if (data) {
-            hint.className = 'edit-hint error'
-            hint.textContent = 'Этот позывной уже занят'
-        } else {
-            hint.className = 'edit-hint success'
-            hint.textContent = 'Позывной свободен'
-        }
-    }, 500)
-}
-
-async function saveProfile() {
-    const msg = document.getElementById('save-status')
-    const newUsername = document.getElementById('username-input').value.trim()
-    const bio = document.getElementById('bio-input').value.trim()
-
-    msg.className = 'save-status'
-    msg.textContent = 'Сохраняти...'
-
-    const updates = { bio, avatar_url: avatarUrl || null }
-
-    if (newUsername !== profileUser.username) {
-        if (newUsername.length < 3 || !/^[a-zA-Zа-яА-ЯёЁ0-9_]+$/.test(newUsername)) {
-            msg.className = 'save-status error'; msg.textContent = 'Нрт — проверь позывной'; return
-        }
-        const { data: taken } = await supabaseClient.from('users').select('username').eq('username', newUsername).single()
-        if (taken) { msg.className = 'save-status error'; msg.textContent = 'Позывной занят'; return }
-
-        const prevList = [...(profileUser.previous_usernames ?? []), profileUser.username]
-        updates.username = newUsername
-        updates.previous_usernames = [...new Set(prevList)]
-    }
-
-    const { error } = await supabaseClient.from('users').update(updates).eq('id', currentUserId)
-
-    if (error) { msg.className = 'save-status error'; msg.textContent = 'Смертч-шум: ' + error.message; return }
-
-    msg.className = 'save-status success'
-    msg.textContent = 'Сохраненол ✓'
-    setTimeout(() => window.location.reload(), 800)
 }
 
 async function logout() {
