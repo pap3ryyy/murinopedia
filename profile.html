@@ -10,7 +10,7 @@
         .profile-banner {
             width: 100%;
             height: 140px;
-            object-fit: cover;
+            object-fit: fill;
             display: block;
             background: #eaecf0;
             border-bottom: 1px solid #a2a9b1;
@@ -444,8 +444,8 @@ async function init() {
         const main = document.querySelector('.container main')
         if (user.profile_bg.startsWith('url(')) {
             main.style.backgroundImage = user.profile_bg
-            main.style.backgroundSize = 'cover'
-            main.style.backgroundPosition = 'center'
+            main.style.backgroundSize = '100% 100%'
+            main.style.backgroundRepeat = 'no-repeat'
         } else {
             main.style.background = user.profile_bg
         }
