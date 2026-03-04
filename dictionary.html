@@ -614,7 +614,16 @@ function renderDictionaryPage() {
         </div>
         <div class="comments-section">
             <h2>Обсуждение</h2>
-            ${renderCommentForm()}
+            ${currentUser
+                ? `<div class="comment-form">
+                    <textarea id="new-comment" placeholder="Пиши своё Знань вч обсуждение..."></textarea>
+                    <div class="comment-form-actions">
+                        <button class="btn btn-primary" onclick="submitComment(null)">Отправити</button>
+                        <span style="font-size:0.8em;color:#54595d;">Пишешь как: <b>${currentUser}</b></span>
+                    </div>
+                </div>`
+                : `<div class="login-prompt">Дляч участия вч обсуждении необходима идентификация. <a href="login.html">Войти вч систему</a></div>`
+            }
             <div id="comments-list"><p class="no-comments">Загружати обсуждение...</p></div>
         </div>
     `
