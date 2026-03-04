@@ -325,6 +325,7 @@ function showDenied(msg) {
 
 function renderEditor() {
     const isMsv = ['м.с.в.проверкость', 'м.с.в.содрунник', 'м.с.в.основательность'].includes(currentRole)
+    isFounder = currentRole === 'м.с.в.основательность'
 
     document.getElementById('editor-wrap').innerHTML = `
         <h1>Новол Знань</h1>
