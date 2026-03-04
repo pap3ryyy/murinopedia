@@ -414,6 +414,7 @@ function renderHeaderUser() {
     }
 }
 
+
 async function logout() {
     await supabaseClient.auth.signOut()
     window.location.href = 'login.html'
@@ -426,6 +427,10 @@ async function loadArticle() {
     if (error || !article) { showError('Знань нрт найденол — возможно Фог скрылость его'); return }
     if (article.status !== 'published' && !isMsv()) {
         showError('Это Знань ещё нач проверке вч М.С.В.')
+        return
+    }
+    if (article.private && !isMsv()) {
+        showError('Это Знань засекреченол М.С.В. — доступ закрытч')
         return
     }
 
@@ -565,12 +570,14 @@ function renderArticle(article) {
     document.getElementById('main-content').innerHTML = `
         <h1 style="font-family:serif;font-weight:normal;font-size:2em;border-bottom:1px solid #a2a9b1;padding-bottom:5px;margin-bottom:10px;">
             ${article.pinned ? '<span class="pinned-badge">📌 Закреплено</span>' : ''}
+            ${article.private ? '<span class="pinned-badge" style="background:#fee7e6;border-color:#d33;color:#d33;">🔒 Приватное</span>' : ''}
             ${article.title}
         </h1>
 
         ${userIsMsv ? `
         <div class="article-actions">
             ${_canDelete ? `<button class="btn btn-secondary" onclick="togglePin(${article.pinned})">${article.pinned ? 'Открепити' : 'Закрепити'}</button>` : ''}
+            ${_canDelete ? `<button class="btn btn-secondary" onclick="togglePrivate(${article.private})">${article.private ? '🔓 Открыти' : '🔒 Скрыти'}</button>` : ''}
             ${_canDelete ? `<button class="btn btn-danger" onclick="deleteArticle()">Удалити Знань</button>` : ''}
             ${article.status === 'pending' ? `<button class="btn btn-primary" onclick="publishArticle()">Опубликовати</button>` : ''}
         </div>
@@ -633,6 +640,12 @@ async function toggleArticleLike() {
     btn.className = `like-btn ${articleLiked ? 'liked' : ''}`
     btn.textContent = `▲ ${articleLiked ? 'Лайк поставленол' : 'Поставити лайк'}`
     countEl.textContent = `${newCount} лайков`
+}
+
+async function togglePrivate(currentlyPrivate) {
+    if (!canDelete()) return
+    await supabaseClient.from('articles').update({ private: !currentlyPrivate }).eq('id', articleId)
+    window.location.reload()
 }
 
 async function togglePin(currentlyPinned) {
