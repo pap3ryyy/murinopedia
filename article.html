@@ -424,7 +424,7 @@ async function loadArticle() {
 
     if (currentUserId) {
         const { error: viewError } = await supabaseClient.from('article_views')
-            .insert({ article_id: articleId, user_id: currentUserId })
+            .upsert({ article_id: articleId, user_id: currentUserId }, { onConflict: 'article_id,user_id', ignoreDuplicates: true })
         if (!viewError) {
             await supabaseClient.from('articles')
                 .update({ views_count: (article.views_count ?? 0) + 1 }).eq('id', articleId)
