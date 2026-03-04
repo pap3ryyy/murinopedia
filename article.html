@@ -516,7 +516,7 @@ function renderContent(content, imageUrl) {
 }
 
 function renderArticle(article) {
-    const isMsv = isMsv()
+    const userIsMsv = isMsv()
     const _canDelete = canDelete()
 
     document.getElementById('main-content').innerHTML = `
@@ -525,7 +525,7 @@ function renderArticle(article) {
             ${article.title}
         </h1>
 
-        ${isMsv ? `
+        ${userIsMsv ? `
         <div class="article-actions">
             ${_canDelete ? `<button class="btn btn-secondary" onclick="togglePin(${article.pinned})">${article.pinned ? 'Открепити' : 'Закрепити'}</button>` : ''}
             ${_canDelete ? `<button class="btn btn-danger" onclick="deleteArticle()">Удалити Знань</button>` : ''}
