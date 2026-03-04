@@ -380,6 +380,28 @@ async function confirmRevoke() {
         return
     }
 
+    // Проверяем — если у пользователя больше нет спонсора и он не МСВ — сбрасываем кастомизацию
+    const { data: userData } = await supabaseClient
+        .from('users').select('role').eq('id', selectedUserId).single()
+    const isMsvRole = userData && ['м.с.в.проверкость', 'м.с.в.содрунник', 'м.с.в.основательность'].includes(userData.role)
+
+    if (!isMsvRole) {
+        const { data: remainingBadges } = await supabaseClient
+            .from('user_badges').select('badges(name)').eq('user_id', selectedUserId)
+        const stillSponsor = (remainingBadges ?? []).some(ub => ub.badges?.name === 'Спонсорность')
+
+        if (!stillSponsor) {
+            await supabaseClient.from('users').update({
+                banner_url: null,
+                name_color: null,
+                profile_bg: null,
+                avatar_border: null,
+                pinned_article_id: null,
+                title: null
+            }).eq('id', selectedUserId)
+        }
+    }
+
     status.style.color = '#14866d'
     status.textContent = 'Значок снят ✓'
     setTimeout(closeGrantModal, 1000)
