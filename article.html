@@ -649,6 +649,7 @@ async function loadComments() {
 }
 
 function renderComment(c, isReply = false, userMap = {}) {
+    console.log('[renderComment] id:', c.id, 'user_id:', c.user_id, 'currentUserId:', currentUserId, 'match:', c.user_id === currentUserId, 'canDelete:', canDelete())
     if (c.deleted) {
         return `<div class="comment ${isReply ? 'reply' : ''}" style="opacity:0.5;font-style:italic;color:#a2a9b1;">
             <div class="comment-header"><span class="comment-date">${new Date(c.created_at).toLocaleDateString('ru-RU')}</span></div>
@@ -743,11 +744,20 @@ async function submitComment(parentId) {
 }
 
 async function deleteComment(commentId, isOwn = false) {
-    if (!isOwn && !canDelete()) return
+    console.log('[deleteComment] id:', commentId, 'isOwn:', isOwn, 'role:', currentRole, 'canDelete:', canDelete(), 'currentUserId:', currentUserId)
+    if (!isOwn && !canDelete()) {
+        console.log('[deleteComment] blocked — no permission')
+        return
+    }
     if (isOwn) {
-        await supabaseClient.from('comments').update({ content: '[сообщенность удалена]', deleted: true }).eq('id', commentId)
+        const { error } = await supabaseClient.from('comments')
+            .update({ content: '[сообщенность удалена]', deleted: true })
+            .eq('id', commentId)
+        console.log('[deleteComment] soft delete error:', error)
     } else {
-        await supabaseClient.from('comments').delete().eq('id', commentId)
+        const { error } = await supabaseClient.from('comments')
+            .delete().eq('id', commentId)
+        console.log('[deleteComment] hard delete error:', error)
     }
     await loadComments()
 }
