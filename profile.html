@@ -439,6 +439,17 @@ async function init() {
     profileUser = user
     isOwnProfile = currentUserId === user.id
 
+    // Проверяем значок спонсора
+    if (isOwnProfile && !isMsvUser) {
+        const { data: allBadges } = await supabaseClient
+            .from('user_badges')
+            .select('badges(name)')
+            .eq('user_id', user.id)
+        if (allBadges && allBadges.some(ub => ub.badges?.name === 'Спонсорность')) {
+            isMsvUser = true
+        }
+    }
+
     // Apply profile bg
     if (user.profile_bg) {
         const main = document.querySelector('.container main')
