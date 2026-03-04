@@ -601,205 +601,33 @@ async function logout() {
     window.location.href = 'login.html'
 }
 
-async function loadArticle() {
-    const { data: article, error } = await supabaseClient
-        .from('articles').select('*').eq('id', articleId).single()
-
-    if (error || !article) { showError('Знань нрт найденол — возможно Фог скрылость его'); return }
-    if (article.status !== 'published' && !isMsv()) {
-        showError('Это Знань ещё нач проверке вч М.С.В.')
-        return
-    }
-
-    if (currentUserId) {
-        const { error: viewError } = await supabaseClient.from('article_views')
-            .upsert({ article_id: articleId, user_id: currentUserId }, { onConflict: 'article_id,user_id', ignoreDuplicates: true })
-        if (!viewError) {
-            await supabaseClient.from('articles')
-                .update({ views_count: (article.views_count ?? 0) + 1 }).eq('id', articleId)
-        }
-    }
-
-    if (currentUserId) {
-        const { data: alreadyLiked } = await supabaseClient
-            .from('article_likes').select('article_id')
-            .eq('article_id', articleId).eq('user_id', currentUserId).single()
-        articleLiked = !!alreadyLiked
-    }
-
-    // Подгружаем данные автора одним запросом
-    if (article.author) {
-        const { data: aData } = await supabaseClient
-            .from('users').select('id, public_id, banner_url, avatar_url, name_color, title')
-            .eq('username', article.author).single()
-        if (aData) {
-            authorPublicIds[article.author] = aData.public_id
-            const { data: badges } = await supabaseClient
-                .from('user_badges')
-                .select('badges(id, name, description, icon_url)')
-                .eq('user_id', aData.id)
-            authorData = { ...aData, badges: badges ?? [] }
-        }
-    }
-
-    document.title = article.title + ' — Муринопедия'
-
-    renderArticle(article)
-    if (document.getElementById('murino-dictionary')) {
-        await loadDictionary()
-    }
-    await loadUserCommentLikes()
-    await loadComments()
-}
-
-function renderReviewBadge(article) {
-    if (article.status === 'pending') return `<span class="review-badge pending">На проверке</span>`
-    if (article.reviewed_by) return `<span class="review-badge verified">Проверена — ${article.reviewed_by}</span>`
-    return `<span class="review-badge msv">Опубликована без проверки (М.С.В.)</span>`
-}
-
-function renderMetaInfobox(article) {
-    const created = new Date(article.created_at).toLocaleDateString('ru-RU')
-    const reviewed = article.reviewed_at ? new Date(article.reviewed_at).toLocaleDateString('ru-RU') : '—'
-    const authorPid = authorPublicIds[article.author]
-    const badges = (authorData.badges ?? []).map(ub => {
-        const b = ub.badges
-        return `<span style="position:relative;display:inline-flex;align-items:center;margin-left:3px;" class="badge-wrap">
-            <img src="${b.icon_url}" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;cursor:help;" title="${b.description ?? b.name}">
-        </span>`
-    }).join('')
-    const nameColor = authorData.name_color ? `color:${authorData.name_color};` : ''
-    const authorHtml = authorPid
-        ? `<a href="profile.html?id=${authorPid}" style="${nameColor}">${article.author ?? 'Аноним'}</a>${badges}`
-        : `${article.author ?? 'Аноним'}${badges}`
-    return `
-        <div class="meta-infobox">
-            <span class="infobox-title">Сведения о Знань</span>
-            <table class="infobox-table">
-                <tr><td>Автор</td><td>${authorHtml}</td></tr>
-                <tr><td>Категория</td><td>${article.tag ?? '—'}</td></tr>
-                <tr><td>Создано</td><td>${created}</td></tr>
-                <tr><td>Проверено</td><td>${reviewed}</td></tr>
-                <tr><td>Статус</td><td>${renderReviewBadge(article)}</td></tr>
-                <tr><td>Просмотры</td><td>${(article.views_count ?? 0) + 1}</td></tr>
-                <tr><td>Лайки</td><td>${article.likes_count ?? 0}</td></tr>
-            </table>
-        </div>
-    `
-}
-
-function renderContentInfobox(article) {
-    const fields = article.infobox ?? []
-    const hasCover = article.cover_url
-    const hasFields = fields.length > 0
-    if (!hasCover && !hasFields) return ''
-    return `
-        <div class="article-infobox">
-            <span class="infobox-title">${article.title}</span>
-            ${hasCover ? `<div class="infobox-image"><img src="${article.cover_url}" alt="${article.title}"></div>` : ''}
-            ${hasFields ? `
-            <table class="infobox-table">
-                ${fields.map(f => `<tr><td>${f.label}</td><td>${f.value}</td></tr>`).join('')}
-            </table>` : ''}
-        </div>
-    `
-}
-
-function renderContent(content, imageUrl, codeBlocks) {
-    codeBlocks = codeBlocks || []
-    if (!content) return ''
-    // Сначала обрабатываем markdown-синтаксис ДО экранирования
-    let html = content
-        .replace(/^> (.+)$/gm, '~~BQ~~$1~~END~~')
-        .replace(/^## (.+)$/gm, '~~H2~~$1~~END~~')
-        .replace(/^### (.+)$/gm, '~~H3~~$1~~END~~')
-        .replace(/\*\*(.+?)\*\*/g, '~~ST~~$1~~ENDST~~')
-        .replace(/\*(.+?)\*/g, '~~EM~~$1~~ENDEM~~')
-    // Теперь экранируем
-    html = html
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/&lt;image&gt;/g, imageUrl
-            ? `<img class="content-image" src="${imageUrl}" alt="Картинка">`
-            : `<div class="inline-image-placeholder">Нрт картинки дляч этого тега</div>`)
-    // Словарь только в статье 27
-    if (String(articleId) === '27') {
-        html = html.replace(/<dictionary>/g, '<div id="murino-dictionary" class="dict-wrap"><div style="padding:20px;text-align:center;color:#a2a9b1;font-size:0.85em;">Загружати словарь...</div></div>')
-    }
-
-    // Вставляем кодблоки
-    codeBlocks.forEach(b => {
-        if (!b.name || !b.content) return
-        const tag = new RegExp('<' + b.name + '>', 'g')
-        html = html.replace(tag, '<div class="article-codeblock">' + b.content + '</div>')
-    })
-
-    // Восстанавливаем HTML теги
-    html = html
-        .replace(/~~BQ~~(.+?)~~END~~/g, '<blockquote>$1</blockquote>')
-        .replace(/~~H2~~(.+?)~~END~~/g, '<h2>$1</h2>')
-        .replace(/~~H3~~(.+?)~~END~~/g, '<h3>$1</h3>')
-        .replace(/~~ST~~(.+?)~~ENDST~~/g, '<strong>$1</strong>')
-        .replace(/~~EM~~(.+?)~~ENDEM~~/g, '<em>$1</em>')
-
-    return html.split('\n').map(line => {
-        if (/^<(h2|h3|blockquote|img|div)/.test(line)) return line
-        if (line.trim() === '') return '<br>'
-        return `<p>${line}</p>`
-    }).join('')
-}
-
-function renderArticle(article) {
-    const userIsMsv = isMsv()
-    const _canDelete = canDelete()
-
+function renderDictionaryPage() {
     document.getElementById('main-content').innerHTML = `
-        <h1 style="font-family:serif;font-weight:normal;font-size:2em;border-bottom:1px solid #a2a9b1;padding-bottom:5px;margin-bottom:10px;">
-            ${article.pinned ? '<span class="pinned-badge">📌 Закреплено</span>' : ''}
-            ${article.title}
+        <h1 style="font-family:serif;font-weight:normal;font-size:2em;border-bottom:1px solid #a2a9b1;padding-bottom:5px;margin-bottom:16px;">
+            📖 Муринский Словарь
         </h1>
-
-        ${userIsMsv ? `
-        <div class="article-actions">
-            ${_canDelete ? `<button class="btn btn-secondary" onclick="togglePin(${article.pinned})">${article.pinned ? 'Открепити' : 'Закрепити'}</button>` : ''}
-            ${_canDelete ? `<button class="btn btn-danger" onclick="deleteArticle()">Удалити Знань</button>` : ''}
-            ${article.status === 'pending' ? `<button class="btn btn-primary" onclick="publishArticle()">Опубликовати</button>` : ''}
+        <div class="info-box" style="margin-bottom:16px;font-size:0.9em;">
+            Здесч собраны слова муринского языка. Каждый Людич может предложити своё слово — М.С.В. проверит ич одобрит.
         </div>
-        ` : ''}
-
-        <div class="article-content clearfix">
-            ${renderMetaInfobox(article)}
-            ${renderContentInfobox(article)}
-            ${renderContent(article.content, article.image_url, article.code_blocks)}
+        <div id="murino-dictionary" class="dict-wrap">
+            <div style="padding:20px;text-align:center;color:#a2a9b1;font-size:0.85em;">Загружати словарь...</div>
         </div>
-
-        <div class="like-bar">
-            <button class="like-btn ${articleLiked ? 'liked' : ''}" id="like-btn" onclick="toggleArticleLike()">
-                ▲ ${articleLiked ? 'Лайк поставленол' : 'Поставити лайк'}
-            </button>
-            <span class="views-count" id="likes-count">${article.likes_count ?? 0} лайков</span>
-            <span class="views-count">· ${(article.views_count ?? 0) + 1} просмотров</span>
-        </div>
-
-        <div class="comments-section" id="comments-section">
-            <h2>Обсуждение Знань</h2>
+        <div class="comments-section">
+            <h2>Обсуждение</h2>
             ${renderCommentForm()}
             <div id="comments-list"><p class="no-comments">Загружати обсуждение...</p></div>
         </div>
     `
 }
 
-function renderCommentForm() {
-    if (!currentUser) return `<div class="login-prompt">Дляч участия вч обсуждении необходима идентификация. <a href="login.html">Войти вч систему</a></div>`
-    return `
-        <div class="comment-form">
-            <textarea id="new-comment" placeholder="Пиши своё Знань вч обсуждение..."></textarea>
-            <div class="comment-form-actions">
-                <button class="btn btn-primary" onclick="submitComment(null)">Отправити</button>
-                <span style="font-size:0.8em;color:#54595d;">Пишешь как: <b>${currentUser}</b></span>
-            </div>
-        </div>
-    `
+async function loadArticle() {
+    document.title = 'Муринский Словарь — Муринопедия'
+    renderDictionaryPage()
+    await loadDictionary()
+    await loadUserCommentLikes()
+    await loadComments()
 }
+
 
 async function toggleArticleLike() {
     if (!currentUserId) { window.location.href = 'login.html'; return }
