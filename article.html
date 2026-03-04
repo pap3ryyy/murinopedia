@@ -110,6 +110,13 @@
             margin-top: 18px;
         }
 
+        .article-codeblock {
+            margin: 12px 0;
+            border: 1px solid #3d3d5c;
+            border-radius: 2px;
+            overflow-x: auto;
+        }
+
         .article-content blockquote {
             border-left: 3px solid #a2a9b1;
             margin: 12px 0 12px 20px;
@@ -513,7 +520,8 @@ function renderContentInfobox(article) {
     `
 }
 
-function renderContent(content, imageUrl) {
+function renderContent(content, imageUrl, codeBlocks) {
+    codeBlocks = codeBlocks || []
     if (!content) return ''
     // Сначала обрабатываем markdown-синтаксис ДО экранирования
     let html = content
@@ -528,6 +536,13 @@ function renderContent(content, imageUrl) {
         .replace(/&lt;image&gt;/g, imageUrl
             ? `<img class="content-image" src="${imageUrl}" alt="Картинка">`
             : `<div class="inline-image-placeholder">Нрт картинки дляч этого тега</div>`)
+    // Вставляем кодблоки
+    codeBlocks.forEach(b => {
+        if (!b.name || !b.content) return
+        const tag = new RegExp('<' + b.name + '>', 'g')
+        html = html.replace(tag, '<div class="article-codeblock">' + b.content + '</div>')
+    })
+
     // Восстанавливаем HTML теги
     html = html
         .replace(/~~BQ~~(.+?)~~END~~/g, '<blockquote>$1</blockquote>')
@@ -564,7 +579,7 @@ function renderArticle(article) {
         <div class="article-content clearfix">
             ${renderMetaInfobox(article)}
             ${renderContentInfobox(article)}
-            ${renderContent(article.content, article.image_url)}
+            ${renderContent(article.content, article.image_url, article.code_blocks)}
         </div>
 
         <div class="like-bar">
