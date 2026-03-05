@@ -618,6 +618,13 @@ function renderCommentForm() {
     `
 }
 
+async function sendNotif(userId, type, message, link) {
+    if (!userId || userId === currentUserId) return
+    await supabaseClient.from('notifications').insert({
+        user_id: userId, type, message, link: link || null, read: false
+    })
+}
+
 async function toggleArticleLike() {
     if (!currentUserId) { window.location.href = 'login.html'; return }
     const btn = document.getElementById('like-btn')
@@ -630,6 +637,12 @@ async function toggleArticleLike() {
     } else {
         await supabaseClient.from('article_likes').insert({ article_id: articleId, user_id: currentUserId })
         articleLiked = true
+        // Уведомление автору статьи
+        const { data: art } = await supabaseClient.from('articles').select('author').eq('id', articleId).single()
+        if (art) {
+            const { data: authorUser } = await supabaseClient.from('users').select('id').eq('username', art.author).single()
+            if (authorUser) await sendNotif(authorUser.id, 'like', currentUser + ' лайкнул твою Знань', 'article.html?id=' + articleId)
+        }
     }
 
     const newCount = articleLiked
@@ -770,6 +783,9 @@ async function toggleCommentLike(commentId) {
     } else {
         await supabaseClient.from('likes').insert({ comment_id: commentId, user_id: currentUserId })
         userCommentLikes.add(commentId)
+        // Уведомление автору комментария
+        const { data: cm } = await supabaseClient.from('comments').select('user_id, username').eq('id', commentId).single()
+        if (cm) await sendNotif(cm.user_id, 'comment_like', currentUser + ' лайкнул твой комментарий', 'article.html?id=' + articleId)
     }
     await loadComments()
 }
@@ -785,13 +801,27 @@ async function submitComment(parentId) {
     }
     if (!text) return
 
-    await supabaseClient.from('comments').insert({
+    const { data: newComment } = await supabaseClient.from('comments').insert({
         article_id: articleId,
         user_id: currentUserId,
         username: currentUser,
         content: text,
         parent_id: parentId || null
-    })
+    }).select().single()
+
+    // Уведомления
+    if (parentId) {
+        // Ответ на комментарий — уведомить автора комментария
+        const { data: parentCm } = await supabaseClient.from('comments').select('user_id, username').eq('id', parentId).single()
+        if (parentCm) await sendNotif(parentCm.user_id, 'reply', currentUser + ' ответил на твой комментарий', 'article.html?id=' + articleId)
+    } else {
+        // Комментарий к статье — уведомить автора статьи
+        const { data: art } = await supabaseClient.from('articles').select('author').eq('id', articleId).single()
+        if (art) {
+            const { data: authorUser } = await supabaseClient.from('users').select('id').eq('username', art.author).single()
+            if (authorUser) await sendNotif(authorUser.id, 'comment', currentUser + ' прокомментировал твою Знань', 'article.html?id=' + articleId)
+        }
+    }
 
     if (parentId) {
         const form = document.getElementById('reply-form-' + parentId)
