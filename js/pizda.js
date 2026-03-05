@@ -22,14 +22,12 @@
         vid.autoplay = true
         vid.loop = true
         vid.muted = true
-        vid.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:fill;z-index:99999;'
-        document.body.appendChild(vid)
-
-        document.addEventListener('click', function unmute() {
+        vid.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:fill;z-index:99999;cursor:pointer;'
+        vid.onclick = function() {
             vid.muted = false
             vid.volume = 1
-            document.removeEventListener('click', unmute)
-        }, { once: true })
+        }
+        document.body.appendChild(vid)
 
         const targets = document.querySelectorAll('main, aside, header, footer, .article-card, .nav-card, .comment, .sidebar-box, .infobox')
         targets.forEach(el => {
