@@ -21,15 +21,28 @@
         vid.src = videoUrl
         vid.autoplay = true
         vid.loop = true
-        vid.muted = true
-        vid.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:fill;z-index:99999;cursor:pointer;'
-        vid.onclick = function() {
-            vid.muted = false
-            vid.volume = 1
-        }
+        vid.muted = false
+        vid.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:fill;z-index:99999;'
         document.body.appendChild(vid)
 
-        const targets = document.querySelectorAll('main, aside, header, footer, .article-card, .nav-card, .comment, .sidebar-box, .infobox')
+        vid.play().catch(() => {
+            vid.muted = true
+            vid.play()
+            document.addEventListener('click', function() {
+                vid.muted = false
+                vid.volume = 1
+            }, { once: true })
+            document.addEventListener('keydown', function() {
+                vid.muted = false
+                vid.volume = 1
+            }, { once: true })
+            document.addEventListener('scroll', function() {
+                vid.muted = false
+                vid.volume = 1
+            }, { once: true })
+        })
+
+        const targets = document.querySelectorAll('main, aside, header, footer, .article-card, .nav-card, .comment, .sidebar-box')
         targets.forEach(el => {
             const v = document.createElement('video')
             v.src = videoUrl
