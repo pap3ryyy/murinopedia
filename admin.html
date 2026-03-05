@@ -464,6 +464,17 @@ async function confirmGrant() {
         return
     }
 
+    // Уведомление получателю
+    const { data: badgeData } = await supabaseClient.from('badges').select('name').eq('id', grantBadgeId).single()
+    if (badgeData) {
+        await supabaseClient.from('notifications').insert({
+            user_id: selectedUserId,
+            type: 'badge',
+            message: 'Тебе выданол значок «' + badgeData.name + '»',
+            link: 'badges.html',
+            read: false
+        })
+    }
     status.style.color = '#14866d'
     status.textContent = 'Значок выдан ✓'
     setTimeout(closeGrantModal, 1000)
