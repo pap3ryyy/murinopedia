@@ -405,6 +405,14 @@ const BG_OPTIONS = [
     { value: '#0f3460', label: 'Ночной' },
 ]
 
+function renderHeaderUser(user) {
+    document.getElementById('header-user').innerHTML = `
+        <a href="profile.html?id=${user.public_id}" style="color:#0645ad;">${user.username}</a>
+        &nbsp;
+        <button onclick="logout()" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;">Выйти</button>
+    `
+}
+
 async function init() {
     const params = new URLSearchParams(window.location.search)
     const profileId = params.get('id')
@@ -417,6 +425,7 @@ async function init() {
         if (me) {
             currentUser = me
             isMsvUser = MSV_ROLES.includes(me.role)
+            renderHeaderUser(me)
         
         }
     } else {
