@@ -522,9 +522,7 @@ async function loadUsers() {
                         }">${u.role}</span></td>
                         <td style="color:#a2a9b1;font-size:0.85em;">${new Date(u.created_at).toLocaleDateString('ru-RU')}</td>
                         <td>
-                            ${u.id !== adminUserId ? `
-                                <button class="btn-remove" style="font-size:0.75em;" onclick="triggerEasterEgg('${u.id}')">🔥 ПИЗДЕЦ</button>
-                            ` : '<span style="font-size:0.8em;color:#a2a9b1;">это ты</span>'}
+                            <button class="btn-remove" style="font-size:0.75em;" onclick="triggerEasterEgg('${u.id}')">🔥 ПИЗДЕЦ</button>
                         </td>
                     </tr>
                 `).join('')}
