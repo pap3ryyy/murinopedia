@@ -17,6 +17,23 @@
         }
         .fog-error h3 { color: #d33; font-family: serif; font-weight: normal; margin: 0 0 6px 0; font-size: 1.1em; }
         .fog-error p { margin: 0; font-size: 0.88em; color: #54595d; }
+        .notif-wrap { position: relative; display: inline-block; }
+        .notif-btn { background: #f8f9fa; border: 1px solid #a2a9b1; cursor: pointer; padding: 3px 8px; border-radius: 2px; font-size: 1em; line-height: 1; }
+        .notif-btn:hover { background: #eaecf0; }
+        .notif-badge { position: absolute; top: -6px; right: -6px; background: #d33; color: #fff; font-size: 0.65em; font-weight: bold; border-radius: 10px; padding: 1px 4px; min-width: 16px; text-align: center; line-height: 1.4; pointer-events: none; }
+        .notif-dropdown { position: absolute; top: calc(100% + 6px); right: 0; width: 300px; background: #fff; border: 1px solid #a2a9b1; box-shadow: 0 4px 12px rgba(0,0,0,0.12); z-index: 1000; display: none; max-height: 400px; overflow-y: auto; }
+        .notif-dropdown.open { display: block; }
+        .notif-head { padding: 8px 12px; border-bottom: 1px solid #eaecf0; font-size: 0.82em; font-weight: bold; color: #54595d; display: flex; justify-content: space-between; }
+        .notif-item { padding: 10px 12px; border-bottom: 1px solid #eaecf0; font-size: 0.82em; cursor: pointer; display: flex; gap: 8px; }
+        .notif-item:hover { background: #f8f9fa; }
+        .notif-item.unread { background: #f0f4ff; }
+        .notif-dot { width: 8px; height: 8px; border-radius: 50%; background: #3366cc; flex-shrink: 0; margin-top: 3px; }
+        .notif-dot.read { background: #eaecf0; }
+        .notif-text { flex: 1; line-height: 1.4; color: #202122; }
+        .notif-time { font-size: 0.82em; color: #a2a9b1; white-space: nowrap; }
+        .notif-empty { padding: 20px; text-align: center; color: #a2a9b1; font-size: 0.85em; }
+        .mark-all-btn { background: none; border: none; color: #3366cc; font-size: 0.78em; cursor: pointer; padding: 0; }
+        .mark-all-btn:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -30,7 +47,19 @@
         <div class="status-bar" id="db-status">
             Оперативная обстановка: <span style="color: #d33; font-weight: bold;">СТАБИЛЬНАЯ</span>
         </div>
-        <div id="nav-user-zone" style="font-size:0.85em;color:#54595d;"></div>
+        <div style="display:flex;align-items:center;gap:8px;">
+            <div class="notif-wrap" id="notif-wrap" style="display:none;">
+                <button class="notif-btn" onclick="toggleNotif(event)">🔔<span class="notif-badge" id="notif-badge" style="display:none;"></span></button>
+                <div class="notif-dropdown" id="notif-dropdown">
+                    <div class="notif-head">
+                        <span>Оповещения</span>
+                        <button class="mark-all-btn" onclick="markAllRead()">Прочитать все</button>
+                    </div>
+                    <div id="notif-list"><div class="notif-empty">Загружати...</div></div>
+                </div>
+            </div>
+            <div id="nav-user-zone" style="font-size:0.85em;color:#54595d;"></div>
+        </div>
     </div>
 </header>
 
@@ -184,6 +213,11 @@ async function init() {
             `
             document.getElementById('create-btn').style.display = 'inline-block'
 
+            const notifWrap = document.getElementById('notif-wrap')
+            notifWrap.style.display = 'inline-block'
+            notifWrap._userId = user.id
+            await loadNotifications(user.id)
+
             const role = user.role
             const isMsv = role !== 'людич'
 
@@ -249,6 +283,62 @@ async function loadStats() {
 async function logout() {
     await supabaseClient.auth.signOut()
     window.location.reload()
+}
+
+let _notifOpen = false
+function toggleNotif(e) {
+    e.stopPropagation()
+    _notifOpen = !_notifOpen
+    document.getElementById('notif-dropdown').classList.toggle('open', _notifOpen)
+}
+document.addEventListener('click', function(e) {
+    const wrap = document.getElementById('notif-wrap')
+    if (wrap && !wrap.contains(e.target)) {
+        _notifOpen = false
+        const dd = document.getElementById('notif-dropdown')
+        if (dd) dd.classList.remove('open')
+    }
+})
+
+async function loadNotifications(userId) {
+    const { data } = await supabaseClient
+        .from('notifications').select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(30)
+
+    const notifs = data ?? []
+    const unread = notifs.filter(n => !n.read).length
+    const badge = document.getElementById('notif-badge')
+    if (unread > 0) { badge.textContent = unread > 99 ? '99+' : unread; badge.style.display = 'block' }
+    else { badge.style.display = 'none' }
+
+    const list = document.getElementById('notif-list')
+    if (!notifs.length) { list.innerHTML = '<div class="notif-empty">Нрт оповещений</div>'; return }
+    list.innerHTML = notifs.map(n => `
+        <div class="notif-item ${n.read ? '' : 'unread'}" id="ni-${n.id}" onclick="openNotif('${n.id}','${n.link ?? ''}','${userId}')">
+            <div class="notif-dot ${n.read ? 'read' : ''}"></div>
+            <div class="notif-text">${n.message}</div>
+            <div class="notif-time">${new Date(n.created_at).toLocaleDateString('ru-RU')}</div>
+        </div>
+    `).join('')
+}
+
+async function openNotif(id, link, userId) {
+    await supabaseClient.from('notifications').update({ read: true }).eq('id', id)
+    const el = document.getElementById('ni-' + id)
+    if (el) { el.classList.remove('unread'); el.querySelector('.notif-dot')?.classList.add('read') }
+    const badge = document.getElementById('notif-badge')
+    if (badge) { const c = parseInt(badge.textContent) - 1; if (c <= 0) badge.style.display = 'none'; else badge.textContent = c }
+    if (link) window.location.href = link
+}
+
+async function markAllRead() {
+    const wrap = document.getElementById('notif-wrap')
+    if (!wrap._userId) return
+    await supabaseClient.from('notifications').update({ read: true }).eq('user_id', wrap._userId).eq('read', false)
+    document.querySelectorAll('.notif-item').forEach(el => { el.classList.remove('unread'); el.querySelector('.notif-dot')?.classList.add('read') })
+    document.getElementById('notif-badge').style.display = 'none'
 }
 
 init()
