@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Значок — Муринопедия</title>
+    <link rel="icon" type="image/png" href="asset/logo.ico">
+    <link rel="stylesheet" href="css/wiki.css">
+    <style>
+        .badge-hero {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            padding: 20px 0 20px 0;
+            border-bottom: 1px solid #a2a9b1;
+            margin-bottom: 20px;
+        }
+        .badge-icon-big {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            flex-shrink: 0;
+            border: 1px solid #eaecf0;
+            padding: 6px;
+            background: #f8f9fa;
+        }
+        .badge-title {
+            font-family: serif;
+            font-size: 1.8em;
+            font-weight: normal;
+            margin: 0 0 6px 0;
+        }
+        .badge-desc {
+            color: #54595d;
+            font-size: 0.95em;
+            margin: 0 0 8px 0;
+        }
+        .badge-meta {
+            font-size: 0.8em;
+            color: #a2a9b1;
+        }
+        .how-to-box {
+            background: #f0f4ff;
+            border: 1px solid #3366cc;
+            border-left: 4px solid #3366cc;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 0.92em;
+        }
+        .how-to-box h3 {
+            font-family: serif;
+            font-weight: normal;
+            font-size: 1.05em;
+            margin: 0 0 6px 0;
+            color: #3366cc;
+        }
+        .holders-section h2 {
+            font-family: serif;
+            font-weight: normal;
+            font-size: 1.3em;
+            border-bottom: 1px solid #a2a9b1;
+            padding-bottom: 4px;
+            margin-bottom: 14px;
+        }
+        .holders-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .holder-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            border: 1px solid #eaecf0;
+            background: #f8f9fa;
+        }
+        .holder-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 2px;
+            object-fit: cover;
+            background: #eaecf0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: serif;
+            font-size: 1.1em;
+            color: #a2a9b1;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .holder-name {
+            font-size: 0.95em;
+        }
+        .holder-date {
+            font-size: 0.78em;
+            color: #a2a9b1;
+            margin-left: auto;
+        }
+        .state-box { padding: 40px 20px; text-align: center; border: 1px solid #a2a9b1; background: #f8f9fa; }
+        .state-box-title { font-family: serif; font-size: 1.3em; margin-bottom: 8px; }
+        .state-box.error { border-color: #d33; background: #fee7e6; }
+        .state-box.error .state-box-title { color: #d33; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-area">
+        <img src="asset/logo.png" alt="М.С.В." class="logo-img">
+        <a href="index.html" class="logo-text">Муринопедия</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+        <div class="status-bar">
+            Оперативная обстановка: <span style="color: #d33; font-weight: bold;">СТАБИЛЬНАЯ</span>
+        </div>
+        <div id="header-user" style="font-size:0.85em;color:#54595d;"></div>
+    </div>
+</header>
+
+<div class="container">
+    <main id="main-content">
+        <p style="color:#54595d;">Загружати...</p>
+    </main>
+    <aside>
+        <div class="sidebar-box">
+            <h4>Навигация</h4>
+            <p>
+                <a href="index.html">Главная</a><br>
+                <a href="articles.html">Архив Знань</a>
+            </p>
+        </div>
+        <div class="sidebar-box" style="border-color: #d33; background: #fee7e6;">
+            <h4 style="color:#d33;">Напоминание</h4>
+            Видл слово «Друг»? Ог — мимикрия Фога. Говори <b>Друн</b>.
+        </div>
+    </aside>
+</div>
+
+<footer>
+    Муринопедия — 2026 год.<br>
+    Ч илу доной, пока естч светл. Мурино стояти, Фог дрожати.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+async function init() {
+    const params = new URLSearchParams(window.location.search)
+    const badgeId = params.get('id')
+    if (!badgeId) { showError('Нрт идентификатора значка'); return }
+
+    const { data: { session } } = await supabaseClient.auth.getSession()
+    if (session) {
+        const { data: me } = await supabaseClient
+            .from('users').select('username, public_id, role').eq('id', session.user.id).single()
+        if (me) {
+            document.getElementById('header-user').innerHTML = `
+                <a href="profile.html?id=${me.public_id}" style="color:#0645ad;">${me.username}</a>
+                &nbsp;
+                <button onclick="logout()" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;">Выйти</button>
+            `
+        }
+    } else {
+        document.getElementById('header-user').innerHTML = `<a href="login.html" style="font-size:0.85em;">Войти</a>`
+    }
+
+    const { data: badge, error } = await supabaseClient
+        .from('badges').select('*').eq('id', badgeId).single()
+
+    if (error || !badge) { showError('Значок нрт найденол вч реестре'); return }
+
+    const { data: holders } = await supabaseClient
+        .from('user_badges')
+        .select('granted_at, users(id, username, public_id, avatar_url, name_color)')
+        .eq('badge_id', badgeId)
+        .order('granted_at', { ascending: true })
+
+    document.title = badge.name + ' — Муринопедия'
+
+    const created = new Date(badge.created_at).toLocaleDateString('ru-RU')
+    const holderCount = holders?.length ?? 0
+
+    document.getElementById('main-content').innerHTML = `
+        <div class="badge-hero">
+            <img src="${badge.icon_url}" class="badge-icon-big" alt="${badge.name}">
+            <div>
+                <h1 class="badge-title">${badge.name}</h1>
+                ${badge.description ? `<p class="badge-desc">${badge.description}</p>` : ''}
+                <div class="badge-meta">Добавленол: ${created} · Выдано: ${holderCount} Людич</div>
+            </div>
+        </div>
+
+        ${badge.how_to_get ? `
+        <div class="how-to-box">
+            <h3>Как получити</h3>
+            ${badge.how_to_get}
+        </div>` : ''}
+
+        <div class="holders-section">
+            <h2>Обладатели <span style="font-size:0.7em;color:#a2a9b1;font-family:sans-serif;">${holderCount}</span></h2>
+            ${holderCount === 0
+                ? '<p style="color:#a2a9b1;font-style:italic;font-size:0.9em;">Нрт обладателей — значок ещё нрт выданол</p>'
+                : `<div class="holders-grid">
+                    ${(holders ?? []).map(h => {
+                        const u = h.users
+                        if (!u) return ''
+                        const nameColor = u.name_color ? `color:${u.name_color};` : ''
+                        const date = new Date(h.granted_at).toLocaleDateString('ru-RU')
+                        return `<div class="holder-row">
+                            <div class="holder-avatar">
+                                ${u.avatar_url
+                                    ? `<img src="${u.avatar_url}" style="width:36px;height:36px;object-fit:cover;display:block;">`
+                                    : u.username[0].toUpperCase()
+                                }
+                            </div>
+                            <a href="profile.html?id=${u.public_id}" class="holder-name" style="${nameColor}">${u.username}</a>
+                            <span class="holder-date">${date}</span>
+                        </div>`
+                    }).join('')}
+                </div>`
+            }
+        </div>
+    `
+}
+
+function showError(msg) {
+    document.getElementById('main-content').innerHTML = `
+        <div class="state-box error">
+            <div class="state-box-title">Смертч-шум</div>
+            <div>${msg}</div><br>
+            <a href="index.html" class="btn btn-secondary">← На главную</a>
+        </div>
+    `
+}
+
+async function logout() {
+    await supabaseClient.auth.signOut()
+    window.location.href = 'login.html'
+}
+
+init()
+</script>
+
+</body>
+</html>
