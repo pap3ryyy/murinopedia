@@ -514,10 +514,10 @@ function renderBadges(userBadges) {
     if (!userBadges || userBadges.length === 0) return ''
     return userBadges.map(ub => {
         const b = ub.badges
-        return `<span class="role-icon-wrap">
-            <img src="${b.icon_url}" style="width:20px;height:20px;object-fit:contain;cursor:help;" alt="${b.name}">
+        return `<a href="badge.html?id=${b.id}" style="text-decoration:none;"><span class="role-icon-wrap">
+            <img src="${b.icon_url}" style="width:20px;height:20px;object-fit:contain;cursor:pointer;" alt="${b.name}">
             <span class="tooltip">${b.description ?? b.name}</span>
-        </span>`
+        </span></a>`
     }).join('')
 }
 
