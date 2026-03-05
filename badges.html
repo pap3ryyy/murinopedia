@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Значки — Муринопедия</title>
+    <link rel="icon" type="image/png" href="asset/logo.ico">
+    <link rel="stylesheet" href="css/wiki.css">
+    <style>
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .badge-card {
+            border: 1px solid #a2a9b1;
+            background: #f8f9fa;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .badge-card:hover { border-color: #3366cc; background: #f0f4ff; }
+        .badge-card img { width: 56px; height: 56px; object-fit: contain; margin-bottom: 10px; }
+        .badge-card-name { font-family: serif; font-size: 1.05em; margin-bottom: 4px; color: #0645ad; }
+        .badge-card-desc { font-size: 0.8em; color: #54595d; line-height: 1.4; }
+        .badge-card-count { font-size: 0.75em; color: #a2a9b1; margin-top: 8px; }
+    </style>
+</head>
+<body>
+<header>
+    <div class="logo-area">
+        <img src="asset/logo.png" alt="М.С.В." class="logo-img">
+        <a href="index.html" class="logo-text">Муринопедия</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+        <div class="status-bar">
+            Оперативная обстановка: <span style="color: #d33; font-weight: bold;">СТАБИЛЬНАЯ</span>
+        </div>
+        <div id="header-user" style="font-size:0.85em;color:#54595d;"></div>
+    </div>
+</header>
+<div class="container">
+    <main>
+        <h1>Реестр значков</h1>
+        <div class="info-box">
+            Значки выдаются М.С.В. за особые заслуги перед Муринопедией. Нажми на значок чтобы узнать подробности.
+        </div>
+        <div id="badges-grid" class="badges-grid">
+            <p style="color:#a2a9b1;font-size:0.9em;">Загружати...</p>
+        </div>
+    </main>
+    <aside>
+        <div class="sidebar-box">
+            <h4>Навигация</h4>
+            <p>
+                <a href="index.html">Главная</a><br>
+                <a href="articles.html">Архив Знань</a>
+            </p>
+        </div>
+        <div class="sidebar-box" style="border-color: #d33; background: #fee7e6;">
+            <h4 style="color:#d33;">Напоминание</h4>
+            Видл слово «Друг»? Ог — мимикрия Фога. Говори <b>Друн</b>.
+        </div>
+    </aside>
+</div>
+<footer>
+    Муринопедия — 2026 год.<br>
+    Ч илу доной, пока естч светл. Мурино стояти, Фог дрожати.
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+async function init() {
+    const { data: { session } } = await supabaseClient.auth.getSession()
+    if (session) {
+        const { data: me } = await supabaseClient
+            .from('users').select('username, public_id').eq('id', session.user.id).single()
+        if (me) {
+            document.getElementById('header-user').innerHTML =
+                '<a href="profile.html?id=' + me.public_id + '" style="color:#0645ad;">' + me.username + '</a>' +
+                '&nbsp;<button onclick="logout()" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;">Выйти</button>'
+        }
+    } else {
+        document.getElementById('header-user').innerHTML = '<a href="login.html" style="font-size:0.85em;">Войти</a>'
+    }
+
+    const { data: badges, error } = await supabaseClient
+        .from('badges').select('*').order('created_at', { ascending: true })
+
+    const grid = document.getElementById('badges-grid')
+
+    if (error || !badges || badges.length === 0) {
+        grid.innerHTML = '<p style="color:#a2a9b1;font-style:italic;font-size:0.9em;">Нрт значков вч реестре</p>'
+        return
+    }
+
+    const { data: holderCounts } = await supabaseClient.from('user_badges').select('badge_id')
+    const countMap = {}
+    if (holderCounts) holderCounts.forEach(function(r) { countMap[r.badge_id] = (countMap[r.badge_id] || 0) + 1 })
+
+    grid.innerHTML = badges.map(function(b) {
+        return '<a href="badge.html?id=' + b.id + '" class="badge-card">' +
+            '<img src="' + b.icon_url + '" alt="' + b.name + '">' +
+            '<div class="badge-card-name">' + b.name + '</div>' +
+            (b.description ? '<div class="badge-card-desc">' + b.description + '</div>' : '') +
+            '<div class="badge-card-count">' + (countMap[b.id] || 0) + ' обладателей</div>' +
+            '</a>'
+    }).join('')
+}
+
+async function logout() {
+    await supabaseClient.auth.signOut()
+    window.location.href = 'login.html'
+}
+
+init()
+</script>
+</body>
+</html>
