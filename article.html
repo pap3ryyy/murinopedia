@@ -484,9 +484,9 @@ function renderMetaInfobox(article) {
     const authorPid = authorPublicIds[article.author]
     const badges = (authorData.badges ?? []).map(ub => {
         const b = ub.badges
-        return `<span style="position:relative;display:inline-flex;align-items:center;margin-left:3px;" class="badge-wrap">
-            <img src="${b.icon_url}" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;cursor:help;" title="${b.description ?? b.name}">
-        </span>`
+        return `<a href="badge.html?id=${b.id}" style="text-decoration:none;"><span style="position:relative;display:inline-flex;align-items:center;margin-left:3px;" class="badge-wrap">
+            <img src="${b.icon_url}" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;cursor:pointer;" title="${b.description ?? b.name}">
+        </span></a>`
     }).join('')
     const nameColor = authorData.name_color ? `color:${authorData.name_color};` : ''
     const authorHtml = authorPid
