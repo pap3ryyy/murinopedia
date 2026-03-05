@@ -171,11 +171,23 @@ async function init() {
 
     if (error || !badge) { showError('Значок нрт найденол вч реестре'); return }
 
-    const { data: holders } = await supabaseClient
+    const { data: holderRows } = await supabaseClient
         .from('user_badges')
-        .select('granted_at, users(id, username, public_id, avatar_url, name_color)')
+        .select('user_id, granted_at')
         .eq('badge_id', badgeId)
         .order('granted_at', { ascending: true })
+
+    let holders = []
+    if (holderRows && holderRows.length > 0) {
+        const userIds = holderRows.map(r => r.user_id)
+        const { data: usersData } = await supabaseClient
+            .from('users')
+            .select('id, username, public_id, avatar_url, name_color')
+            .in('id', userIds)
+        const userMap = {}
+        if (usersData) usersData.forEach(u => { userMap[u.id] = u })
+        holders = holderRows.map(r => ({ granted_at: r.granted_at, users: userMap[r.user_id] ?? null }))
+    }
 
     document.title = badge.name + ' — Муринопедия'
 
