@@ -17,7 +17,22 @@
     }
 
     function triggerChaos(videoUrl) {
-        document.querySelectorAll('div, section, main, aside, header, footer, article, nav, p, h1, h2, h3, h4, span, a, td, th, li, img, button').forEach(el => {
+        const vid = document.createElement('video')
+        vid.src = videoUrl
+        vid.autoplay = true
+        vid.loop = true
+        vid.muted = true
+        vid.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:fill;z-index:99999;'
+        document.body.appendChild(vid)
+
+        document.addEventListener('click', function unmute() {
+            vid.muted = false
+            vid.volume = 1
+            document.removeEventListener('click', unmute)
+        }, { once: true })
+
+        const targets = document.querySelectorAll('main, aside, header, footer, .article-card, .nav-card, .comment, .sidebar-box, .infobox')
+        targets.forEach(el => {
             const v = document.createElement('video')
             v.src = videoUrl
             v.autoplay = true
@@ -28,15 +43,6 @@
             el.style.overflow = 'hidden'
             el.appendChild(v)
         })
-
-        const main = document.createElement('video')
-        main.src = videoUrl
-        main.autoplay = true
-        main.loop = true
-        main.muted = false
-        main.volume = 1
-        main.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:fill;z-index:99999;pointer-events:none;'
-        document.body.appendChild(main)
     }
 
     if (document.readyState === 'loading') {
