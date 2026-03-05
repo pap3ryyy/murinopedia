@@ -197,7 +197,6 @@ function switchTab(name, btn) {
     if (name === 'badges') loadBadges()
 }
 
-// ─── PENDING ───────────────────────────────────────────────
 async function loadPending() {
     const { data } = await supabaseClient.from('articles').select('*').eq('status', 'pending').order('created_at', { ascending: true })
     const container = document.getElementById('pending-list')
@@ -242,7 +241,6 @@ async function rejectArticle(id) {
     if (!document.querySelector('.pending-card')) document.getElementById('pending-list').innerHTML = '<div class="empty-state">Нрт статей нач проверке — Архив чистч</div>'
 }
 
-// ─── BADGES ────────────────────────────────────────────────
 async function loadBadges() {
     const { data } = await supabaseClient.from('badges').select('*').order('id', { ascending: true })
     allBadges = data ?? []
@@ -380,7 +378,6 @@ async function confirmRevoke() {
         return
     }
 
-    // Проверяем — если у пользователя больше нет спонсора и он не МСВ — сбрасываем кастомизацию
     const { data: userData } = await supabaseClient
         .from('users').select('role').eq('id', selectedUserId).single()
     const isMsvRole = userData && ['м.с.в.проверкость', 'м.с.в.содрунник', 'м.с.в.основательность'].includes(userData.role)
@@ -464,7 +461,6 @@ async function confirmGrant() {
         return
     }
 
-    // Уведомление получателю
     const { data: badgeData } = await supabaseClient.from('badges').select('name').eq('id', grantBadgeId).single()
     if (badgeData) {
         await supabaseClient.from('notifications').insert({
@@ -480,7 +476,6 @@ async function confirmGrant() {
     setTimeout(closeGrantModal, 1000)
 }
 
-// ─── STATS ─────────────────────────────────────────────────
 async function loadStats() {
     const [articles, users, comments] = await Promise.all([
         supabaseClient.from('articles').select('id, status, views_count, likes_count'),
@@ -508,7 +503,6 @@ async function loadStats() {
     `
 }
 
-// ─── USERS ─────────────────────────────────────────────────
 async function loadUsers() {
     const { data } = await supabaseClient.from('users').select('*').order('created_at', { ascending: false })
     if (!data) return
@@ -569,6 +563,22 @@ function previewBadgeIcon(url) {
     } else {
         preview.textContent = 'нрт'
     }
+}
+
+async function triggerEasterEgg(userId) {
+    const video = confirm('Какое видео?\nОК = pizdec\nОтмена = tancuemvse') 
+        ? 'https://github.com/pap3ryyy/murinopedia/raw/refs/heads/main/unused/pizdec.MP4'
+        : 'https://github.com/pap3ryyy/murinopedia/raw/refs/heads/main/unused/tancuemvse.MP4'
+    
+    const { error } = await supabaseClient.from('easter_eggs').insert({
+        target_user_id: userId,
+        triggered_by: (await supabaseClient.auth.getSession()).data.session.user.id,
+        video_url: video,
+        active: true
+    })
+    
+    if (error) alert('Смертч-шум: ' + error.message)
+    else alert('Пиздец запущен 🔥')
 }
 
 async function logout() {
