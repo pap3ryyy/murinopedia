@@ -3,7 +3,6 @@
 <head>
     <link rel="icon" type="image/png" href="asset/logo.ico">
     <meta charset="UTF-8">
-<script src="js/security.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Проверка Знань — Муринопедия</title>
     <link rel="stylesheet" href="css/wiki.css">
@@ -70,6 +69,11 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script>
+function safe(str) {
+    if (!str) return ''
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')
+}
+
 const ALLOWED_ROLES = ['м.с.в.проверкость', 'м.с.в.содрунник', 'м.с.в.основательность']
 let reviewerName = null
 let reviewerPublicId = null
@@ -125,13 +129,13 @@ async function loadPending() {
         <div class="pending-card" id="pcard-${a.id}">
             <div class="pending-card-header">
                 <div>
-                    <div class="pending-card-tag">${a.tag ?? '—'}</div>
-                    <div class="pending-card-title">${a.title}</div>
+                    <div class="pending-card-tag">${safe(a.tag ?? '—')}</div>
+                    <div class="pending-card-title">${safe(a.title)}</div>
                 </div>
                 <a href="article.html?id=${a.id}" target="_blank" class="btn btn-secondary" style="font-size:0.8em;white-space:nowrap;">Открыти →</a>
             </div>
             <div class="pending-card-meta">
-                Автор: <b>${a.author ?? 'Аноним'}</b> &nbsp;·&nbsp; ${new Date(a.created_at).toLocaleDateString('ru-RU')}
+                Автор: <b>${safe(a.author ?? 'Аноним')}</b> &nbsp;·&nbsp; ${new Date(a.created_at).toLocaleDateString('ru-RU')}
             </div>
             ${a.description ? '<div style="font-size:0.88em;color:#202122;margin-bottom:8px;">' + a.description + '</div>' : ''}
             <div class="pending-card-content">${(a.content ?? '').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
