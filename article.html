@@ -3,7 +3,6 @@
 <head>
     <link rel="icon" type="image/png" href="asset/logo.ico">
     <meta charset="UTF-8">
-<script src="js/security.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Знань — Муринопедия</title>
     <link rel="stylesheet" href="css/wiki.css">
@@ -365,9 +364,12 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
-<script src="js/security.js"></script>
-<script src="js/pizda.js"></script>
 <script>
+function safe(str) {
+    if (!str) return ''
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')
+}
+
 let currentUser = null
 let currentUserId = null
 let currentUserPublicId = null
@@ -744,8 +746,8 @@ function renderComment(c, isReply = false, userMap = {}) {
     }</div>`
     const nc = udata.nameColor ? `color:${udata.nameColor};` : ''
     const authorHtml = pid
-        ? `<a href="profile.html?id=${pid}" class="comment-author" style="${nc}">${c.username}</a>`
-        : `<span class="comment-author" style="${nc}">${c.username}</span>`
+        ? `<a href="profile.html?id=${pid}" class="comment-author" style="${nc}">${safe(c.username)}</a>`
+        : `<span class="comment-author" style="${nc}">${safe(c.username)}</span>`
     return `
         <div class="comment ${isReply ? 'reply' : ''}" id="comment-${c.id}" style="${commentBannerStyle}">
             <div class="comment-header">
@@ -753,7 +755,7 @@ function renderComment(c, isReply = false, userMap = {}) {
                 ${authorHtml}
                 <span class="comment-date">${date}</span>
             </div>
-            <div class="comment-content">${c.content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+            <div class="comment-content">${safe(c.content)}</div>
             <div class="comment-actions">
                 <button class="comment-btn ${liked ? 'liked' : ''}" onclick="toggleCommentLike(${c.id})">▲ ${likeCount}</button>
                 ${currentUser && !isReply ? `<button class="comment-btn" onclick="toggleReplyForm(${c.id})">Ответити</button>` : ''}
@@ -870,6 +872,3 @@ init()
 
 </body>
 </html>
-
-
-
