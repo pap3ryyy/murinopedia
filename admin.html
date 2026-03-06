@@ -3,10 +3,8 @@
 <head>
     <link rel="icon" type="image/png" href="asset/logo.ico">
     <meta charset="UTF-8">
-<script src="js/security.js"></script>
-    <script src="js/security.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Штаб М.С.В. - Муринопедия</title>
+    <title>Штаб М.С.В. — Муринопедия</title>
     <link rel="stylesheet" href="css/wiki.css">
     <style>
         .admin-tabs { display: flex; border-bottom: 2px solid #a2a9b1; margin-bottom: 24px; flex-wrap: wrap; }
@@ -115,6 +113,7 @@
     </aside>
 </div>
 
+<!-- Modal для выдачи значка -->
 <div class="grant-modal" id="grant-modal">
     <div class="grant-modal-box">
         <h3 id="grant-modal-title">Выдати значок</h3>
@@ -134,8 +133,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
-<script src="js/security.js"></script>
-<script src="js/pizda.js"></script>
 <script>
 let adminUser = null
 let adminUserId = null
@@ -200,6 +197,11 @@ function switchTab(name, btn) {
     if (name === 'badges') loadBadges()
 }
 
+function safe(str) {
+    if (!str) return ''
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')
+}
+
 async function loadPending() {
     const { data } = await supabaseClient.from('articles').select('*').eq('status', 'pending').order('created_at', { ascending: true })
     const container = document.getElementById('pending-list')
@@ -208,14 +210,14 @@ async function loadPending() {
         <div class="pending-card" id="pcard-${a.id}">
             <div class="pending-card-header">
                 <div>
-                    <div style="font-size:0.75em;color:#54595d;text-transform:uppercase;">${a.tag ?? '—'}</div>
-                    <div class="pending-card-title">${a.title}</div>
+                    <div style="font-size:0.75em;color:#54595d;text-transform:uppercase;">${safe(a.tag ?? '—')}</div>
+                    <div class="pending-card-title">${safe(a.title)}</div>
                 </div>
                 <a href="article.html?id=${a.id}" target="_blank" class="btn btn-secondary" style="font-size:0.8em;white-space:nowrap;">Открыти →</a>
             </div>
-            <div class="pending-card-meta">Автор: <b>${a.author ?? 'Аноним'}</b> · ${new Date(a.created_at).toLocaleDateString('ru-RU')}</div>
-            ${a.description ? `<div style="font-size:0.88em;margin-bottom:8px;">${a.description}</div>` : ''}
-            <div class="pending-card-content">${(a.content ?? '').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+            <div class="pending-card-meta">Автор: <b>${safe(a.author ?? 'Аноним')}</b> · ${new Date(a.created_at).toLocaleDateString('ru-RU')}</div>
+            ${a.description ? `<div style="font-size:0.88em;margin-bottom:8px;">${safe(a.description)}</div>` : ''}
+            <div class="pending-card-content">${safe(a.content ?? '')}</div>
             <div class="pending-card-actions">
                 <button class="btn btn-primary" onclick="approveArticle(${a.id})">Принять</button>
                 <button class="btn btn-danger" onclick="rejectArticle(${a.id})">Отклонити</button>
@@ -592,7 +594,3 @@ init()
 
 </body>
 </html>
-
-
-
-
