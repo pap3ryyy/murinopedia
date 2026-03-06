@@ -2,7 +2,6 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-<script src="js/security.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Значки — Муринопедия</title>
     <link rel="icon" type="image/png" href="asset/logo.ico">
@@ -75,9 +74,13 @@
     Ч илу доной, пока естч светл. Мурино стояти, Фог дрожати.
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/security.js"></script>
 <script src="js/config.js"></script>
 <script>
+function safe(str) {
+    if (!str) return ''
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')
+}
+
 async function init() {
     const { data: { session } } = await supabaseClient.auth.getSession()
     if (session) {
