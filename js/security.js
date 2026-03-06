@@ -4,25 +4,30 @@
     m.content = "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://rvykoymrumzgkgbwdefm.supabase.co wss://rvykoymrumzgkgbwdefm.supabase.co https://cdn.jsdelivr.net; img-src 'self' data: https://rvykoymrumzgkgbwdefm.supabase.co;";
     document.head.prepend(m);
 
-    const clean = (el) => {
-        if (el.innerHTML.includes('<img') || el.innerHTML.includes('onerror') || el.innerHTML.includes('<script')) {
-            el.textContent = el.innerHTML;
-        }
+    const sanitize = (el) => {
+        const dangerousTags = el.querySelectorAll('script, iframe, object, embed, frame, frameset');
+        dangerousTags.forEach(s => s.remove());
+
+        const allElements = el.querySelectorAll('*');
+        allElements.forEach(item => {
+            const attrs = item.attributes;
+            for (let i = attrs.length - 1; i >= 0; i--) {
+                if (attrs[i].name.toLowerCase().startsWith('on')) {
+                    item.removeAttribute(attrs[i].name);
+                }
+            }
+            if (item.tagName === 'A' && item.getAttribute('href')?.toLowerCase().startsWith('javascript:')) {
+                item.removeAttribute('href');
+            }
+        });
     };
 
-    const runClean = () => {
-        document.querySelectorAll('.article-card-title, .article-card-desc, .user-data, .article-content').forEach(clean);
+    const run = () => {
+        document.querySelectorAll('.article-content, .user-data, .article-card-desc, .meta-infobox, .infobox-table').forEach(sanitize);
     };
 
     if (document.body) {
-        const observer = new MutationObserver(() => runClean());
-        observer.observe(document.body, { childList: true, subtree: true });
-    } else {
-        document.addEventListener("DOMContentLoaded", () => {
-            const observer = new MutationObserver(() => runClean());
-            observer.observe(document.body, { childList: true, subtree: true });
-        });
+        new MutationObserver(run).observe(document.body, { childList: true, subtree: true });
     }
-    
-    runClean();
+    run();
 })();
