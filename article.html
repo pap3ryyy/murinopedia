@@ -311,6 +311,8 @@
         .state-box-title { font-family: serif; font-size: 1.3em; margin-bottom: 8px; }
 
         .state-box.error { border-color: #d33; background: #fee7e6; }
+        body.dark .state-box.error { background: #2d1b1b !important; color: #f38ba8 !important; }
+        body.dark .state-box { background: #1c1c1f !important; border-color: #3f3f46 !important; color: #e4e4e7 !important; }
         .state-box.error .state-box-title { color: #d33; }
 
         .pinned-badge {
@@ -364,7 +366,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
-<script src="js/theme.js"></script>
 <script>
 function safe(str) {
     if (!str) return ''
