@@ -3,7 +3,6 @@
 <head>
     <link rel="icon" type="image/png" href="asset/logo.ico">
     <meta charset="UTF-8">
-<script src="js/security.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Архив Знань — Муринопедия</title>
     <link rel="stylesheet" href="css/wiki.css">
@@ -148,7 +147,17 @@
         }
 
         
-    </style>
+        .article-card-pinned {
+        border-color: #3366cc !important;
+        background: #f0f4ff !important;
+    }
+    .pin-badge {
+        font-size: 0.75em;
+        color: #3366cc;
+        margin-bottom: 4px;
+        font-weight: bold;
+    }
+</style>
 </head>
 <body>
 
@@ -213,8 +222,12 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
-<script src="js/security.js"></script>
 <script>
+function safe(str) {
+    if (!str) return ''
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')
+}
+
 let allArticles = []
 let currentFilter = 'all'
 let currentRole = null
@@ -295,12 +308,16 @@ function renderArticles(data) {
 
     const grid = document.createElement('div')
     grid.className = 'articles-grid'
-    grid.innerHTML = data.map(article => `
-        <a href="article.html?id=${article.id}" class="article-card">
-            <div class="article-card-tag">${article.tag ?? ''}${article.private ? ' &nbsp;<span style="color:#d33;font-size:0.85em;">🔒 Приватное</span>' : ''}</div>
-            <div class="article-card-title">${article.title}</div>
-            <div class="article-card-desc">${article.description ?? ''}</div>
-            <div class="article-card-meta">Автор: ${article.author ?? 'Аноним'}</div>
+    // Sort: pinned first
+    const sorted = [...data].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0))
+
+    grid.innerHTML = sorted.map(article => `
+        <a href="article.html?id=${article.id}" class="article-card${article.pinned ? ' article-card-pinned' : ''}">
+            ${article.pinned ? '<div class="pin-badge">📌 Закреплено</div>' : ''}
+            <div class="article-card-tag">${safe(article.tag ?? '')}${article.private ? ' &nbsp;<span style="color:#d33;font-size:0.85em;">🔒 Приватное</span>' : ''}</div>
+            <div class="article-card-title">${safe(article.title)}</div>
+            <div class="article-card-desc">${safe(article.description ?? '')}</div>
+            <div class="article-card-meta">Автор: ${safe(article.author ?? 'Аноним')}</div>
         </a>
     `).join('')
 
@@ -350,5 +367,3 @@ init()
 
 </body>
 </html>
-
-
