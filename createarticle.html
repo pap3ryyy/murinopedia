@@ -377,8 +377,8 @@ function renderEditor() {
                     <div class="image-preview" id="cover-preview">Нрт обложки</div>
                     <div class="image-tab-content active" id="cover-content-upload">
                         <div class="upload-zone" onclick="document.getElementById('cover-file').click()">
-                            Выбери PNG / JPG / WebP
-                            <input type="file" id="cover-file" accept="image/png,image/jpeg,image/webp" onchange="uploadImage(this,'cover')">
+                            Выбери PNG / JPG / WebP / GIF
+                            <input type="file" id="cover-file" accept="image/png,image/jpeg,image/webp,image/gif" onchange="uploadImage(this,'cover')">
                         </div>
                         <div class="upload-status" id="cover-upload-status"></div>
                     </div>
@@ -593,3 +593,4 @@ init()
 
 </body>
 </html>
+
