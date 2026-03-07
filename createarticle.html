@@ -389,8 +389,8 @@ function renderEditor() {
                     <div class="image-preview" id="content-preview">Нрт картинки</div>
                     <div class="image-tab-content active" id="content-content-upload">
                         <div class="upload-zone" onclick="document.getElementById('content-file').click()">
-                            Выбери PNG / JPG / WebP
-                            <input type="file" id="content-file" accept="image/png,image/jpeg,image/webp" onchange="uploadImage(this,'content')">
+                            Выбери PNG / JPG / WebP/ GIF
+                            <input type="file" id="content-file" accept="image/png,image/jpeg,image/webp,image/gif" onchange="uploadImage(this,'content')">
                         </div>
                         <div class="upload-status" id="content-upload-status"></div>
                     </div>
@@ -593,4 +593,5 @@ init()
 
 </body>
 </html>
+
 
