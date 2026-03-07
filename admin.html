@@ -133,7 +133,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
-<script src="js/theme.js"></script>
 <script>
 let adminUser = null
 let adminUserId = null
@@ -529,6 +528,7 @@ async function loadUsers() {
                         <td style="color:#a2a9b1;font-size:0.85em;">${new Date(u.created_at).toLocaleDateString('ru-RU')}</td>
                         <td>
                             <button class="btn-remove" style="font-size:0.75em;" onclick="triggerEasterEgg('${u.id}')">🔥 ПИЗДЕЦ</button>
+                            <button class="btn-remove" style="font-size:0.75em;background:${u.banned_by ? '#fee7e6' : ''};" onclick="banUser('${u.id}', '${u.username}', ${!!u.banned_by})">${'${u.banned_by ? \'🔓 Разбанить\' : \'🔨 Бан\'}'}</button>
                         </td>
                     </tr>
                 `).join('')}
@@ -567,6 +567,29 @@ function previewBadgeIcon(url) {
     } else {
         preview.textContent = 'нрт'
     }
+}
+
+async function banUser(userId, username, isBanned) {
+    if (isBanned) {
+        if (!confirm('Разбанить ' + username + '?')) return
+        await supabaseClient.from('users').update({
+            banned_until: null, ban_reason: null, banned_by: null
+        }).eq('id', userId)
+        alert('Разбаненол!')
+        loadUsers()
+        return
+    }
+    const reason = prompt('Причина бана для ' + username + ':')
+    if (!reason) return
+    const durInput = prompt('Длительность в часах (оставь пустым = навсегда):')
+    const banned_until = durInput ? new Date(Date.now() + parseInt(durInput) * 3600000).toISOString() : null
+    await supabaseClient.from('users').update({
+        banned_until,
+        ban_reason: reason,
+        banned_by: adminUser
+    }).eq('id', userId)
+    alert('Забаненол!')
+    loadUsers()
 }
 
 async function triggerEasterEgg(userId) {
