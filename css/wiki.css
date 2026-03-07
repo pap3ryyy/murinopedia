@@ -545,7 +545,14 @@ body.dark footer {
     border-top-color: #3f3f46;
 }
 
-body.dark .nav-card { border-bottom-color: #3f3f46; }
+body.dark .nav-card {
+    border-bottom-color: #3f3f46;
+    background: #27272a !important;
+    border-color: #3f3f46 !important;
+}
+body.dark .nav-card p,
+body.dark .nav-card div { color: #a1a1aa !important; }
+body.dark .nav-card h3 a { color: #89b4fa !important; }
 
 body.dark input,
 body.dark textarea,
