@@ -377,7 +377,7 @@ function renderEditor() {
                     <div class="image-preview" id="cover-preview">Нрт обложки</div>
                     <div class="image-tab-content active" id="cover-content-upload">
                         <div class="upload-zone" onclick="document.getElementById('cover-file').click()">
-                            Выбери PNG / JPG / WebP / GIF
+                            Выбери PNG / JPG / WebP
                             <input type="file" id="cover-file" accept="image/png,image/jpeg,image/webp,image/gif" onchange="uploadImage(this,'cover')">
                         </div>
                         <div class="upload-status" id="cover-upload-status"></div>
@@ -389,7 +389,7 @@ function renderEditor() {
                     <div class="image-preview" id="content-preview">Нрт картинки</div>
                     <div class="image-tab-content active" id="content-content-upload">
                         <div class="upload-zone" onclick="document.getElementById('content-file').click()">
-                            Выбери PNG / JPG / WebP/ GIF
+                            Выбери PNG / JPG / WebP
                             <input type="file" id="content-file" accept="image/png,image/jpeg,image/webp,image/gif" onchange="uploadImage(this,'content')">
                         </div>
                         <div class="upload-status" id="content-upload-status"></div>
@@ -543,6 +543,24 @@ async function submitArticle() {
 
     msg.className = 'status-msg success'
     msg.textContent = 'Знань отправленол!'
+
+    if (status === 'pending') {
+        const { data: msvUsers } = await supabaseClient
+            .from('users')
+            .select('id')
+            .in('role', ['м.с.в.проверкость', 'м.с.в.содрунник', 'м.с.в.основательность'])
+        if (msvUsers && msvUsers.length > 0) {
+            await supabaseClient.from('notifications').insert(
+                msvUsers.map(u => ({
+                    user_id: u.id,
+                    type: 'review',
+                    message: `Новол Знань на проверке: «${title}» от ${currentUser}`,
+                    link: `article.html?id=${data.id}`
+                }))
+            )
+        }
+    }
+
     setTimeout(() => { window.location.href = 'article.html?id=' + data.id }, 1000)
 }
 
@@ -593,5 +611,3 @@ init()
 
 </body>
 </html>
-
-
