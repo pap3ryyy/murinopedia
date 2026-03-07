@@ -3,7 +3,6 @@
 <head>
     <link rel="icon" type="image/png" href="asset/logo.ico">
     <meta charset="UTF-8">
-<script src="js/security.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Новол Знань — Муринопедия</title>
     <link rel="stylesheet" href="css/wiki.css">
@@ -376,14 +375,7 @@ function renderEditor() {
                 <div class="image-block">
                     <h4>Обложка (инфобокс) — макс. 300×200px</h4>
                     <div class="image-preview" id="cover-preview">Нрт обложки</div>
-                    <div class="image-tabs">
-                        <button class="image-tab active" id="cover-tab-url" onclick="switchTab('cover','url')">URL</button>
-                        <button class="image-tab" id="cover-tab-upload" onclick="switchTab('cover','upload')">Файл</button>
-                    </div>
-                    <div class="image-tab-content active" id="cover-content-url">
-                        <input type="text" class="field-input" id="cover-url-input" placeholder="https://..." oninput="previewUrl('cover', this.value)">
-                    </div>
-                    <div class="image-tab-content" id="cover-content-upload">
+                    <div class="image-tab-content active" id="cover-content-upload">
                         <div class="upload-zone" onclick="document.getElementById('cover-file').click()">
                             Выбери PNG / JPG / WebP
                             <input type="file" id="cover-file" accept="image/png,image/jpeg,image/webp" onchange="uploadImage(this,'cover')">
@@ -395,14 +387,7 @@ function renderEditor() {
                 <div class="image-block">
                     <h4>Картинка для &lt;image&gt; в тексте — макс. 800×500px</h4>
                     <div class="image-preview" id="content-preview">Нрт картинки</div>
-                    <div class="image-tabs">
-                        <button class="image-tab active" id="content-tab-url" onclick="switchTab('content','url')">URL</button>
-                        <button class="image-tab" id="content-tab-upload" onclick="switchTab('content','upload')">Файл</button>
-                    </div>
-                    <div class="image-tab-content active" id="content-content-url">
-                        <input type="text" class="field-input" id="content-url-input" placeholder="https://..." oninput="previewUrl('content', this.value)">
-                    </div>
-                    <div class="image-tab-content" id="content-content-upload">
+                    <div class="image-tab-content active" id="content-content-upload">
                         <div class="upload-zone" onclick="document.getElementById('content-file').click()">
                             Выбери PNG / JPG / WebP
                             <input type="file" id="content-file" accept="image/png,image/jpeg,image/webp" onchange="uploadImage(this,'content')">
@@ -446,19 +431,6 @@ function renderEditor() {
     `
 
     renderInfoboxFields()
-}
-
-function switchTab(type, tab) {
-    document.getElementById(`${type}-tab-url`).classList.toggle('active', tab === 'url')
-    document.getElementById(`${type}-tab-upload`).classList.toggle('active', tab === 'upload')
-    document.getElementById(`${type}-content-url`).classList.toggle('active', tab === 'url')
-    document.getElementById(`${type}-content-upload`).classList.toggle('active', tab === 'upload')
-}
-
-function previewUrl(type, url) {
-    if (type === 'cover') coverUrl = url
-    else contentImageUrl = url
-    updatePreview(type, url)
 }
 
 function updatePreview(type, url) {
