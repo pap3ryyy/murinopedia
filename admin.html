@@ -619,7 +619,7 @@ async function banUser(userId, username, isBanned) {
     }
 
     const { data: u } = await supabaseClient.from('users')
-        .select('username, bio, avatar_url, banner_url, role, created_at, likes_count')
+        .select('username, bio, avatar_url, banner_url, role, created_at, likes_count, public_id')
         .eq('id', userId).single()
 
     const { count: articleCount } = await supabaseClient.from('articles')
@@ -680,7 +680,8 @@ async function submitBan(userId, username) {
     const updates = { banned_until, ban_reason: reason, banned_by: adminUser }
 
     if (document.getElementById('act-rename').checked) {
-        updates.username = 'user_' + userId.substring(0, 8)
+        const { data: pubData } = await supabaseClient.from('users').select('public_id').eq('id', userId).single()
+        updates.username = 'user_' + (pubData?.public_id ?? userId.substring(0, 8))
         updates.force_rename = true
     }
     if (document.getElementById('act-bio').checked) updates.bio = 'Контент недоступен'
