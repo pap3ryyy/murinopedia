@@ -567,3 +567,63 @@ body.dark select:focus {
     border-color: #89b4fa;
     background: #1c1c1f;
 }
+
+/* Тёмная тема — дополнительные блоки */
+body.dark .warning-box,
+body.dark .error-box {
+    background: #2d1b1b !important;
+    border-color: #d33 !important;
+    color: #e4e4e7 !important;
+}
+body.dark .warning-box h4,
+body.dark .warning-box strong,
+body.dark .warning-box p,
+body.dark .warning-box a,
+body.dark .error-box p,
+body.dark .error-box h2 {
+    color: #f38ba8 !important;
+}
+body.dark .notice-box {
+    background: #2d2510 !important;
+    border-color: #c8a850 !important;
+    color: #e4e4e7 !important;
+}
+body.dark .info-box {
+    background: #1e293b !important;
+    border-color: #3366cc !important;
+    color: #e4e4e7 !important;
+}
+body.dark .success-box {
+    background: #1b2d1b !important;
+    border-color: #14866d !important;
+    color: #e4e4e7 !important;
+}
+body.dark .article-infobox {
+    background: #27272a !important;
+    border-color: #3f3f46 !important;
+}
+body.dark .article-card {
+    background: #1c1c1f !important;
+    border-color: #3f3f46 !important;
+    color: #e4e4e7 !important;
+}
+body.dark .pending-card,
+body.dark .editor-wrap,
+body.dark .auth-wrap,
+body.dark .badges-wrap,
+body.dark .profile-head,
+body.dark .profile-content,
+body.dark .badge-page,
+body.dark .dict-wrap {
+    background: #1c1c1f !important;
+    border-color: #3f3f46 !important;
+    color: #e4e4e7 !important;
+}
+body.dark .btn-secondary {
+    background: #27272a !important;
+    color: #e4e4e7 !important;
+    border-color: #3f3f46 !important;
+}
+body.dark .btn-secondary:hover {
+    background: #3f3f46 !important;
+}
