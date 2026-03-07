@@ -358,6 +358,12 @@
 <script src="js/ban_check.js"></script>
 <script src="js/theme.js"></script>
 <script>
+function isSafeUrl(url) {
+    if (!url) return false
+    return url.startsWith('https://rvykoymrumzgkgbwdefm.supabase.co') ||
+           url.startsWith('https://pap3ryyy.github.io/murinopedia/')
+}
+
 function safe(str) {
     if (!str) return ''
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')
@@ -659,13 +665,13 @@ async function renderProfile() {
 
     document.getElementById('main-content').innerHTML = `
         ${u.banner_url
-            ? `<img src="${u.banner_url}" class="profile-banner" alt="Баннер">`
+            ? (isSafeUrl(u.banner_url) ? `<img src="${u.banner_url}" class="profile-banner" alt="Баннер">` : `<div class="profile-banner-placeholder"></div>`)
             : `<div class="profile-banner-placeholder"></div>`
         }
 
         <div class="profile-head">
             <div class="profile-avatar-wrap" style="border: ${borderStyle};">
-                ${u.avatar_url
+                ${isSafeUrl(u.avatar_url)
                     ? `<img src="${u.avatar_url}" alt="${u.username}">`
                     : `<div class="profile-avatar-initial">${u.username[0].toUpperCase()}</div>`
                 }
