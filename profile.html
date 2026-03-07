@@ -420,6 +420,34 @@ function renderHeaderUser(user) {
     `
 }
 
+async function requestUnban(userId, username) {
+    const reason = prompt('Причина запроса на разбан ' + username + ':')
+    if (!reason) return
+    const { data: { session } } = await supabaseClient.auth.getSession()
+    if (!session) return
+
+    const { error } = await supabaseClient.from('unban_requests').insert({
+        user_id: userId,
+        username: username,
+        reason: reason
+    })
+    if (error) { alert('Смертч-шум: ' + error.message); return }
+
+    const { data: founders } = await supabaseClient
+        .from('users').select('id').eq('role', 'м.с.в.основательность')
+    if (founders && founders.length > 0) {
+        await supabaseClient.from('notifications').insert(
+            founders.map(f => ({
+                user_id: f.id,
+                type: 'unban_request',
+                message: 'Запросч на разбан: ' + username + ' — ' + reason,
+                link: 'profile.html?id=' + profileUser.public_id
+            }))
+        )
+    }
+    alert('Запросч отправленол Основательности!')
+}
+
 async function init() {
     const params = new URLSearchParams(window.location.search)
     const profileId = params.get('id')
@@ -585,6 +613,29 @@ async function renderProfile() {
     const isBanned = u.banned_by !== null && u.banned_by !== undefined
 
     if (isBanned) {
+        const isMsvViewer = currentUser && ['м.с.в.содрунник', 'м.с.в.основательность'].includes(currentUser.role)
+        const isFounderViewer = currentUser && currentUser.role === 'м.с.в.основательность'
+
+        const banDetails = isMsvViewer ? `
+            <table style="width:100%;border-collapse:collapse;font-size:0.88em;margin-top:10px;">
+                <tr style="border-bottom:1px solid #eaecf0;">
+                    <td style="padding:4px 8px;font-weight:bold;color:#54595d;white-space:nowrap;">Кто забанил</td>
+                    <td style="padding:4px 8px;">${safe(u.banned_by)}</td>
+                </tr>
+                <tr style="border-bottom:1px solid #eaecf0;">
+                    <td style="padding:4px 8px;font-weight:bold;color:#54595d;white-space:nowrap;">Причина</td>
+                    <td style="padding:4px 8px;">${safe(u.ban_reason ?? '—')}</td>
+                </tr>
+                <tr>
+                    <td style="padding:4px 8px;font-weight:bold;color:#54595d;white-space:nowrap;">До</td>
+                    <td style="padding:4px 8px;">${u.banned_until ? new Date(u.banned_until).toLocaleString('ru-RU') : 'Навсегда'}</td>
+                </tr>
+            </table>
+            ${isMsvViewer && !isFounderViewer ? `<div style="margin-top:12px;">
+                <button class="btn btn-secondary" onclick="requestUnban('${u.id}', '${safe(u.username)}')">Подати запросч на разбан</button>
+            </div>` : ''}
+        ` : ''
+
         document.getElementById('main-content').innerHTML = `
         <div class="profile-banner-placeholder" style="background:#fee7e6;border-bottom:2px solid #d33;"></div>
         <div class="profile-head">
@@ -597,8 +648,8 @@ async function renderProfile() {
                 </div>
                 <div class="warning-box" style="margin-top:10px;">
                     <strong>Субьектость забанена М.С.В.</strong><br>
-                    Возможно это Фог. Будьте осторожны — контент скрыт в целях безопасности Людич.<br>
-                    <span style="font-size:0.85em;color:#54595d;">Вч реестре сч: ${new Date(u.created_at).toLocaleDateString('ru-RU')}</span>
+                    Возможно это Фог. Будьте осторожны — контент скрыт вч целях безопасности Людич.
+                    ${banDetails}
                 </div>
             </div>
         </div>

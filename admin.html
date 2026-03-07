@@ -154,6 +154,7 @@ async function init() {
     adminUser = user.username
     adminUserId = user.id
     adminPublicId = user.public_id
+    isFounder = user.role === 'м.с.в.основательность'
 
     const link = document.getElementById('admin-username-link')
     link.textContent = adminUser
@@ -180,11 +181,13 @@ function renderAdmin() {
             <button class="admin-tab" onclick="switchTab('badges', this)">Значки</button>
             <button class="admin-tab" onclick="switchTab('stats', this)">Статистика</button>
             <button class="admin-tab" onclick="switchTab('users', this)">Людич</button>
+                        ${isFounder ? `<button class="admin-tab" onclick="switchTab('unban', this)">Запросы разбана</button>` : ''}
         </div>
         <div class="admin-tab-content active" id="tab-pending"><div id="pending-list"><p style="color:#54595d;">Загружати...</p></div></div>
         <div class="admin-tab-content" id="tab-badges"><div id="badges-content"><p style="color:#54595d;">Загружати...</p></div></div>
         <div class="admin-tab-content" id="tab-stats"><div id="stats-content"><p style="color:#54595d;">Загружати...</p></div></div>
         <div class="admin-tab-content" id="tab-users"><div id="users-content"><p style="color:#54595d;">Загружати...</p></div></div>
+        ${isFounder ? '<div class="admin-tab-content" id="tab-unban"><div id="unban-content"><p style="color:#54595d;">Загружати...</p></div></div>' : ''}
     `
     loadPending()
 }
@@ -197,6 +200,7 @@ function switchTab(name, btn) {
     if (name === 'stats') loadStats()
     if (name === 'users') loadUsers()
     if (name === 'badges') loadBadges()
+    if (name === 'unban') loadUnbanRequests()
 }
 
 function safe(str) {
@@ -508,6 +512,38 @@ async function loadStats() {
             <div class="stat-card"><span class="stat-number">${(comments.data ?? []).length}</span><span class="stat-label">Комментариев</span></div>
         </div>
     `
+}
+
+async function loadUnbanRequests() {
+    const container = document.getElementById('unban-content')
+    const { data, error } = await supabaseClient
+        .from('unban_requests').select('*').eq('status', 'pending').order('created_at', { ascending: false })
+    if (!data || data.length === 0) { container.innerHTML = '<p style="color:#54595d;">Нрт запросов</p>'; return }
+    container.innerHTML = data.map(r => `
+        <div style="border:1px solid #a2a9b1;padding:15px;margin-bottom:12px;background:#f8f9fa;">
+            <div style="font-weight:bold;margin-bottom:6px;">${safe(r.username)}</div>
+            <div style="font-size:0.88em;color:#54595d;margin-bottom:4px;">Причина: ${safe(r.reason)}</div>
+            <div style="font-size:0.82em;color:#a2a9b1;margin-bottom:10px;">${new Date(r.created_at).toLocaleString('ru-RU')}</div>
+            <div style="display:flex;gap:8px;">
+                <button class="btn btn-primary" onclick="acceptUnban(${r.id}, '${r.user_id}')">Принять разбан</button>
+                <button class="btn btn-danger" onclick="rejectUnban(${r.id})">Отклонити</button>
+            </div>
+        </div>
+    `).join('')
+}
+
+async function acceptUnban(requestId, userId) {
+    if (!confirm('Принять разбан?')) return
+    await supabaseClient.from('users').update({ banned_until: null, ban_reason: null, banned_by: null }).eq('id', userId)
+    await supabaseClient.from('unban_requests').update({ status: 'accepted' }).eq('id', requestId)
+    alert('Разбаненол!')
+    loadUnbanRequests()
+}
+
+async function rejectUnban(requestId) {
+    if (!confirm('Отклонить запрос?')) return
+    await supabaseClient.from('unban_requests').update({ status: 'rejected' }).eq('id', requestId)
+    loadUnbanRequests()
 }
 
 async function loadUsers() {
