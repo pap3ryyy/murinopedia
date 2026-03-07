@@ -611,21 +611,92 @@ async function banUser(userId, username, isBanned) {
     if (isBanned) {
         if (!confirm('Разбанить ' + username + '?')) return
         await supabaseClient.from('users').update({
-            banned_until: null, ban_reason: null, banned_by: null
+            banned_until: null, ban_reason: null, banned_by: null, force_rename: false
         }).eq('id', userId)
         alert('Разбаненол!')
         loadUsers()
         return
     }
-    const reason = prompt('Причина бана для ' + username + ':')
-    if (!reason) return
-    const durInput = prompt('Длительность в часах (оставь пустым = навсегда):')
+
+    const { data: u } = await supabaseClient.from('users')
+        .select('username, bio, avatar_url, banner_url, role, created_at, likes_count')
+        .eq('id', userId).single()
+
+    const { count: articleCount } = await supabaseClient.from('articles')
+        .select('id', { count: 'exact', head: true }).eq('author', username)
+
+    const { count: commentCount } = await supabaseClient.from('comments')
+        .select('id', { count: 'exact', head: true }).eq('user_id', userId)
+
+    const modal = document.createElement('div')
+    modal.id = 'ban-modal'
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;'
+    modal.innerHTML = `
+        <div style="background:#fff;border:1px solid #a2a9b1;padding:24px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;">
+            <h3 style="font-family:serif;font-weight:normal;border-bottom:1px solid #a2a9b1;padding-bottom:8px;margin-bottom:16px;">Бан: ${username}</h3>
+            <table style="width:100%;border-collapse:collapse;font-size:0.88em;margin-bottom:16px;">
+                <tr><td style="padding:4px 8px;color:#54595d;font-weight:bold;">Роль</td><td style="padding:4px 8px;">${u?.role ?? '—'}</td></tr>
+                <tr><td style="padding:4px 8px;color:#54595d;font-weight:bold;">В реестре с</td><td style="padding:4px 8px;">${u?.created_at ? new Date(u.created_at).toLocaleDateString('ru-RU') : '—'}</td></tr>
+                <tr><td style="padding:4px 8px;color:#54595d;font-weight:bold;">Статей</td><td style="padding:4px 8px;">${articleCount ?? 0}</td></tr>
+                <tr><td style="padding:4px 8px;color:#54595d;font-weight:bold;">Комментариев</td><td style="padding:4px 8px;">${commentCount ?? 0}</td></tr>
+                <tr><td style="padding:4px 8px;color:#54595d;font-weight:bold;">Описание</td><td style="padding:4px 8px;">${u?.bio ? u.bio.substring(0,80) : '—'}</td></tr>
+            </table>
+
+            <div style="margin-bottom:12px;">
+                <label style="font-size:0.85em;font-weight:bold;color:#54595d;display:block;margin-bottom:4px;">Причина</label>
+                <input type="text" id="ban-reason" placeholder="Причина бана..." style="width:100%;padding:7px 10px;border:1px solid #a2a9b1;font-size:0.9em;box-sizing:border-box;">
+            </div>
+
+            <div style="margin-bottom:12px;">
+                <label style="font-size:0.85em;font-weight:bold;color:#54595d;display:block;margin-bottom:4px;">Длительность (часов, пусто = навсегда)</label>
+                <input type="number" id="ban-duration" placeholder="Например: 24" style="width:100%;padding:7px 10px;border:1px solid #a2a9b1;font-size:0.9em;box-sizing:border-box;">
+            </div>
+
+            <div style="border:1px solid #a2a9b1;padding:12px;background:#f8f9fa;margin-bottom:16px;">
+                <div style="font-size:0.85em;font-weight:bold;color:#54595d;margin-bottom:8px;">Действия при бане</div>
+                <label style="display:block;margin-bottom:6px;font-size:0.88em;"><input type="checkbox" id="act-rename"> Сбросить ник (заменить на user_id, потребовать смену)</label>
+                <label style="display:block;margin-bottom:6px;font-size:0.88em;"><input type="checkbox" id="act-bio"> Сбросить описание → «Контент недоступен»</label>
+                <label style="display:block;margin-bottom:6px;font-size:0.88em;"><input type="checkbox" id="act-avatar"> Сбросить аватар → placeholder</label>
+                <label style="display:block;margin-bottom:6px;font-size:0.88em;"><input type="checkbox" id="act-banner"> Сбросить баннер → placeholder</label>
+                <label style="display:block;margin-bottom:6px;font-size:0.88em;"><input type="checkbox" id="act-articles"> Удалить все статьи</label>
+                <label style="display:block;font-size:0.88em;"><input type="checkbox" id="act-comments"> Удалить все комментарии</label>
+            </div>
+
+            <div style="display:flex;gap:8px;">
+                <button onclick="submitBan('${userId}', '${username}')" class="btn btn-danger">Забанити</button>
+                <button onclick="document.getElementById('ban-modal').remove()" class="btn btn-secondary">Отменити</button>
+            </div>
+        </div>
+    `
+    document.body.appendChild(modal)
+}
+
+async function submitBan(userId, username) {
+    const reason = document.getElementById('ban-reason').value.trim()
+    if (!reason) { alert('Укажи причину'); return }
+    const durInput = document.getElementById('ban-duration').value.trim()
     const banned_until = durInput ? new Date(Date.now() + parseInt(durInput) * 3600000).toISOString() : null
-    await supabaseClient.from('users').update({
-        banned_until,
-        ban_reason: reason,
-        banned_by: adminUser
-    }).eq('id', userId)
+
+    const updates = { banned_until, ban_reason: reason, banned_by: adminUser }
+
+    if (document.getElementById('act-rename').checked) {
+        updates.username = 'user_' + userId.substring(0, 8)
+        updates.force_rename = true
+    }
+    if (document.getElementById('act-bio').checked) updates.bio = 'Контент недоступен'
+    if (document.getElementById('act-avatar').checked) updates.avatar_url = 'asset/placeholder.png'
+    if (document.getElementById('act-banner').checked) updates.banner_url = 'asset/placeholder.png'
+
+    await supabaseClient.from('users').update(updates).eq('id', userId)
+
+    if (document.getElementById('act-articles').checked) {
+        await supabaseClient.from('articles').delete().eq('author', username)
+    }
+    if (document.getElementById('act-comments').checked) {
+        await supabaseClient.from('comments').delete().eq('user_id', userId)
+    }
+
+    document.getElementById('ban-modal').remove()
     alert('Забаненол!')
     loadUsers()
 }
