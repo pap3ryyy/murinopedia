@@ -428,90 +428,135 @@ footer {
     margin-bottom: 20px;
 }
 
+
 /* ===== ТЁМНАЯ ТЕМА ===== */
 body.dark {
-    background-color: #1a1a2e;
-    color: #cdd6f4;
+    background-color: #18181b;
+    color: #e4e4e7;
 }
 body.dark a { color: #89b4fa; }
+body.dark a:hover { color: #b4d0fc; }
 body.dark a:visited { color: #cba6f7; }
+
 body.dark header {
-    background: #181825;
-    border-bottom-color: #313244;
+    background: #1c1c1f;
+    border-bottom-color: #3f3f46;
 }
-body.dark footer {
-    background: #181825;
-    border-top-color: #313244;
-    color: #6c7086;
+body.dark .logo-text { color: #e4e4e7; }
+body.dark .status-bar {
+    background: #27272a;
+    border-color: #3f3f46;
+    color: #a1a1aa;
 }
-body.dark .wiki-sidebar-box,
+
+body.dark .container {
+    background: #1c1c1f;
+    border-color: #3f3f46;
+}
+
+body.dark main h1,
+body.dark main h2 { border-bottom-color: #3f3f46; }
+
+body.dark aside { border-left-color: #3f3f46; }
+
 body.dark .sidebar-box {
-    background: #1e1e2e;
-    border-color: #313244;
+    background: #27272a;
+    border-color: #3f3f46;
 }
-body.dark .article-card {
-    background: #1e1e2e;
-    border-color: #313244;
-    color: #cdd6f4;
-}
-body.dark .article-card:hover { border-color: #89b4fa; }
-body.dark .article-card-title { color: #cdd6f4; }
-body.dark .article-card-desc,
-body.dark .article-card-meta { color: #a6adc8; }
-body.dark .btn {
-    border-color: #313244;
-    background: #2a2a3e;
-    color: #cdd6f4;
-}
-body.dark .btn-primary {
-    background: #3366cc;
+body.dark .sidebar-box h4 { border-bottom-color: #3f3f46; }
+
+body.dark .info-box {
+    background: #1e293b;
     border-color: #3366cc;
-    color: #fff;
+    color: #e4e4e7;
 }
-body.dark .btn:hover { background: #313244; }
-body.dark .btn-primary:hover { background: #2255bb; }
+body.dark .warning-box {
+    background: #2d1b1b;
+    border-color: #d33;
+    color: #e4e4e7;
+}
+body.dark .success-box {
+    background: #1b2d1b;
+    border-color: #14866d;
+    color: #e4e4e7;
+}
+body.dark .notice-box {
+    background: #2d2510;
+    border-color: #c8a850;
+    color: #e4e4e7;
+}
+
+body.dark .article-infobox {
+    background: #27272a;
+    border-color: #3f3f46;
+}
+body.dark .article-infobox caption,
+body.dark .article-infobox .infobox-title {
+    background: #1e3a5f;
+    color: #e4e4e7;
+}
+body.dark .article-infobox td {
+    border-top-color: #3f3f46;
+}
+body.dark .article-infobox td:first-child { color: #a1a1aa; }
+
+body.dark table.wiki-table th {
+    background: #27272a;
+    border-color: #3f3f46;
+    color: #e4e4e7;
+}
+body.dark table.wiki-table td {
+    border-color: #3f3f46;
+}
+body.dark table.wiki-table tr:nth-child(even) td {
+    background: #1c1c1f;
+}
+
+body.dark .btn-secondary {
+    background: #27272a;
+    color: #e4e4e7 !important;
+    border-color: #3f3f46;
+}
+body.dark .btn-secondary:hover { background: #3f3f46; }
+
+body.dark blockquote {
+    border-left-color: #3f3f46;
+    color: #a1a1aa;
+}
+
+body.dark .wiki-image {
+    background: #27272a;
+    border-color: #3f3f46;
+}
+body.dark .wiki-image .caption { color: #a1a1aa; }
+
+body.dark .toc {
+    background: #27272a;
+    border-color: #3f3f46;
+}
+
+body.dark .article-meta {
+    color: #a1a1aa;
+    border-bottom-color: #3f3f46;
+}
+
+body.dark footer {
+    color: #71717a;
+    border-top-color: #3f3f46;
+}
+
+body.dark .nav-card { border-bottom-color: #3f3f46; }
+
 body.dark input,
 body.dark textarea,
 body.dark select {
-    background: #2a2a3e;
-    border-color: #313244;
-    color: #cdd6f4;
+    background: #27272a;
+    border-color: #3f3f46;
+    color: #e4e4e7;
 }
 body.dark input:focus,
 body.dark textarea:focus,
 body.dark select:focus {
     border-color: #89b4fa;
-    background: #1e1e2e;
-}
-body.dark .notice-box {
-    background: #2a2a3e;
-    border-color: #313244;
-    color: #cdd6f4;
-}
-body.dark .comment {
-    background: #1e1e2e;
-    border-color: #313244;
-}
-body.dark .nav-card {
-    background: #1e1e2e;
-    border-color: #313244;
-}
-body.dark .nav-card:hover { border-color: #89b4fa; }
-body.dark table { border-color: #313244; }
-body.dark th {
-    background: #2a2a3e;
-    border-color: #313244;
-}
-body.dark td { border-color: #313244; }
-body.dark .notification-dropdown {
-    background: #1e1e2e;
-    border-color: #313244;
-}
-body.dark .notification-item { border-bottom-color: #313244; }
-body.dark .notification-item:hover { background: #2a2a3e; }
-body.dark .profile-head,
-body.dark .editor-wrap,
-body.dark .settings-wrap {
-    background: #1e1e2e;
-    border-color: #313244;
+    background: #1c1c1f;
 }
