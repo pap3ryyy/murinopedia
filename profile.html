@@ -430,6 +430,7 @@ async function init() {
         if (me) {
             currentUser = me
             isMsvUser = MSV_ROLES.includes(me.role)
+            await supabaseClient.from('users').update({ last_seen: new Date().toISOString() }).eq('id', session.user.id)
             renderHeaderUser(me)
         
         }
@@ -518,6 +519,21 @@ async function init() {
 
 
 
+function getOnlineStatus(lastSeen) {
+    if (!lastSeen) return null
+    const diff = (Date.now() - new Date(lastSeen).getTime()) / 1000 / 60
+    if (diff < 5) return 'online'
+    if (diff < 30) return 'recently'
+    return null
+}
+
+function renderOnline(lastSeen) {
+    const status = getOnlineStatus(lastSeen)
+    if (status === 'online') return '<span style="display:inline-block;width:10px;height:10px;background:#14866d;border-radius:50%;border:2px solid #fff;margin-left:4px;vertical-align:middle;" title="В сети"></span>'
+    if (status === 'recently') return '<span style="display:inline-block;width:10px;height:10px;background:#c8a850;border-radius:50%;border:2px solid #fff;margin-left:4px;vertical-align:middle;" title="Недавно был"></span>'
+    return ''
+}
+
 function renderBadges(userBadges) {
     if (!userBadges || userBadges.length === 0) return ''
     return userBadges.map(ub => {
@@ -579,12 +595,14 @@ async function renderProfile() {
             </div>
             <div style="flex:1;padding-bottom:4px;">
                 <div class="profile-username">
-                    <span style="color:${nameColor};">${u.username}</span>
+                    <span style="color:${nameColor};">${safe(u.username)}</span>
+                    ${renderOnline(u.last_seen)}
                     ${renderBadges(userBadges)}
                 </div>
                 ${u.title ? `<div class="profile-title" style="color:${mutedColor};">${u.title}</div>` : ''}
                 ${u.bio ? `<div class="profile-bio" style="color:${mutedColor};">${u.bio.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>` : ''}
-                <div class="profile-meta" style="color:${mutedColor};">Вч реестре сч: ${joined}</div>
+                <div class="profile-meta" style="color:\${mutedColor};">Вч реестре сч: \${joined}</div>
+                ${u.last_seen ? `<div class="profile-meta" style="color:${mutedColor};">Последний заход: ${new Date(u.last_seen).toLocaleString('ru-RU')}</div>` : ''}
                 ${prevNicks.length > 0 ? `<div class="prev-nicks" style="margin-top:4px;font-size:0.8em;color:${mutedColor};">Прошлые: ${prevNicks.map(n => `<span>${n}</span>`).join('')}</div>` : ''}
             </div>
         </div>
