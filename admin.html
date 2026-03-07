@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <link rel="icon<script src="js/config.js"></script>
-<script src="js/ban_check.js"></script>" type="image/png" href="asset/logo.ico">
+    <link rel="icon" type="image/png" href="asset/logo.ico">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Штаб М.С.В. — Муринопедия</title>
@@ -134,7 +133,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
-<script src="js/ban_check.js"></script>
 <script>
 let adminUser = null
 let adminUserId = null
@@ -530,7 +528,7 @@ async function loadUsers() {
                         <td style="color:#a2a9b1;font-size:0.85em;">${new Date(u.created_at).toLocaleDateString('ru-RU')}</td>
                         <td>
                             <button class="btn-remove" style="font-size:0.75em;" onclick="triggerEasterEgg('${u.id}')">🔥 ПИЗДЕЦ</button>
-                            <button class="btn-remove" style="font-size:0.75em;background:${u.banned_by ? '#fee7e6' : ''};" onclick="banUser('${u.id}', '${u.username}', ${!!u.banned_by})">${'${u.banned_by ? \'🔓 Разбанить\' : \'🔨 Бан\'}'}</button>
+                            <button class="btn-remove" style="font-size:0.75em;" onclick="banUser('${u.id}', '${u.username}', ${u.banned_by ? 'true' : 'false'})">${u.banned_by ? '🔓 Разбанить' : '🔨 Бан'}</button>
                         </td>
                     </tr>
                 `).join('')}
