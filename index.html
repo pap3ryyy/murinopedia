@@ -2,7 +2,6 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-<script src="js/security.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Муринопедия — Свободная энциклопедия Мурино</title>
     <link rel="icon" type="image/png" href="asset/logo.ico">
@@ -59,7 +58,7 @@
                     <div id="notif-list"><div class="notif-empty">Загружати...</div></div>
                 </div>
             </div>
-            <div id="nav-user-zone" style="font-size:0.85em;color:#54595d;"></div>
+            <div id="nav-user-zone" style="font-size:0.85em;color:#54595d;display:flex;align-items:center;gap:8px;"></div>
         </div>
     </div>
 </header>
@@ -193,10 +192,7 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/security.js"></script>
 <script src="js/config.js"></script>
-<script src="js/theme.js"></script>
-<script src="js/pizda.js"></script>
 <script>
 async function init() {
     const dbOk = await checkDb()
@@ -213,6 +209,8 @@ async function init() {
             zone.innerHTML = `
                 <a href="profile.html?id=${user.public_id}" style="color:#0645ad;">${user.username}</a>
                 &nbsp;
+                <a href="settings.html" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;color:#202122;text-decoration:none;">Настройки</a>
+                &nbsp;
                 <button onclick="logout()" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;">Выйти</button>
             `
             document.getElementById('create-btn').style.display = 'inline-block'
@@ -221,6 +219,7 @@ async function init() {
             notifWrap.style.display = 'inline-block'
             notifWrap._userId = user.id
             await loadNotifications(user.id)
+
 
             const role = user.role
             const isMsv = role !== 'людич'
@@ -320,21 +319,22 @@ async function loadNotifications(userId) {
     const list = document.getElementById('notif-list')
     if (!notifs.length) { list.innerHTML = '<div class="notif-empty">Нрт оповещений</div>'; return }
     list.innerHTML = notifs.map(n => `
-        <div class="notif-item ${n.read ? '' : 'unread'}" id="ni-${n.id}" onclick="openNotif('${n.id}','${n.link ?? ''}','${userId}')">
+        <div class="notif-item ${n.read ? '' : 'unread'}" id="ni-${n.id}" data-link="${(n.link ?? '').replace(/"/g,'')}" onclick="openNotif('${n.id}','${userId}')">
             <div class="notif-dot ${n.read ? 'read' : ''}"></div>
-            <div class="notif-text">${n.message}</div>
+            <div class="notif-text">${n.message.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
             <div class="notif-time">${new Date(n.created_at).toLocaleDateString('ru-RU')}</div>
         </div>
     `).join('')
 }
 
-async function openNotif(id, link, userId) {
+async function openNotif(id, userId) {
+    const item = document.getElementById('ni-' + id)
+    const link = item ? item.dataset.link : null
     await supabaseClient.from('notifications').update({ read: true }).eq('id', id)
-    const el = document.getElementById('ni-' + id)
-    if (el) { el.classList.remove('unread'); el.querySelector('.notif-dot')?.classList.add('read') }
+    if (item) { item.classList.remove('unread'); item.querySelector('.notif-dot')?.classList.add('read') }
     const badge = document.getElementById('notif-badge')
     if (badge) { const c = parseInt(badge.textContent) - 1; if (c <= 0) badge.style.display = 'none'; else badge.textContent = c }
-    if (link) window.location.href = link
+    if (link && link.startsWith('/') || (link && !link.includes('alert') && !link.includes('script') && !link.includes('javascript'))) window.location.href = link
 }
 
 async function markAllRead() {
@@ -350,6 +350,3 @@ init()
 
 </body>
 </html>
-
-
-
