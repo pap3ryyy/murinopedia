@@ -396,3 +396,122 @@ footer {
 
 .mt-0 { margin-top: 0; }
 .mb-0 { margin-bottom: 0; }
+.wiki-sidebar-left {
+    display: none;
+}
+
+.sidebar-group h5 {
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #54595d;
+    margin: 12px 0 4px 0;
+    border-bottom: 1px solid #eaecf0;
+    padding-bottom: 3px;
+}
+
+.sidebar-group ul {
+    margin: 0;
+    padding-left: 16px;
+}
+
+.sidebar-group li {
+    margin: 3px 0;
+    font-size: 0.9em;
+}
+
+.welcome-box {
+    background: #f8f9fa;
+    border: 1px solid #a2a9b1;
+    border-left: 5px solid #3366cc;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+/* ===== ТЁМНАЯ ТЕМА ===== */
+body.dark {
+    background-color: #1a1a2e;
+    color: #cdd6f4;
+}
+body.dark a { color: #89b4fa; }
+body.dark a:visited { color: #cba6f7; }
+body.dark header {
+    background: #181825;
+    border-bottom-color: #313244;
+}
+body.dark footer {
+    background: #181825;
+    border-top-color: #313244;
+    color: #6c7086;
+}
+body.dark .wiki-sidebar-box,
+body.dark .sidebar-box {
+    background: #1e1e2e;
+    border-color: #313244;
+}
+body.dark .article-card {
+    background: #1e1e2e;
+    border-color: #313244;
+    color: #cdd6f4;
+}
+body.dark .article-card:hover { border-color: #89b4fa; }
+body.dark .article-card-title { color: #cdd6f4; }
+body.dark .article-card-desc,
+body.dark .article-card-meta { color: #a6adc8; }
+body.dark .btn {
+    border-color: #313244;
+    background: #2a2a3e;
+    color: #cdd6f4;
+}
+body.dark .btn-primary {
+    background: #3366cc;
+    border-color: #3366cc;
+    color: #fff;
+}
+body.dark .btn:hover { background: #313244; }
+body.dark .btn-primary:hover { background: #2255bb; }
+body.dark input,
+body.dark textarea,
+body.dark select {
+    background: #2a2a3e;
+    border-color: #313244;
+    color: #cdd6f4;
+}
+body.dark input:focus,
+body.dark textarea:focus,
+body.dark select:focus {
+    border-color: #89b4fa;
+    background: #1e1e2e;
+}
+body.dark .notice-box {
+    background: #2a2a3e;
+    border-color: #313244;
+    color: #cdd6f4;
+}
+body.dark .comment {
+    background: #1e1e2e;
+    border-color: #313244;
+}
+body.dark .nav-card {
+    background: #1e1e2e;
+    border-color: #313244;
+}
+body.dark .nav-card:hover { border-color: #89b4fa; }
+body.dark table { border-color: #313244; }
+body.dark th {
+    background: #2a2a3e;
+    border-color: #313244;
+}
+body.dark td { border-color: #313244; }
+body.dark .notification-dropdown {
+    background: #1e1e2e;
+    border-color: #313244;
+}
+body.dark .notification-item { border-bottom-color: #313244; }
+body.dark .notification-item:hover { background: #2a2a3e; }
+body.dark .profile-head,
+body.dark .editor-wrap,
+body.dark .settings-wrap {
+    background: #1e1e2e;
+    border-color: #313244;
+}
