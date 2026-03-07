@@ -685,8 +685,8 @@ async function submitBan(userId, username) {
         updates.force_rename = true
     }
     if (document.getElementById('act-bio').checked) updates.bio = 'Контент недоступен'
-    if (document.getElementById('act-avatar').checked) updates.avatar_url = 'asset/placeholder.png'
-    if (document.getElementById('act-banner').checked) updates.banner_url = 'asset/placeholder.png'
+    if (document.getElementById('act-avatar').checked) updates.avatar_url = 'https://pap3ryyy.github.io/murinopedia/asset/placeholder.png'
+    if (document.getElementById('act-banner').checked) updates.banner_url = 'https://pap3ryyy.github.io/murinopedia/asset/placeholder.png'
 
     await supabaseClient.from('users').update(updates).eq('id', userId)
 
