@@ -611,7 +611,7 @@ async function banUser(userId, username, isBanned) {
     if (isBanned) {
         if (!confirm('Разбанить ' + username + '?')) return
         await supabaseClient.from('users').update({
-            banned_until: null, ban_reason: null, banned_by: null, force_rename: false
+            banned_until: null, ban_reason: null, banned_by: null
         }).eq('id', userId)
         alert('Разбаненол!')
         loadUsers()
