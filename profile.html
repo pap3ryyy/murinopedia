@@ -616,7 +616,9 @@ async function renderProfile() {
     const nameColor = u.name_color || textColor
     const borderStyle = u.avatar_border || '3px solid #fff'
 
-    const isBanned = u.banned_by !== null && u.banned_by !== undefined
+    const isBannedPermanent = u.banned_by !== null && u.banned_by !== undefined && u.banned_until === null
+    const isBannedTimed = u.banned_by !== null && u.banned_by !== undefined && u.banned_until && new Date(u.banned_until) > new Date()
+    const isBanned = isBannedPermanent || isBannedTimed
 
     if (isBanned) {
         const isMsvViewer = currentUser && ['м.с.в.содрунник', 'м.с.в.основательность'].includes(currentUser.role)
