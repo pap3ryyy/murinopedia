@@ -227,7 +227,7 @@
 <script src="js/config.js"></script>
 <script src="js/ban_check.js"></script>
 <script src="js/theme.js"></script>
-<script src="js/player.js"></script><script src="js/player.js"></script>
+<script src="js/player.js"></script>
 <script>
 let currentUser = null, track = null, audio = null, audioCtx = null, analyser = null, animFrame = null
 let isPlaying = false, isRepeat = false, liked = false, comments = []
@@ -250,8 +250,8 @@ async function init() {
                 <button onclick="supabaseClient.auth.signOut().then(()=>location.reload())" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;">Выйти</button>
             `
             if (session) {
-                const { data: lk } = await supabaseClient.from('track_likes').select('track_id').eq('track_id', trackId).eq('user_id', session.user.id).single()
-                liked = !!lk
+                const { data: lk } = await supabaseClient.from('track_likes').select('track_id').eq('track_id', trackId).eq('user_id', session.user.id)
+                liked = !!(lk && lk.length > 0)
             }
         }
     }
@@ -276,7 +276,7 @@ function renderPage() {
         <div class="track-stage" id="track-stage">
             ${isVideo ? `
                 <div class="track-video-wrap">
-                    <video id="track-media" src="${track.file_url}" preload="auto" style="width:100%;max-height:320px;display:block;"></video>
+                    <video id="track-media" src="${track.file_url}" preload="auto" style="width:100%;max-height:320px;display:block;" onclick="togglePlay()"></video>
                 </div>
             ` : `
                 <canvas id="visualizer-canvas" height="160"></canvas>
@@ -358,7 +358,9 @@ function togglePlay() {
         stopVisualizer()
     } else {
         if (!audioCtx && track.file_type !== 'video/mp4') setupVisualizer()
-        audio.play(); isPlaying = true
+        const p = audio.play()
+        if (p !== undefined) p.catch(e => console.warn('play error', e))
+        isPlaying = true
         document.getElementById('btn-play').textContent = '⏸'
         if (track.file_type !== 'video/mp4') startVisualizer()
     }
