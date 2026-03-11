@@ -181,12 +181,14 @@ function renderAdmin() {
             <button class="admin-tab" onclick="switchTab('badges', this)">Значки</button>
             <button class="admin-tab" onclick="switchTab('stats', this)">Статистика</button>
             <button class="admin-tab" onclick="switchTab('users', this)">Людич</button>
+            <button class="admin-tab" onclick="switchTab('fm', this)">Мурино FM</button>
                         ${isFounder ? `<button class="admin-tab" onclick="switchTab('unban', this)">Запросы разбана</button>` : ''}
         </div>
         <div class="admin-tab-content active" id="tab-pending"><div id="pending-list"><p style="color:#54595d;">Загружати...</p></div></div>
         <div class="admin-tab-content" id="tab-badges"><div id="badges-content"><p style="color:#54595d;">Загружати...</p></div></div>
         <div class="admin-tab-content" id="tab-stats"><div id="stats-content"><p style="color:#54595d;">Загружати...</p></div></div>
         <div class="admin-tab-content" id="tab-users"><div id="users-content"><p style="color:#54595d;">Загружати...</p></div></div>
+        <div class="admin-tab-content" id="tab-fm"><div id="fm-content"><p style="color:#54595d;">Загружати...</p></div></div>
         ${isFounder ? '<div class="admin-tab-content" id="tab-unban"><div id="unban-content"><p style="color:#54595d;">Загружати...</p></div></div>' : ''}
     `
     loadPending()
@@ -201,6 +203,7 @@ function switchTab(name, btn) {
     if (name === 'users') loadUsers()
     if (name === 'badges') loadBadges()
     if (name === 'unban') loadUnbanRequests()
+    if (name === 'fm') loadFmPending()
 }
 
 function safe(str) {
@@ -724,7 +727,99 @@ async function logout() {
 }
 
 init()
-</script>
+async function loadFmPending() {
+    const el = document.getElementById('fm-content')
+    el.innerHTML = '<p style="color:#54595d;">Загружати...</p>'
+
+    const { data: pending } = await supabaseClient.from('tracks').select('*').eq('status', 'pending').order('created_at', { ascending: true })
+    const { data: published } = await supabaseClient.from('tracks').select('*').eq('status', 'published').order('created_at', { ascending: false }).limit(20)
+
+    let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <b>На проверке: ${pending?.length || 0}</b>
+        <a href="uploadmusic.html" class="btn btn-primary" style="font-size:0.82em;padding:4px 12px;">+ Загрузити трек</a>
+    </div>`
+
+    if (!pending || pending.length === 0) {
+        html += '<p style="color:#54595d;">Нрт треков на проверке</p>'
+    } else {
+        html += pending.map(t => `
+            <div class="pending-card" style="margin-bottom:12px;">
+                <div class="pending-card-header">
+                    <div>
+                        <div class="pending-card-title">${safe(t.title)} ${t.file_type === 'video/mp4' ? '🎬' : '🎵'}</div>
+                        <div class="pending-card-meta">
+                            Автор: <b>@${safe(t.author)}</b>
+                            ${t.mashup_source ? ` · Мешап из: <b>${safe(t.mashup_source)}</b>` : ''}
+                            · Загрузил: <b>${safe(t.uploaded_by)}</b>
+                            · ${new Date(t.created_at).toLocaleDateString('ru-RU')}
+                            ${t.trim_watermark ? ' · <span style="color:#d33;font-size:0.85em;">обрезать водяной знак</span>' : ''}
+                        </div>
+                    </div>
+                </div>
+                ${t.file_type === 'video/mp4'
+                    ? `<video src="${t.file_url}" controls style="width:100%;max-height:200px;margin-bottom:10px;"></video>`
+                    : `<audio src="${t.file_url}" controls style="width:100%;margin-bottom:10px;"></audio>`
+                }
+                <div class="pending-card-actions">
+                    <button class="btn btn-primary" onclick="approveFmTrack(${t.id})">✓ Принять</button>
+                    <button class="btn btn-danger" onclick="rejectFmTrack(${t.id})">✕ Отклонити</button>
+                </div>
+            </div>
+        `).join('')
+    }
+
+    html += `<div style="margin-top:24px;border-top:1px solid #a2a9b1;padding-top:14px;">
+        <b>Опубликованные треки (${published?.length || 0})</b>
+        <div style="margin-top:8px;">`
+
+    if (!published || published.length === 0) {
+        html += '<p style="color:#a2a9b1;font-size:0.85em;">Нрт треков</p>'
+    } else {
+        html += published.map(t => `
+            <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #eaecf0;font-size:0.88em;">
+                <span style="color:#a2a9b1;min-width:16px;">${t.file_type === 'video/mp4' ? '🎬' : '🎵'}</span>
+                <div style="flex:1;min-width:0;">
+                    <a href="track.html?id=${t.id}" style="color:#0645ad;font-weight:bold;" target="_blank">${safe(t.title)}</a>
+                    <span style="color:#54595d;font-size:0.82em;"> · @${safe(t.author)}</span>
+                </div>
+                <span style="color:#a2a9b1;font-size:0.8em;">▶ ${t.plays_count || 0} &nbsp; ♥ ${t.likes_count || 0}</span>
+                <button onclick="deleteFmTrack(${t.id})" style="background:none;border:1px solid #d33;color:#d33;padding:2px 8px;cursor:pointer;font-size:0.78em;">Удалить</button>
+            </div>
+        `).join('')
+    }
+
+    html += '</div></div>'
+    el.innerHTML = html
+}
+
+async function approveFmTrack(id) {
+    await supabaseClient.from('tracks').update({ status: 'published' }).eq('id', id)
+    loadFmPending()
+}
+
+async function rejectFmTrack(id) {
+    if (!confirm('Удалити трек?')) return
+    const { data: t } = await supabaseClient.from('tracks').select('file_url').eq('id', id).single()
+    await supabaseClient.from('tracks').delete().eq('id', id)
+    if (t?.file_url) {
+        const path = t.file_url.split('/tracks/')[1]
+        if (path) await supabaseClient.storage.from('tracks').remove(['tracks/' + path])
+    }
+    loadFmPending()
+}
+
+async function deleteFmTrack(id) {
+    if (!confirm('Удалити опубликованный трек?')) return
+    const { data: t } = await supabaseClient.from('tracks').select('file_url').eq('id', id).single()
+    await supabaseClient.from('tracks').delete().eq('id', id)
+    if (t?.file_url) {
+        const path = t.file_url.split('/tracks/')[1]
+        if (path) await supabaseClient.storage.from('tracks').remove(['tracks/' + path])
+    }
+    loadFmPending()
+}
+
+
 
 </body>
 </html>
