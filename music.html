@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="icon" type="image/png" href="asset/logo.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мурино FM — Муринопедия</title>
+    <link rel="stylesheet" href="css/wiki.css">
+    <style>
+        .track-list-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #eaecf0;
+            font-size: 0.9em;
+        }
+        .track-list-item:last-child { border-bottom: none; }
+        .track-num { color: #a2a9b1; min-width: 22px; text-align: right; font-size: 0.82em; }
+        .track-play-mini {
+            width: 28px; height: 28px;
+            background: #3366cc; border: none;
+            color: #fff; font-size: 0.85em;
+            cursor: pointer; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .track-play-mini:hover { background: #2a4b8d; }
+        .track-link { color: #0645ad; text-decoration: none; font-weight: bold; }
+        .track-link:hover { text-decoration: underline; }
+        .track-meta-small { color: #54595d; font-size: 0.82em; margin-top: 1px; }
+        .track-badge { font-size: 0.7em; background: #eaf0fb; color: #3366cc; padding: 1px 5px; border-radius: 2px; }
+        .track-stats-small { margin-left: auto; color: #a2a9b1; font-size: 0.78em; white-space: nowrap; }
+        .fm-banner {
+            background: #1a1a2e;
+            border: 1px solid #3366cc;
+            padding: 14px 18px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .fm-banner-title { font-family: serif; font-size: 1.4em; color: #fff; font-weight: normal; }
+        .fm-banner-title span { color: #3366cc; }
+        .fm-banner-sub { color: #a1a1aa; font-size: 0.8em; margin-top: 2px; }
+        body.dark .track-list-item { border-bottom-color: #3f3f46; }
+        body.dark .track-link { color: #89b4fa; }
+        body.dark .track-meta-small { color: #a1a1aa; }
+    </style>
+</head>
+<body>
+<header>
+    <div class="logo-area">
+        <img src="asset/logo.png" alt="М.С.В." class="logo-img">
+        <a href="index.html" class="logo-text">Муринопедия</a>
+    </div>
+    <div id="header-user"></div>
+</header>
+<div class="container">
+    <div class="main-content">
+        <div class="fm-banner">
+            <div>
+                <div class="fm-banner-title">Мурино <span>FM</span></div>
+                <div class="fm-banner-sub">Архив Звука Муринской Суверенной Агломерации</div>
+            </div>
+            <div style="margin-left:auto;">
+                <a href="uploadmusic.html" class="btn btn-primary" id="upload-btn" style="display:none;">+ Загрузити трек</a>
+            </div>
+        </div>
+
+        <div class="sidebar-box">
+            <div class="sidebar-box-title">Все треки</div>
+            <div id="tracks-list" style="padding:4px 8px;"><p style="color:#54595d;">Загружати...</p></div>
+        </div>
+
+        <div id="msv-section" style="display:none;margin-top:18px;">
+            <div class="sidebar-box">
+                <div class="sidebar-box-title">На проверке (МСВ)</div>
+                <div id="pending-list" style="padding:8px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-box">
+            <div class="sidebar-box-title">Навигация</div>
+            <ul style="margin:0;padding-left:18px;font-size:0.88em;line-height:1.8;">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="articles.html">Знань</a></li>
+                <li><b>Мурино FM</b></li>
+            </ul>
+        </div>
+        <div class="sidebar-box">
+            <div class="sidebar-box-title">Статистика</div>
+            <div id="fm-stats" style="font-size:0.88em;color:#54595d;padding:4px 0;">...</div>
+        </div>
+    </div>
+</div>
+<footer>
+    Муринопедия — 2026 год.<br>
+    Ч илу доной, пока естч светл. Мурино стояти, Фог дрожати.
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/ban_check.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/player.js"></script><script src="js/player.js"></script>
+<script>
+let currentUser = null, isMsv = false, tracks = []
+function safe(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
+
+async function init() {
+    const { data: { session } } = await supabaseClient.auth.getSession()
+    if (session) {
+        const { data: u } = await supabaseClient.from('users').select('username,role,public_id').eq('id', session.user.id).single()
+        if (u) {
+            currentUser = u
+            isMsv = ['м.с.в.проверкость','м.с.в.содрунник','м.с.в.основательность'].includes(u.role)
+            document.getElementById('upload-btn').style.display = 'inline-block'
+            document.getElementById('header-user').innerHTML = `
+                <a href="profile.html?id=${u.public_id}" style="color:#0645ad;font-size:0.85em;">${safe(u.username)}</a>&nbsp;
+                <a href="settings.html" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;font-size:0.85em;color:#202122;text-decoration:none;">Настройки</a>&nbsp;
+                <button onclick="supabaseClient.auth.signOut().then(()=>location.reload())" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;">Выйти</button>
+            `
+        }
+    }
+    await loadTracks()
+    if (isMsv) await loadPending()
+    loadStats()
+}
+
+async function loadTracks() {
+    const { data } = await supabaseClient.from('tracks').select('*').eq('status','published').order('created_at',{ascending:false})
+    tracks = data || []
+    if (!tracks.length) { document.getElementById('tracks-list').innerHTML = '<p style="color:#54595d;">Нрт треков — будь первым!</p>'; return }
+    document.getElementById('tracks-list').innerHTML = tracks.map((t,i) => `
+        <div class="track-list-item" id="trow-${t.id}">
+            <span class="track-num">${i+1}</span>
+            <button class="track-play-mini" id="pbtn-${t.id}" onclick="playThis(${t.id})">▶</button>
+            <div style="flex:1;min-width:0;">
+                <div>
+                    <a href="track.html?id=${t.id}" class="track-link">${safe(t.title)}</a>
+                    ${t.file_type==='video/mp4'?' 🎬':''}
+                    ${t.mashup_source?`<span class="track-badge">Мешап</span>`:''}
+                </div>
+                <div class="track-meta-small">@${safe(t.author)}${t.mashup_source?` · ${safe(t.mashup_source)}`:''}</div>
+            </div>
+            <div class="track-stats-small">▶ ${t.plays_count||0} &nbsp; ♥ ${t.likes_count||0}</div>
+        </div>
+    `).join('')
+}
+
+function playThis(id) {
+    const t = tracks.find(x=>x.id===id); if(!t) return
+    document.querySelectorAll('.track-play-mini').forEach(b=>b.textContent='▶')
+    document.getElementById('pbtn-'+id).textContent='⏸'
+    MurinoFM.play(t)
+}
+
+async function loadPending() {
+    const { data } = await supabaseClient.from('tracks').select('*').eq('status','pending').order('created_at',{ascending:true})
+    if (!data||!data.length) return
+    document.getElementById('msv-section').style.display = 'block'
+    document.getElementById('pending-list').innerHTML = data.map(t=>`
+        <div style="padding:8px 0;border-bottom:1px solid #eaecf0;">
+            <div style="font-weight:bold;margin-bottom:2px;">${safe(t.title)} ${t.file_type==='video/mp4'?'🎬':'🎵'}</div>
+            <div style="font-size:0.82em;color:#54595d;margin-bottom:6px;">@${safe(t.author)} · от ${safe(t.uploaded_by)}</div>
+            ${t.file_type==='video/mp4'
+                ?`<video src="${t.file_url}" controls style="width:100%;max-height:140px;margin-bottom:6px;"></video>`
+                :`<audio src="${t.file_url}" controls style="width:100%;margin-bottom:6px;"></audio>`}
+            <button class="btn btn-primary" onclick="approveTrack(${t.id})" style="font-size:0.82em;padding:3px 10px;">Принять</button>
+            <button class="btn btn-danger" onclick="rejectTrack(${t.id})" style="font-size:0.82em;padding:3px 10px;margin-left:6px;">Отклонити</button>
+        </div>
+    `).join('')
+}
+
+async function approveTrack(id) {
+    await supabaseClient.from('tracks').update({status:'published'}).eq('id',id)
+    loadTracks(); loadPending()
+}
+async function rejectTrack(id) {
+    if(!confirm('Удалити трек?')) return
+    await supabaseClient.from('tracks').delete().eq('id',id)
+    loadPending()
+}
+
+async function loadStats() {
+    const { count } = await supabaseClient.from('tracks').select('id',{count:'exact',head:true}).eq('status','published')
+    const { data: top } = await supabaseClient.from('tracks').select('id,title,plays_count').eq('status','published').order('plays_count',{ascending:false}).limit(1)
+    document.getElementById('fm-stats').innerHTML =
+        `Треков: <b>${count||0}</b><br>`+
+        (top&&top[0]?`Топ: <a href="track.html?id=${top[0].id}" style="color:#0645ad;">${safe(top[0].title)}</a> (${top[0].plays_count||0} ▶)`:'')
+}
+
+init()
+</script>
+</body>
+</html>
