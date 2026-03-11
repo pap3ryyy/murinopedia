@@ -276,7 +276,7 @@ function renderPage() {
         <div class="track-stage" id="track-stage">
             ${isVideo ? `
                 <div class="track-video-wrap">
-                    <video id="track-media" src="${track.file_url}" preload="auto" style="width:100%;max-height:320px;display:block;" onclick="togglePlay()"></video>
+                    <video id="track-media" src="${track.file_url}" controls preload="auto" style="width:100%;max-height:320px;display:block;" onclick="togglePlay()"></video>
                 </div>
             ` : `
                 <canvas id="visualizer-canvas" height="160"></canvas>
@@ -331,23 +331,39 @@ function renderPage() {
 
 function setupAudio() {
     const isVideo = track.file_type === 'video/mp4'
-    if (isVideo) {
-        audio = document.getElementById('track-media')
-    } else {
-        audio = new Audio(track.file_url)
-        audio.volume = 0.8
-        audio.crossOrigin = 'anonymous'
-    }
 
-    audio.addEventListener('loadedmetadata', () => {
-        document.getElementById('time-dur').textContent = fmt(audio.duration)
-        drawWaveform()
-    })
-    audio.addEventListener('timeupdate', onTimeUpdate)
-    audio.addEventListener('ended', () => {
-        if (isRepeat) { audio.currentTime = 0; audio.play() }
-        else { document.getElementById('btn-play').textContent = '▶'; isPlaying = false; stopVisualizer() }
-    })
+    if (isVideo) {
+        // Для видео — показываем встроенный плеер браузера, глобальный FM не используем
+        const vid = document.getElementById('track-media')
+        if (vid) {
+            audio = vid
+            audio.addEventListener('loadedmetadata', () => {
+                document.getElementById('time-dur').textContent = fmt(audio.duration)
+                drawWaveform()
+            })
+            audio.addEventListener('timeupdate', onTimeUpdate)
+            audio.addEventListener('ended', () => {
+                if (isRepeat) { audio.currentTime = 0; audio.play() }
+                else { document.getElementById('btn-play').textContent = '▶'; isPlaying = false }
+            })
+        }
+    } else {
+        // Для аудио — используем глобальный MurinoFM плеер + локальный Audio для визуализатора
+        audio = new Audio(track.file_url)
+        audio.crossOrigin = 'anonymous'
+        audio.volume = 0.8
+        audio.addEventListener('loadedmetadata', () => {
+            document.getElementById('time-dur').textContent = fmt(audio.duration)
+            drawWaveform()
+        })
+        audio.addEventListener('timeupdate', onTimeUpdate)
+        audio.addEventListener('ended', () => {
+            if (isRepeat) { audio.currentTime = 0; audio.play() }
+            else { document.getElementById('btn-play').textContent = '▶'; isPlaying = false; stopVisualizer() }
+        })
+        // Также запускаем в глобальном плеере
+        MurinoFM.play(track)
+    }
 }
 
 function togglePlay() {
