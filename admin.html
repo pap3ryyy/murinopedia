@@ -149,7 +149,7 @@ async function init() {
     if (!session) return showDenied('Нрт идентификации')
 
     const { data: user } = await supabaseClient.from('users').select('*').eq('id', session.user.id).single()
-    if (!user || !['м.с.в.основательность', 'м.с.в.содрунник'].includes(user.role)) return showDenied('Доступ только дляч М.С.В.')
+    if (!user || !['м.с.в.основательность', 'м.с.в.содрунник', 'м.с.в.проверкость'].includes(user.role)) return showDenied('Доступ только дляч М.С.В.')
 
     adminUser = user.username
     adminUserId = user.id
@@ -819,7 +819,6 @@ async function deleteFmTrack(id) {
     loadFmPending()
 }
 
-
-
+</script>
 </body>
 </html>
