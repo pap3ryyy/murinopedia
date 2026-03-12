@@ -267,7 +267,21 @@ async function init() {
     loadRelated()
     loadComments()
 
-    await supabaseClient.from('tracks').update({ plays_count: (t.plays_count || 0) + 1 }).eq('id', trackId)
+    if (currentUser) {
+        const { data: existingPlay } = await supabaseClient.from('track_views')
+            .select('track_id').eq('track_id', trackId).eq('user_id', session.user.id).maybeSingle()
+        if (!existingPlay) {
+            await supabaseClient.from('track_views').insert({ track_id: trackId, user_id: session.user.id })
+            await supabaseClient.from('tracks').update({ plays_count: (t.plays_count || 0) + 1 }).eq('id', trackId)
+        }
+    } else {
+        // Гость — считаем по сессии через sessionStorage
+        const key = 'played_' + trackId
+        if (!sessionStorage.getItem(key)) {
+            sessionStorage.setItem(key, '1')
+            await supabaseClient.from('tracks').update({ plays_count: (t.plays_count || 0) + 1 }).eq('id', trackId)
+        }
+    }
 }
 
 function renderPage() {

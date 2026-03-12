@@ -81,7 +81,7 @@
 <script src="js/config.js"></script>
 <script src="js/ban_check.js"></script>
 <script src="js/theme.js"></script>
-<script src="js/player.js"></script><script>
+<script>
 let currentUser = null, fileType = null, isMp4 = false
 
 function safe(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
@@ -144,7 +144,7 @@ function renderForm() {
         <div class="watermark-row" id="watermark-row">
             <div class="checkbox-row">
                 <input type="checkbox" id="trim-wm">
-                <label for="trim-wm">Скачано с водяным знаком TikTok — обрезать последние 5 секунд</label>
+                <label for="trim-wm">Скачано с водяным знаком TikTok — МСВ обрежет последние 5 секунд при проверке</label>
             </div>
         </div>
         <div style="display:flex;gap:10px;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid #eaecf0;">
