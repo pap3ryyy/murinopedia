@@ -7,271 +7,145 @@
     <title>Трек — Мурино FM</title>
     <link rel="stylesheet" href="css/wiki.css">
     <style>
-        /* ── Particles & Glow Effects ── */
-        .track-stage {
-            background: #0d0d14;
-            border: 1px solid #3366cc;
-            padding: 0;
-            margin-bottom: 18px;
-            position: relative;
-            overflow: hidden;
-        }
-        .track-stage::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse at 50% 100%, rgba(51,102,204,0.15) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 1;
-            transition: opacity 0.5s;
-        }
-        .track-stage.playing::before {
-            animation: stagePulse 2s ease-in-out infinite;
-        }
-        @keyframes stagePulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-        #particles-canvas {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 2;
-        }
-        .track-stage canvas {
-            display: block;
-            width: 100%;
-            height: 160px;
-            position: relative;
-            z-index: 3;
-        }
-        .track-video-wrap {
-            position: relative;
-            background: #000;
-        }
-        .track-video-wrap video {
-            width: 100%;
-            max-height: 320px;
-            display: block;
-        }
+    /* Visualizer stage - вики размер */
+    .track-stage {
+        background: #0d0d14;
+        border: 1px solid #a2a9b1;
+        position: relative;
+        overflow: hidden;
+    }
+    .track-stage canvas { display: block; width: 100%; }
+    #particles-canvas {
+        position: absolute; top: 0; left: 0;
+        width: 100%; height: 100%;
+        pointer-events: none; z-index: 2;
+    }
+    #visualizer-canvas { position: relative; z-index: 3; }
+    .waveform-wrap {
+        position: relative; height: 34px;
+        background: #0d0d14; cursor: pointer; z-index: 4;
+    }
+    .wf-marker {
+        position: absolute; top: 0; bottom: 0;
+        width: 2px; background: rgba(255,200,0,0.7);
+        pointer-events: none; cursor: pointer;
+    }
+    .wf-marker:hover::after {
+        content: attr(title);
+        position: absolute; top: -20px; left: 50%;
+        transform: translateX(-50%);
+        background: #1a1a2e; color: #ffd700;
+        font-size: 0.7em; padding: 1px 4px;
+        white-space: nowrap;
+    }
 
-        /* ── Glow ring around play button ── */
-        .ctrl-play {
-            width: 36px; height: 36px;
-            background: #3366cc; border: none; border-radius: 50%;
-            color: #fff; font-size: 1em; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            position: relative;
-            transition: transform 0.15s;
-        }
-        .ctrl-play::after {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: 50%;
-            border: 2px solid rgba(51,102,204,0);
-            transition: border-color 0.3s, transform 0.3s;
-        }
-        .ctrl-play.playing::after {
-            border-color: rgba(51,102,204,0.6);
-            animation: ringPulse 1.5s ease-in-out infinite;
-        }
-        @keyframes ringPulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.3); opacity: 0; }
-        }
-        .ctrl-play:hover { background: #2a4b8d; transform: scale(1.08); }
+    /* Плеер-контролы — темная полоска */
+    .track-controls {
+        background: #111118;
+        padding: 8px 12px;
+        display: flex; align-items: center; gap: 10px;
+        border-top: 1px solid #1e1e2e;
+        position: relative; z-index: 4;
+    }
+    .ctrl-btn {
+        background: none; border: none; color: #e4e4e7;
+        cursor: pointer; padding: 0; line-height: 1;
+        transition: color 0.15s;
+    }
+    .ctrl-btn:hover { color: #3366cc; }
+    .ctrl-play {
+        width: 30px; height: 30px;
+        background: #3366cc; border: none; border-radius: 50%;
+        color: #fff; font-size: 0.9em; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; transition: transform 0.15s;
+        position: relative;
+    }
+    .ctrl-play::after {
+        content: '';
+        position: absolute; inset: -4px; border-radius: 50%;
+        border: 2px solid transparent; transition: all 0.3s;
+    }
+    .ctrl-play.playing::after {
+        border-color: rgba(51,102,204,0.5);
+        animation: ringPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes ringPulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.4); opacity: 0; }
+    }
+    .ctrl-play:hover { background: #2a4b8d; transform: scale(1.08); }
+    .progress-wrap {
+        flex: 1; height: 3px; background: #2a2a3a;
+        cursor: pointer; border-radius: 2px; position: relative;
+    }
+    .progress-wrap:hover { height: 5px; }
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #3366cc, #7aa7f7);
+        border-radius: 2px; width: 0%;
+        box-shadow: 0 0 5px rgba(51,102,204,0.6);
+    }
+    .time-label { font-size: 0.75em; color: #a1a1aa; white-space: nowrap; min-width: 30px; }
+    .vol-wrap { display: flex; align-items: center; gap: 4px; }
+    .vol-wrap span { color: #a1a1aa; font-size: 0.85em; }
+    .vol-wrap input { width: 55px; cursor: pointer; }
 
-        /* ── Player controls ── */
-        .track-controls {
-            background: #111118;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-top: 1px solid #1e1e2e;
-            position: relative;
-            z-index: 4;
-        }
-        .ctrl-btn {
-            background: none; border: none; color: #e4e4e7;
-            font-size: 1.3em; cursor: pointer; padding: 0;
-            line-height: 1;
-            transition: color 0.15s;
-        }
-        .ctrl-btn:hover { color: #3366cc; }
-        .ctrl-btn.active { color: #3366cc; }
-        .progress-wrap {
-            flex: 1; height: 4px; background: #2a2a3a;
-            cursor: pointer; border-radius: 2px; position: relative;
-        }
-        .progress-wrap:hover { height: 6px; margin: -1px 0; }
-        .progress-fill {
-            height: 100%; background: linear-gradient(90deg, #3366cc, #66aaff);
-            border-radius: 2px; width: 0%;
-            pointer-events: none;
-            transition: width 0.1s linear;
-            box-shadow: 0 0 6px rgba(51,102,204,0.5);
-        }
-        .progress-marker {
-            position: absolute; top: -6px;
-            width: 2px; height: 16px;
-            background: rgba(255,200,0,0.7);
-            transform: translateX(-50%);
-            pointer-events: none;
-        }
-        .time-label { font-size: 0.78em; color: #a1a1aa; white-space: nowrap; min-width: 32px; }
-        .vol-wrap { display: flex; align-items: center; gap: 5px; }
-        .vol-wrap span { color: #a1a1aa; font-size: 0.9em; }
-        .vol-wrap input { width: 60px; cursor: pointer; }
+    /* Лайк кнопка */
+    .track-like-btn {
+        border: 1px solid #a2a9b1; background: #f8f9fa;
+        padding: 3px 10px; cursor: pointer; font-size: 0.85em;
+        color: #54595d; transition: all 0.2s;
+    }
+    .track-like-btn.liked { border-color: #d33; color: #d33; background: #fff0f0; }
+    .track-like-btn:hover { transform: scale(1.05); }
+    .track-like-btn:active { transform: scale(0.95); }
 
-        /* ── Track info with subtle glow border when playing ── */
-        .track-info-block {
-            background: #fff;
-            border: 1px solid #a2a9b1;
-            padding: 14px 16px;
-            margin-bottom: 16px;
-            transition: border-color 0.5s, box-shadow 0.5s;
-        }
-        .track-info-block.playing {
-            border-color: #3366cc;
-            box-shadow: 0 0 12px rgba(51,102,204,0.12);
-        }
-        .track-info-block h1 {
-            font-family: serif;
-            font-size: 1.6em;
-            font-weight: normal;
-            margin: 0 0 6px 0;
-            border-bottom: 1px solid #eaecf0;
-            padding-bottom: 8px;
-        }
-        .track-info-row { font-size: 0.88em; color: #54595d; margin: 4px 0; }
-        .track-info-row b { color: #202122; }
-        .track-badge { font-size: 0.78em; background: #eaf0fb; color: #3366cc; padding: 2px 7px; border-radius: 2px; }
-        .track-like-btn {
-            border: 1px solid #a2a9b1; background: #f8f9fa;
-            padding: 4px 12px; cursor: pointer; font-size: 0.88em;
-            color: #54595d; margin-top: 8px;
-            transition: all 0.2s;
-        }
-        .track-like-btn.liked { border-color: #d33; color: #d33; background: #fff0f0; }
-        .track-like-btn:hover { background: #eaf0fb; transform: scale(1.04); }
-        .track-like-btn:active { transform: scale(0.96); }
+    /* Эквалайзер у заголовка */
+    .eq-bars {
+        display: none; align-items: flex-end;
+        gap: 2px; height: 18px; margin-left: 8px; vertical-align: middle;
+    }
+    .eq-bars.active { display: inline-flex; }
+    .eq-bars span {
+        width: 3px; background: #3366cc; border-radius: 1px;
+        animation: eqAnim 0.7s ease-in-out infinite alternate;
+    }
+    .eq-bars span:nth-child(2) { animation-delay: 0.15s; }
+    .eq-bars span:nth-child(3) { animation-delay: 0.3s; }
+    .eq-bars span:nth-child(4) { animation-delay: 0.1s; }
+    @keyframes eqAnim { from { height: 3px; } to { height: 16px; } }
 
-        /* ── Equalizer bars next to title when playing ── */
-        .eq-bars {
-            display: none;
-            align-items: flex-end;
-            gap: 2px;
-            height: 18px;
-            margin-left: 8px;
-            vertical-align: middle;
-        }
-        .eq-bars.active { display: inline-flex; }
-        .eq-bars span {
-            width: 3px;
-            background: #3366cc;
-            border-radius: 1px;
-            animation: eqAnim 0.7s ease-in-out infinite alternate;
-        }
-        .eq-bars span:nth-child(2) { animation-delay: 0.15s; }
-        .eq-bars span:nth-child(3) { animation-delay: 0.3s; }
-        .eq-bars span:nth-child(4) { animation-delay: 0.1s; }
-        @keyframes eqAnim {
-            from { height: 3px; }
-            to { height: 16px; }
-        }
+    /* Комментарий-пузырь */
+    .tc-bubble {
+        position: absolute;
+        background: rgba(51,102,204,0.1);
+        border: 1px solid #3366cc;
+        border-radius: 3px; padding: 2px 7px;
+        font-size: 0.78em; color: #202122;
+        white-space: nowrap; pointer-events: none; top: 2px;
+        animation: tcfade 4s ease forwards;
+    }
+    @keyframes tcfade {
+        0% { opacity: 0; transform: translateY(4px); }
+        10% { opacity: 1; transform: translateY(0); }
+        80% { opacity: 1; } 100% { opacity: 0; }
+    }
+    .tc-list { max-height: 160px; overflow-y: auto; }
+    .tc-item { padding: 5px 0; border-bottom: 1px solid #eaecf0; font-size: 0.86em; }
+    .tc-item:last-child { border-bottom: none; }
+    .tc-ts {
+        display: inline-block; background: #eaf0fb; color: #3366cc;
+        padding: 1px 5px; font-size: 0.8em; border-radius: 2px;
+        cursor: pointer; margin-right: 4px; font-family: monospace;
+    }
+    .tc-ts:hover { background: #3366cc; color: #fff; }
+    .tc-author { font-weight: bold; margin-right: 4px; }
 
-        /* ── Timed comments ── */
-        .tcomments {
-            background: #fff;
-            border: 1px solid #a2a9b1;
-            padding: 14px 16px;
-            margin-bottom: 16px;
-        }
-        .tcomments h3 {
-            font-family: serif; font-weight: normal; font-size: 1.1em;
-            border-bottom: 1px solid #eaecf0; padding-bottom: 6px; margin: 0 0 10px 0;
-        }
-        .tc-stream {
-            min-height: 40px;
-            position: relative;
-            overflow: hidden;
-        }
-        .tc-bubble {
-            position: absolute;
-            background: rgba(51,102,204,0.12);
-            border: 1px solid #3366cc;
-            border-radius: 3px;
-            padding: 3px 8px;
-            font-size: 0.8em;
-            color: #202122;
-            white-space: nowrap;
-            pointer-events: none;
-            top: 4px;
-            animation: tcfade 4s ease forwards;
-        }
-        @keyframes tcfade {
-            0% { opacity: 0; transform: translateY(4px); }
-            10% { opacity: 1; transform: translateY(0); }
-            80% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-        .tc-list { max-height: 180px; overflow-y: auto; margin-top: 10px; }
-        .tc-item {
-            padding: 6px 0;
-            border-bottom: 1px solid #eaecf0;
-            font-size: 0.86em;
-        }
-        .tc-item:last-child { border-bottom: none; }
-        .tc-ts {
-            display: inline-block; background: #eaf0fb; color: #3366cc;
-            padding: 1px 5px; font-size: 0.82em; border-radius: 2px;
-            cursor: pointer; margin-right: 5px; font-family: monospace;
-        }
-        .tc-ts:hover { background: #3366cc; color: #fff; }
-        .tc-author { font-weight: bold; margin-right: 4px; }
-        .tc-input-row { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
-        .tc-input-row input {
-            flex: 1; padding: 5px 9px; border: 1px solid #a2a9b1;
-            font-size: 0.86em; background: #f8f9fa; outline: none;
-        }
-        .tc-input-row input:focus { border-color: #3366cc; background: #fff; }
-        .tc-hint { font-size: 0.76em; color: #a2a9b1; margin-top: 3px; }
-
-        /* ── Waveform markers ── */
-        .waveform-wrap {
-            position: relative; height: 40px;
-            background: #0d0d14; cursor: pointer;
-            z-index: 4;
-        }
-        .wf-canvas { display: block; width: 100%; height: 40px; }
-        .wf-marker {
-            position: absolute; top: 0; bottom: 0;
-            width: 2px; background: rgba(255,200,0,0.6);
-            pointer-events: none;
-        }
-        .wf-marker-tip {
-            position: absolute; top: -20px; left: 50%;
-            transform: translateX(-50%);
-            background: #1a1a2e; color: #ffd700;
-            font-size: 0.7em; padding: 1px 4px; border-radius: 2px;
-            white-space: nowrap;
-        }
-
-        body.dark .track-info-block { background: #1c1c1f; border-color: #3f3f46; }
-        body.dark .track-info-block h1 { border-bottom-color: #3f3f46; }
-        body.dark .track-info-row { color: #a1a1aa; }
-        body.dark .track-info-row b { color: #e4e4e7; }
-        body.dark .tcomments { background: #1c1c1f; border-color: #3f3f46; }
-        body.dark .tcomments h3 { border-bottom-color: #3f3f46; }
-        body.dark .tc-item { border-bottom-color: #3f3f46; }
-        body.dark .tc-bubble { background: rgba(51,102,204,0.2); color: #e4e4e7; }
-        body.dark .tc-input-row input { background: #27272a; border-color: #3f3f46; color: #e4e4e7; }
-        body.dark .tc-input-row input:focus { border-color: #3366cc; background: #1c1c1f; }
-        body.dark .track-info-block.playing { box-shadow: 0 0 16px rgba(51,102,204,0.2); }
-    </style>
+    body.dark .track-stage { border-color: #3f3f46; }
+    body.dark .tc-item { border-bottom-color: #3f3f46; }
+    body.dark .tc-bubble { color: #e4e4e7; }
+</style>
 </head>
 <body>
 <header>
@@ -370,66 +244,93 @@ async function init() {
 function renderPage() {
     const isVideo = track.file_type === 'video/mp4'
     document.getElementById('main-content').innerHTML = `
-        <div class="track-stage" id="track-stage">
-            <canvas id="particles-canvas"></canvas>
-            ${isVideo ? `
-                <div class="track-video-wrap">
-                    <video id="track-media" src="${track.file_url}" controls preload="auto" style="width:100%;max-height:320px;display:block;" onclick="togglePlay()"></video>
-                </div>
-            ` : `
-                <canvas id="visualizer-canvas" height="160"></canvas>
-            `}
-            <div class="waveform-wrap" id="wf-wrap">
-                <canvas id="wf-canvas" height="40"></canvas>
+        <h1 style="font-family:serif;font-weight:normal;font-size:1.9em;border-bottom:1px solid #a2a9b1;padding-bottom:6px;margin-bottom:14px;">
+            ${safe(track.title)}
+            <span class="eq-bars" id="eq-bars"><span></span><span></span><span></span><span></span></span>
+        </h1>
+
+        <table class="article-infobox" style="float:right;clear:right;margin:0 0 16px 20px;width:220px;">
+            <tr><th colspan="2" style="text-align:center;font-family:serif;font-size:1em;font-weight:normal;padding:8px;background:#eaecf0;">
+                ${isVideo ? '🎬 Видео-мешап' : '🎵 Аудио-трек'}
+            </th></tr>
+            <tr><td style="padding:4px 8px;font-size:0.82em;color:#54595d;white-space:nowrap;">Автор</td><td style="padding:4px 8px;font-size:0.85em;"><b>@${safe(track.author)}</b></td></tr>
+            ${track.mashup_source ? `<tr><td style="padding:4px 8px;font-size:0.82em;color:#54595d;">Оригинал</td><td style="padding:4px 8px;font-size:0.85em;">${safe(track.mashup_source)}</td></tr>` : ''}
+            <tr><td style="padding:4px 8px;font-size:0.82em;color:#54595d;">Загружено</td><td style="padding:4px 8px;font-size:0.85em;">${safe(track.uploaded_by)}</td></tr>
+            <tr><td style="padding:4px 8px;font-size:0.82em;color:#54595d;">Дата</td><td style="padding:4px 8px;font-size:0.85em;">${new Date(track.created_at).toLocaleDateString('ru-RU')}</td></tr>
+            <tr><td style="padding:4px 8px;font-size:0.82em;color:#54595d;">Прослушиваний</td><td style="padding:4px 8px;font-size:0.85em;"><span id="plays-count">${track.plays_count || 0}</span></td></tr>
+            <tr><td colspan="2" style="padding:6px 8px;text-align:center;border-top:1px solid #a2a9b1;">
+                <button class="track-like-btn ${liked ? 'liked' : ''}" id="like-btn" onclick="toggleLike()">♥ <span id="like-count">${track.likes_count || 0}</span></button>
+            </td></tr>
+        </table>
+
+        ${isVideo ? `
+            <div style="margin-bottom:14px;">
+                <video id="track-media" src="${track.file_url}" controls preload="auto"
+                    style="width:100%;max-width:560px;display:block;border:1px solid #a2a9b1;">
+                </video>
             </div>
-            <div class="track-controls">
-                <button class="ctrl-btn" id="btn-repeat" onclick="toggleRepeat()" title="Повтор">🔁</button>
-                <button class="ctrl-play" id="btn-play" onclick="togglePlay()">▶</button>
-                <span class="time-label" id="time-cur">0:00</span>
-                <div class="progress-wrap" id="progress-wrap" onclick="seekClick(event)">
-                    <div class="progress-fill" id="progress-fill"></div>
+        ` : `
+            <div id="track-stage" class="track-stage" style="margin-bottom:14px;max-width:560px;">
+                <canvas id="particles-canvas"></canvas>
+                <canvas id="visualizer-canvas" height="130"></canvas>
+                <div class="waveform-wrap" id="wf-wrap" onclick="seekWf(event)">
+                    <canvas id="wf-canvas" height="34"></canvas>
                 </div>
-                <span class="time-label" id="time-dur">0:00</span>
-                <div class="vol-wrap">
-                    <span>🔊</span>
-                    <input type="range" min="0" max="1" step="0.05" value="0.8" oninput="setVol(this.value)">
+                <div class="track-controls">
+                    <button class="ctrl-play" id="btn-play" onclick="togglePlay()">▶</button>
+                    <span class="time-label" id="time-cur">0:00</span>
+                    <div class="progress-wrap" id="progress-wrap" onclick="seekClick(event)">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <span class="time-label" id="time-dur">0:00</span>
+                    <button class="ctrl-btn" id="btn-repeat" onclick="toggleRepeat()" title="Повтор" style="font-size:1em;">🔁</button>
+                    <div class="vol-wrap"><span>🔊</span><input type="range" min="0" max="1" step="0.05" value="0.8" oninput="setVol(this.value)"></div>
                 </div>
+            </div>
+        `}
+
+        <p style="font-size:0.9em;line-height:1.6;clear:none;">
+            <b>${safe(track.title)}</b> — ${track.mashup_source ? `мешап на основе трека «${safe(track.mashup_source)}»` : 'трек'}, загруженный в Архив Звука Мурино FM пользователем
+            <a href="#" style="color:#0645ad;">${safe(track.uploaded_by)}</a>.
+            Автор оригинала: <a href="#" style="color:#0645ad;">@${safe(track.author)}</a>.
+        </p>
+
+        <div style="clear:both;"></div>
+
+        <div class="sidebar-box" style="margin-top:16px;">
+            <div class="sidebar-box-title">Комментарии к моментам</div>
+            <div style="padding:8px;">
+                <div style="font-size:0.78em;color:#a2a9b1;margin-bottom:6px;">Нажми на таймкод — перемотает к этому моменту.</div>
+                <div id="tc-stream" style="height:28px;position:relative;overflow:hidden;margin-bottom:4px;"></div>
+                <div class="tc-list" id="tc-list"><p style="color:#a2a9b1;font-size:0.85em;margin:0;">Нрт комментариев</p></div>
+                ${currentUser ? `
+                <div style="display:flex;gap:8px;margin-top:10px;">
+                    <input type="text" id="tc-input" placeholder="Комментарий к моменту..." maxlength="200"
+                        onkeydown="if(event.key==='Enter')sendComment()"
+                        style="flex:1;padding:5px 9px;border:1px solid #a2a9b1;font-size:0.86em;background:#f8f9fa;outline:none;">
+                    <button class="btn btn-primary" style="font-size:0.82em;padding:4px 12px;" onclick="sendComment()">→</button>
+                </div>
+                <div style="font-size:0.76em;color:#a2a9b1;margin-top:3px;">Комментарий прикрепится к текущей позиции трека</div>
+                ` : `<div style="font-size:0.85em;color:#54595d;margin-top:6px;"><a href="login.html" style="color:#0645ad;">Войди</a> чтобы комментировать</div>`}
             </div>
         </div>
 
-        <div class="track-info-block" id="track-info-block">
-            <h1>
-                ${safe(track.title)}
-                <span class="eq-bars" id="eq-bars"><span></span><span></span><span></span><span></span></span>
-            </h1>
-            <div class="track-info-row">Автор: <b>@${safe(track.author)}</b></div>
-            ${track.mashup_source ? `<div class="track-info-row">Оригинал: <b>${safe(track.mashup_source)}</b> &nbsp;<span class="track-badge">Мешап</span></div>` : ''}
-            <div class="track-info-row">Загружено: <b>${safe(track.uploaded_by)}</b> · ${new Date(track.created_at).toLocaleDateString('ru-RU')}</div>
-            <div class="track-info-row">Прослушиваний: <b>${track.plays_count || 0}</b></div>
-            <button class="track-like-btn ${liked ? 'liked' : ''}" id="like-btn" onclick="toggleLike()">
-                ♥ <span id="like-count">${track.likes_count || 0}</span>
-            </button>
-            &nbsp;&nbsp;<a href="music.html" style="font-size:0.85em;color:#0645ad;">← Все треки</a>
-        </div>
-
-        <div class="tcomments">
-            <h3>Комментарии к треку</h3>
-            <div style="font-size:0.78em;color:#a2a9b1;margin-bottom:8px;">Нажми на таймкод чтобы перемотать. Комментарий привязывается к текущей позиции трека.</div>
-            <div class="tc-stream" id="tc-stream" style="height:32px;"></div>
-            <div class="tc-list" id="tc-list"><p style="color:#a2a9b1;font-size:0.85em;">Нрт комментариев</p></div>
-            ${currentUser ? `
-            <div class="tc-input-row">
-                <input type="text" id="tc-input" placeholder="Оставить комментарий..." maxlength="200" onkeydown="if(event.key==='Enter')sendComment()">
-                <button class="btn btn-primary" style="font-size:0.82em;padding:4px 12px;" onclick="sendComment()">→</button>
-            </div>
-            <div class="tc-hint">Комментарий прикрепится к текущей позиции трека</div>
-            ` : `<div style="font-size:0.85em;color:#54595d;margin-top:8px;"><a href="login.html" style="color:#0645ad;">Войди</a> чтобы оставить комментарий</div>`}
+        <div style="margin-top:10px;font-size:0.85em;">
+            <a href="music.html" style="color:#0645ad;">← Все треки Мурино FM</a>
         </div>
     `
 
-    setupAudio()
+    if (!isVideo) {
+        setupAudio()
+    } else {
+        audio = document.getElementById('track-media')
+        if (audio) {
+            audio.addEventListener('play', () => setPlayingState(true))
+            audio.addEventListener('pause', () => setPlayingState(false))
+            audio.addEventListener('ended', () => { setPlayingState(false); if (isRepeat) { audio.currentTime = 0; audio.play() } })
+        }
+    }
 }
-
 function setupAudio() {
     const isVideo = track.file_type === 'video/mp4'
 
@@ -488,6 +389,12 @@ function togglePlay() {
 function toggleRepeat() {
     isRepeat = !isRepeat
     document.getElementById('btn-repeat').style.color = isRepeat ? '#3366cc' : ''
+}
+
+function seekWf(e) {
+    if (!audio || !audio.duration) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration
 }
 
 function seekClick(e) {
