@@ -146,18 +146,55 @@
             padding: 20px 0;
         }
 
-        
         .article-card-pinned {
-        border-color: #3366cc !important;
-        background: #f0f4ff !important;
-    }
-    .pin-badge {
-        font-size: 0.75em;
-        color: #3366cc;
-        margin-bottom: 4px;
-        font-weight: bold;
-    }
-</style>
+            border-color: #3366cc !important;
+            background: #f0f4ff !important;
+        }
+
+        .pin-badge {
+            font-size: 0.75em;
+            color: #3366cc;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+
+        .season-sub-badge {
+            display: inline-block;
+            font-size: 0.75em;
+            color: #14866d;
+            background: #d4f5e9;
+            border: 1px solid #14866d;
+            border-radius: 2px;
+            padding: 1px 6px;
+            margin-left: 4px;
+            vertical-align: middle;
+            font-weight: normal;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        /* Подфильтр сезонности */
+        .season-subfilter {
+            display: none;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: -8px;
+            margin-bottom: 14px;
+            padding: 8px 12px;
+            background: #f0f4ff;
+            border: 1px solid #cee0f2;
+            border-radius: 2px;
+        }
+
+        .season-subfilter.visible { display: flex; }
+
+        .season-subfilter span {
+            font-size: 0.8em;
+            color: #54595d;
+            align-self: center;
+            margin-right: 4px;
+        }
+    </style>
 </head>
 <body>
 
@@ -184,13 +221,26 @@
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
             <div class="filter-bar" style="margin-bottom:0;">
                 <button class="filter-btn active" onclick="setFilter('all', this)">Всч</button>
-            <button class="filter-btn" onclick="setFilter('Локация', this)">Локации</button>
-            <button class="filter-btn" onclick="setFilter('Сущность', this)">Сущности</button>
-            <button class="filter-btn" onclick="setFilter('История', this)">История</button>
-            <button class="filter-btn" onclick="setFilter('Язык', this)">Язык</button>
+                <button class="filter-btn" onclick="setFilter('Локация', this)">Локации</button>
+                <button class="filter-btn" onclick="setFilter('Сущность', this)">Сущности</button>
+                <button class="filter-btn" onclick="setFilter('История', this)">История</button>
+                <button class="filter-btn" onclick="setFilter('Язык', this)">Язык</button>
                 <button class="filter-btn" onclick="setFilter('М.С.В.', this)">М.С.В.</button>
+                <button class="filter-btn" onclick="setFilter('Сезонность', this)">Сезонность</button>
             </div>
             <a href="createarticle.html" class="btn btn-primary" id="create-btn" style="display:none;white-space:nowrap;">+ Создати Знань</a>
+        </div>
+
+        <!-- Подфильтр подразделов сезонности -->
+        <div class="season-subfilter" id="season-subfilter">
+            <span>Подраздел:</span>
+            <button class="filter-btn active" onclick="setSeasonSub('all', this)">Всч</button>
+            <button class="filter-btn" onclick="setSeasonSub('Молочное', this)">Молочное</button>
+            <button class="filter-btn" onclick="setSeasonSub('Мурино', this)">Мурино</button>
+            <button class="filter-btn" onclick="setSeasonSub('Банька', this)">Банька</button>
+            <button class="filter-btn" onclick="setSeasonSub('Красноярость', this)">Красноярость</button>
+            <button class="filter-btn" onclick="setSeasonSub('Село', this)">Село</button>
+            <button class="filter-btn" onclick="setSeasonSub('Город', this)">Город</button>
         </div>
 
         <div class="articles-count" id="articles-count"></div>
@@ -213,8 +263,6 @@
     </aside>
 </div>
 
-
-
 <footer>
     Муринопедия — 2026 год. <br>
     Ч илу доной, пока естч светл. Мурино стояти, Фог дрожати.
@@ -233,6 +281,7 @@ function safe(str) {
 
 let allArticles = []
 let currentFilter = 'all'
+let currentSeasonSub = 'all'
 let currentRole = null
 
 async function init() {
@@ -267,7 +316,6 @@ async function loadArticles() {
         }
 
         const { data, error } = await query
-
         if (error) throw error
 
         allArticles = data
@@ -311,18 +359,22 @@ function renderArticles(data) {
 
     const grid = document.createElement('div')
     grid.className = 'articles-grid'
-    // Sort: pinned first
     const sorted = [...data].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0))
 
-    grid.innerHTML = sorted.map(article => `
+    grid.innerHTML = sorted.map(article => {
+        const seasonBadge = article.season
+            ? `<span class="season-sub-badge">${safe(article.season)}</span>`
+            : ''
+        return `
         <a href="article.html?id=${article.id}" class="article-card${article.pinned ? ' article-card-pinned' : ''}">
             ${article.pinned ? '<div class="pin-badge">📌 Закреплено</div>' : ''}
-            <div class="article-card-tag">${safe(article.tag ?? '')}${article.private ? ' &nbsp;<span style="color:#d33;font-size:0.85em;">🔒 Приватное</span>' : ''}</div>
+            <div class="article-card-tag">${safe(article.tag ?? '')}${seasonBadge}${article.private ? ' &nbsp;<span style="color:#d33;font-size:0.85em;">🔒 Приватное</span>' : ''}</div>
             <div class="article-card-title">${safe(article.title)}</div>
             <div class="article-card-desc">${safe(article.description ?? '')}</div>
             <div class="article-card-meta">Автор: ${safe(article.author ?? 'Аноним')}</div>
         </a>
-    `).join('')
+        `
+    }).join('')
 
     container.innerHTML = ''
     container.appendChild(grid)
@@ -339,9 +391,29 @@ function updateStats(data) {
 }
 
 function setFilter(tag, btn) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'))
+    document.querySelectorAll('.filter-bar .filter-btn').forEach(b => b.classList.remove('active'))
     btn.classList.add('active')
     currentFilter = tag
+    currentSeasonSub = 'all'
+
+    // показываем/скрываем подфильтр сезонности
+    const subfilter = document.getElementById('season-subfilter')
+    if (tag === 'Сезонность') {
+        subfilter.classList.add('visible')
+        // сброс подфильтра
+        document.querySelectorAll('#season-subfilter .filter-btn').forEach(b => b.classList.remove('active'))
+        document.querySelector('#season-subfilter .filter-btn').classList.add('active')
+    } else {
+        subfilter.classList.remove('visible')
+    }
+
+    filterArticles()
+}
+
+function setSeasonSub(sub, btn) {
+    document.querySelectorAll('#season-subfilter .filter-btn').forEach(b => b.classList.remove('active'))
+    btn.classList.add('active')
+    currentSeasonSub = sub
     filterArticles()
 }
 
@@ -351,6 +423,10 @@ function filterArticles() {
 
     if (currentFilter !== 'all') {
         filtered = filtered.filter(a => a.tag === currentFilter)
+    }
+
+    if (currentFilter === 'Сезонность' && currentSeasonSub !== 'all') {
+        filtered = filtered.filter(a => a.season === currentSeasonSub)
     }
 
     if (query) {
