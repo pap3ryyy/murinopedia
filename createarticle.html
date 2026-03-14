@@ -265,6 +265,30 @@
         .code-block-textarea { width: 100%; padding: 8px; border: 1px solid #a2a9b1; font-family: monospace; font-size: 0.82em; background: #1e1e2e; color: #cdd6f4; outline: none; resize: vertical; min-height: 120px; line-height: 1.5; box-sizing: border-box; }
         .code-block-textarea:focus { border-color: #3366cc; }
         .code-block-tag { font-family: monospace; font-size: 0.8em; background: #eaecf0; padding: 2px 6px; border-radius: 2px; color: #54595d; }
+
+        /* Сезонность — чипы */
+        .season-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 14px;
+            border: 1px solid #a2a9b1;
+            background: #f8f9fa;
+            font-size: 0.85em;
+            cursor: pointer;
+            border-radius: 2px;
+            color: #202122;
+            user-select: none;
+            transition: background 0.1s, border-color 0.1s;
+        }
+        .season-chip:hover { background: #eaecf0; }
+        .season-chip input[type=radio] { accent-color: #3366cc; }
+        .season-chip:has(input:checked) {
+            background: #cee0f2;
+            border-color: #3366cc;
+            color: #3366cc;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -357,6 +381,24 @@ function renderEditor() {
         </div>
 
         <div class="infobox-section">
+            <h3>Сезонность</h3>
+            <div style="font-size:0.82em;color:#54595d;margin-bottom:10px;">Выбери подраздел или укажи свой</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+                <label class="season-chip"><input type="radio" name="season" value="" checked onchange="onSeasonChange(this)"> Не указывать</label>
+                <label class="season-chip"><input type="radio" name="season" value="Молочное" onchange="onSeasonChange(this)"> Молочное</label>
+                <label class="season-chip"><input type="radio" name="season" value="Мурино" onchange="onSeasonChange(this)"> Мурино</label>
+                <label class="season-chip"><input type="radio" name="season" value="Банька" onchange="onSeasonChange(this)"> Банька</label>
+                <label class="season-chip"><input type="radio" name="season" value="Красноярость" onchange="onSeasonChange(this)"> Красноярость</label>
+                <label class="season-chip"><input type="radio" name="season" value="Село" onchange="onSeasonChange(this)"> Село</label>
+                <label class="season-chip"><input type="radio" name="season" value="Город" onchange="onSeasonChange(this)"> Город</label>
+                <label class="season-chip"><input type="radio" name="season" value="__custom__" onchange="onSeasonChange(this)"> Своё</label>
+            </div>
+            <div id="season-custom-wrap" style="display:none;">
+                <input type="text" class="field-input" id="season-custom" placeholder="Название своего подраздела..." style="max-width:320px;">
+            </div>
+        </div>
+
+        <div class="infobox-section">
             <h3>Инфобокс</h3>
             <div id="infobox-fields"></div>
             <button class="btn btn-secondary" onclick="addInfoboxField()" style="margin-top:8px;">+ Добавить поле</button>
@@ -434,6 +476,21 @@ function renderEditor() {
     `
 
     renderInfoboxFields()
+}
+
+function onSeasonChange(radio) {
+    const wrap = document.getElementById('season-custom-wrap')
+    if (wrap) wrap.style.display = radio.value === '__custom__' ? 'block' : 'none'
+}
+
+function getSeasonValue() {
+    const checked = document.querySelector('input[name="season"]:checked')
+    if (!checked || !checked.value) return null
+    if (checked.value === '__custom__') {
+        const custom = document.getElementById('season-custom')?.value?.trim()
+        return custom || null
+    }
+    return checked.value
 }
 
 function updatePreview(type, url) {
@@ -517,6 +574,7 @@ async function submitArticle() {
     const content = document.getElementById('f-content').value.trim()
     const statusEl = document.getElementById('f-status')
     const status = statusEl ? statusEl.value : 'pending'
+    const season = getSeasonValue()
     const msg = document.getElementById('submit-status')
 
     if (!title) { msg.className = 'status-msg error'; msg.textContent = 'Нрт названия — Фог вч форме'; return }
@@ -535,7 +593,8 @@ async function submitArticle() {
         cover_url: coverUrl || null,
         image_url: contentImageUrl || null,
         infobox: infoboxFields.filter(f => f.label || f.value),
-        code_blocks: codeBlocks.filter(b => b.name && b.content)
+        code_blocks: codeBlocks.filter(b => b.name && b.content),
+        season: season || null
     }).select().single()
 
     if (error) {
