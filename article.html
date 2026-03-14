@@ -424,7 +424,6 @@ function renderHeaderUser() {
     }
 }
 
-
 async function logout() {
     await supabaseClient.auth.signOut()
     window.location.href = 'login.html'
@@ -462,7 +461,6 @@ async function loadArticle() {
         articleLiked = !!alreadyLiked
     }
 
-    
     if (article.author) {
         const { data: aData } = await supabaseClient
             .from('users').select('id, public_id, banner_url, avatar_url, name_color, title')
@@ -510,6 +508,7 @@ function renderMetaInfobox(article) {
             <table class="infobox-table">
                 <tr><td>Автор</td><td>${authorHtml}</td></tr>
                 <tr><td>Категория</td><td>${safe(article.tag ?? '—')}</td></tr>
+                ${article.season ? `<tr><td>Подраздел</td><td>${safe(article.season)}</td></tr>` : ''}
                 <tr><td>Создано</td><td>${created}</td></tr>
                 <tr><td>Проверено</td><td>${reviewed}</td></tr>
                 <tr><td>Статус</td><td>${renderReviewBadge(article)}</td></tr>
@@ -560,7 +559,6 @@ function renderContent(content, imageUrl, codeBlocks) {
         html = html.replace(tag, '<div class="article-codeblock">' + b.content + '</div>')
     })
 
-    
     html = html
         .replace(/~~BQ~~(.+?)~~END~~/g, '<blockquote>$1</blockquote>')
         .replace(/~~H2~~(.+?)~~END~~/g, '<h2>$1</h2>')
@@ -715,7 +713,6 @@ async function loadComments() {
         return
     }
 
-    
     const usernames = [...new Set(data.map(c => c.username))]
     const { data: usersData } = await supabaseClient
         .from('users').select('username, public_id, avatar_url, banner_url, name_color').in('username', usernames)
@@ -795,7 +792,6 @@ async function toggleCommentLike(commentId) {
     } else {
         await supabaseClient.from('likes').insert({ comment_id: commentId, user_id: currentUserId })
         userCommentLikes.add(commentId)
-        
         const { data: cm } = await supabaseClient.from('comments').select('user_id, username').eq('id', commentId).single()
         if (cm) await sendNotif(cm.user_id, 'comment_like', currentUser + ' лайкнул твой комментарий', 'article.html?id=' + articleId)
     }
@@ -821,13 +817,10 @@ async function submitComment(parentId) {
         parent_id: parentId || null
     }).select().single()
 
-    
     if (parentId) {
-        
         const { data: parentCm } = await supabaseClient.from('comments').select('user_id, username').eq('id', parentId).single()
         if (parentCm) await sendNotif(parentCm.user_id, 'reply', currentUser + ' ответил на твой комментарий', 'article.html?id=' + articleId)
     } else {
-        
         const { data: art } = await supabaseClient.from('articles').select('author').eq('id', articleId).single()
         if (art) {
             const { data: authorUser } = await supabaseClient.from('users').select('id').eq('username', art.author).single()
@@ -846,20 +839,13 @@ async function submitComment(parentId) {
 }
 
 async function deleteComment(commentId, isOwn = false) {
-    console.log('[deleteComment] id:', commentId, 'isOwn:', isOwn, 'role:', currentRole, 'canDelete:', canDelete(), 'currentUserId:', currentUserId)
-    if (!isOwn && !canDelete()) {
-        console.log('[deleteComment] blocked — no permission')
-        return
-    }
+    if (!isOwn && !canDelete()) return
     if (isOwn) {
-        const { error } = await supabaseClient.from('comments')
+        await supabaseClient.from('comments')
             .update({ content: '[сообщенность удалена]', deleted: true })
             .eq('id', commentId)
-        console.log('[deleteComment] soft delete error:', error)
     } else {
-        const { error } = await supabaseClient.from('comments')
-            .delete().eq('id', commentId)
-        console.log('[deleteComment] hard delete error:', error)
+        await supabaseClient.from('comments').delete().eq('id', commentId)
     }
     await loadComments()
 }
