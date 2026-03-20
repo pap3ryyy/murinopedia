@@ -7,7 +7,6 @@
     <title>Трек — Мурино FM</title>
     <link rel="stylesheet" href="css/wiki.css">
     <style>
-        /* ── Visualizer stage ── */
         .track-stage {
             background: #0d0d14;
             border: 1px solid #3366cc;
@@ -30,8 +29,6 @@
             max-height: 320px;
             display: block;
         }
-
-        /* ── Player controls ── */
         .track-controls {
             background: #111118;
             padding: 12px 16px;
@@ -41,35 +38,59 @@
             border-top: 1px solid #1e1e2e;
         }
         .ctrl-btn {
-            background: none; border: none; color: #e4e4e7;
-            font-size: 1.3em; cursor: pointer; padding: 0;
+            background: none;
+            border: none;
+            color: #e4e4e7;
+            font-size: 1.3em;
+            cursor: pointer;
+            padding: 0;
             line-height: 1;
             transition: color 0.15s;
         }
         .ctrl-btn:hover { color: #3366cc; }
         .ctrl-btn.active { color: #3366cc; }
         .ctrl-play {
-            width: 36px; height: 36px;
-            background: #3366cc; border: none; border-radius: 50%;
-            color: #fff; font-size: 1em; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: #3366cc;
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .ctrl-play:hover { background: #2a4b8d; }
         .progress-wrap {
-            flex: 1; height: 4px; background: #2a2a3a;
-            cursor: pointer; border-radius: 2px; position: relative;
+            flex: 1;
+            height: 4px;
+            background: #2a2a3a;
+            cursor: pointer;
+            border-radius: 2px;
+            position: relative;
         }
         .progress-fill {
-            height: 100%; background: #3366cc;
-            border-radius: 2px; width: 0%;
+            height: 100%;
+            background: #3366cc;
+            border-radius: 2px;
+            width: 0%;
             pointer-events: none;
         }
-        .time-label { font-size: 0.78em; color: #a1a1aa; white-space: nowrap; min-width: 32px; }
-        .vol-wrap { display: flex; align-items: center; gap: 5px; }
+        .time-label {
+            font-size: 0.78em;
+            color: #a1a1aa;
+            white-space: nowrap;
+            min-width: 32px;
+        }
+        .vol-wrap {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
         .vol-wrap span { color: #a1a1aa; font-size: 0.9em; }
         .vol-wrap input { width: 60px; cursor: pointer; }
-
-        /* ── Track info ── */
         .track-info-block {
             background: #fff;
             border: 1px solid #a2a9b1;
@@ -86,16 +107,24 @@
         }
         .track-info-row { font-size: 0.88em; color: #54595d; margin: 4px 0; }
         .track-info-row b { color: #202122; }
-        .track-badge { font-size: 0.78em; background: #eaf0fb; color: #3366cc; padding: 2px 7px; border-radius: 2px; }
+        .track-badge {
+            font-size: 0.78em;
+            background: #eaf0fb;
+            color: #3366cc;
+            padding: 2px 7px;
+            border-radius: 2px;
+        }
         .track-like-btn {
-            border: 1px solid #a2a9b1; background: #f8f9fa;
-            padding: 4px 12px; cursor: pointer; font-size: 0.88em;
-            color: #54595d; margin-top: 8px;
+            border: 1px solid #a2a9b1;
+            background: #f8f9fa;
+            padding: 4px 12px;
+            cursor: pointer;
+            font-size: 0.88em;
+            color: #54595d;
+            margin-top: 8px;
         }
         .track-like-btn.liked { border-color: #d33; color: #d33; background: #fff0f0; }
         .track-like-btn:hover { background: #eaf0fb; }
-
-        /* ── Timed comments ── */
         .tcomments {
             background: #fff;
             border: 1px solid #a2a9b1;
@@ -103,8 +132,12 @@
             margin-bottom: 16px;
         }
         .tcomments h3 {
-            font-family: serif; font-weight: normal; font-size: 1.1em;
-            border-bottom: 1px solid #eaecf0; padding-bottom: 6px; margin: 0 0 10px 0;
+            font-family: serif;
+            font-weight: normal;
+            font-size: 1.1em;
+            border-bottom: 1px solid #eaecf0;
+            padding-bottom: 6px;
+            margin: 0 0 10px 0;
         }
         .tc-stream {
             min-height: 40px;
@@ -138,39 +171,56 @@
         }
         .tc-item:last-child { border-bottom: none; }
         .tc-ts {
-            display: inline-block; background: #eaf0fb; color: #3366cc;
-            padding: 1px 5px; font-size: 0.82em; border-radius: 2px;
-            cursor: pointer; margin-right: 5px; font-family: monospace;
+            display: inline-block;
+            background: #eaf0fb;
+            color: #3366cc;
+            padding: 1px 5px;
+            font-size: 0.82em;
+            border-radius: 2px;
+            cursor: pointer;
+            margin-right: 5px;
+            font-family: monospace;
         }
         .tc-ts:hover { background: #3366cc; color: #fff; }
         .tc-author { font-weight: bold; margin-right: 4px; }
         .tc-input-row { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
         .tc-input-row input {
-            flex: 1; padding: 5px 9px; border: 1px solid #a2a9b1;
-            font-size: 0.86em; background: #f8f9fa; outline: none;
+            flex: 1;
+            padding: 5px 9px;
+            border: 1px solid #a2a9b1;
+            font-size: 0.86em;
+            background: #f8f9fa;
+            outline: none;
         }
         .tc-input-row input:focus { border-color: #3366cc; background: #fff; }
         .tc-hint { font-size: 0.76em; color: #a2a9b1; margin-top: 3px; }
-
-        /* ── Waveform markers ── */
         .waveform-wrap {
-            position: relative; height: 40px;
-            background: #0d0d14; cursor: pointer;
+            position: relative;
+            height: 40px;
+            background: #0d0d14;
+            cursor: pointer;
         }
         .wf-canvas { display: block; width: 100%; height: 40px; }
         .wf-marker {
-            position: absolute; top: 0; bottom: 0;
-            width: 2px; background: rgba(255,200,0,0.6);
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255,200,0,0.6);
             pointer-events: none;
         }
         .wf-marker-tip {
-            position: absolute; top: -20px; left: 50%;
+            position: absolute;
+            top: -20px;
+            left: 50%;
             transform: translateX(-50%);
-            background: #1a1a2e; color: #ffd700;
-            font-size: 0.7em; padding: 1px 4px; border-radius: 2px;
+            background: #1a1a2e;
+            color: #ffd700;
+            font-size: 0.7em;
+            padding: 1px 4px;
+            border-radius: 2px;
             white-space: nowrap;
         }
-
         body.dark .track-info-block { background: #1c1c1f; border-color: #3f3f46; }
         body.dark .track-info-block h1 { border-bottom-color: #3f3f46; }
         body.dark .track-info-row { color: #a1a1aa; }
@@ -221,53 +271,54 @@
 <script src="js/alert.js"></script>
 <script src="js/ban_check.js"></script>
 <script src="js/theme.js"></script>
+<script src="js/player.js"></script>
 <script>
-let currentUser = null, track = null, audio = null, audioCtx = null, analyser = null, animFrame = null
-let isPlaying = false, isRepeat = false, liked = false, comments = []
+let currentUser = null, track = null, audio = null, audioCtx = null, analyser = null, animFrame = null;
+let isPlaying = false, isRepeat = false, liked = false, comments = [];
 
-function safe(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
-function fmt(s){if(!s||isNaN(s))return '0:00';const m=Math.floor(s/60),sc=Math.floor(s%60);return m+':'+(sc<10?'0':'')+sc}
+function safe(s) { if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+function fmt(s) { if(!s||isNaN(s)) return '0:00'; const m=Math.floor(s/60), sc=Math.floor(s%60); return m+':'+(sc<10?'0':'')+sc; }
 
-const params = new URLSearchParams(location.search)
-const trackId = parseInt(params.get('id'))
+const params = new URLSearchParams(location.search);
+const trackId = parseInt(params.get('id'));
 
 async function init() {
-    const { data: { session } } = await supabaseClient.auth.getSession()
+    const { data: { session } } = await supabaseClient.auth.getSession();
     if (session) {
-        const { data: u } = await supabaseClient.from('users').select('username,role,public_id').eq('id', session.user.id).single()
+        const { data: u } = await supabaseClient.from('users').select('username,role,public_id').eq('id', session.user.id).single();
         if (u) {
-            currentUser = u
+            currentUser = u;
             document.getElementById('header-user').innerHTML = `
                 <a href="profile.html?id=${u.public_id}" style="color:#0645ad;font-size:0.85em;">${safe(u.username)}</a>&nbsp;
                 <a href="settings.html" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;font-size:0.85em;color:#202122;text-decoration:none;">Настройки</a>&nbsp;
                 <button onclick="supabaseClient.auth.signOut().then(()=>location.reload())" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;">Выйти</button>
-            `
-            const { data: lk } = await supabaseClient.from('track_likes').select('track_id').eq('track_id', trackId).eq('user_id', session.user.id)
-            liked = !!(lk && lk.length > 0)
+            `;
+            const { data: lk } = await supabaseClient.from('track_likes').select('track_id').eq('track_id', trackId).eq('user_id', session.user.id);
+            liked = !!(lk && lk.length > 0);
         }
     }
 
-    if (!trackId) { document.getElementById('main-content').innerHTML = '<p style="color:#d33;">Трек не найден.</p>'; return }
+    if (!trackId) { document.getElementById('main-content').innerHTML = '<p style="color:#d33;">Трек не найден.</p>'; return; }
 
-    const { data: t } = await supabaseClient.from('tracks').select('*').eq('id', trackId).eq('status', 'published').single()
-    if (!t) { document.getElementById('main-content').innerHTML = '<p style="color:#d33;">Трек не найден или ещё на проверке.</p>'; return }
-    track = t
+    const { data: t } = await supabaseClient.from('tracks').select('*').eq('id', trackId).eq('status', 'published').single();
+    if (!t) { document.getElementById('main-content').innerHTML = '<p style="color:#d33;">Трек не найден или ещё на проверке.</p>'; return; }
+    track = t;
 
-    document.title = `${t.title} — Мурино FM`
-    renderPage()
-    loadRelated()
-    loadComments()
+    document.title = `${t.title} — Мурино FM`;
+    renderPage();
+    loadRelated();
+    loadComments();
 
-    await supabaseClient.from('tracks').update({ plays_count: (t.plays_count || 0) + 1 }).eq('id', trackId)
+    await supabaseClient.from('tracks').update({ plays_count: (t.plays_count || 0) + 1 }).eq('id', trackId);
 }
 
 function renderPage() {
-    const isVideo = track.file_type === 'video/mp4'
+    const isVideo = track.file_type === 'video/mp4';
     document.getElementById('main-content').innerHTML = `
         <div class="track-stage" id="track-stage">
             ${isVideo ? `
                 <div class="track-video-wrap">
-                    <video id="track-media" src="${track.file_url}" preload="auto" style="width:100%;max-height:320px;display:block;" onclick="togglePlay()"></video>
+                    <video id="track-media" src="${track.file_url}" preload="auto" style="width:100%;max-height:320px;display:block;"></video>
                 </div>
             ` : `
                 <canvas id="visualizer-canvas" height="160"></canvas>
@@ -315,64 +366,59 @@ function renderPage() {
             <div class="tc-hint">Комментарий прикрепится к текущей позиции трека</div>
             ` : `<div style="font-size:0.85em;color:#54595d;margin-top:8px;"><a href="login.html" style="color:#0645ad;">Войди</a> чтобы оставить комментарий</div>`}
         </div>
-    `
+    `;
 
-    setupAudio()
+    setupAudio();
 }
 
 function setupAudio() {
-    const isVideo = track.file_type === 'video/mp4'
+    const isVideo = track.file_type === 'video/mp4';
 
     if (isVideo) {
-        const vid = document.getElementById('track-media')
+        const vid = document.getElementById('track-media');
         if (vid) {
-            audio = vid
-            audio.volume = 0.8
+            audio = vid;
+            audio.controls = false;
+            audio.volume = parseFloat(document.querySelector('.vol-wrap input').value);
             audio.addEventListener('loadedmetadata', () => {
-                document.getElementById('time-dur').textContent = fmt(audio.duration)
-                drawWaveform()
-            })
-            audio.addEventListener('timeupdate', onTimeUpdate)
+                document.getElementById('time-dur').textContent = fmt(audio.duration);
+                drawWaveform();
+            });
+            audio.addEventListener('timeupdate', onTimeUpdate);
             audio.addEventListener('ended', () => {
                 if (isRepeat) {
                     audio.currentTime = 0;
-                    audio.play().catch(e => console.warn('repeat play error', e));
+                    audio.play().catch(e => console.warn(e));
                 } else {
                     isPlaying = false;
                     document.getElementById('btn-play').textContent = '▶';
                 }
-            })
-            // Синхронизация громкости
-            const volSlider = document.querySelector('.vol-wrap input');
-            if (volSlider) audio.volume = parseFloat(volSlider.value);
+            });
         }
     } else {
-        audio = new Audio(track.file_url)
-        audio.crossOrigin = 'anonymous'
-        audio.volume = 0.8
+        audio = new Audio(track.file_url);
+        audio.crossOrigin = 'anonymous';
+        audio.volume = parseFloat(document.querySelector('.vol-wrap input').value);
         audio.addEventListener('loadedmetadata', () => {
-            document.getElementById('time-dur').textContent = fmt(audio.duration)
-            drawWaveform()
-        })
-        audio.addEventListener('timeupdate', onTimeUpdate)
+            document.getElementById('time-dur').textContent = fmt(audio.duration);
+            drawWaveform();
+        });
+        audio.addEventListener('timeupdate', onTimeUpdate);
         audio.addEventListener('ended', () => {
             if (isRepeat) {
                 audio.currentTime = 0;
-                audio.play().catch(e => console.warn('repeat play error', e));
+                audio.play().catch(e => console.warn(e));
             } else {
                 isPlaying = false;
                 document.getElementById('btn-play').textContent = '▶';
                 stopVisualizer();
             }
-        })
-        // Синхронизация громкости
-        const volSlider = document.querySelector('.vol-wrap input');
-        if (volSlider) audio.volume = parseFloat(volSlider.value);
+        });
     }
 }
 
 function togglePlay() {
-    if (!audio) return
+    if (!audio) return;
     if (isPlaying) {
         audio.pause();
         isPlaying = false;
@@ -381,10 +427,7 @@ function togglePlay() {
     } else {
         const playPromise = audio.play();
         if (playPromise !== undefined) {
-            playPromise.catch(e => {
-                console.warn('Playback failed', e);
-                // Если автоплей заблокирован — просто игнорируем
-            });
+            playPromise.catch(e => console.warn('play blocked', e));
         }
         isPlaying = true;
         document.getElementById('btn-play').textContent = '⏸';
@@ -396,150 +439,148 @@ function togglePlay() {
 }
 
 function toggleRepeat() {
-    isRepeat = !isRepeat
-    const btn = document.getElementById('btn-repeat')
-    if (btn) btn.style.color = isRepeat ? '#3366cc' : ''
+    isRepeat = !isRepeat;
+    const btn = document.getElementById('btn-repeat');
+    if (btn) btn.style.color = isRepeat ? '#3366cc' : '';
 }
 
 function seekClick(e) {
-    if (!audio || !audio.duration) return
-    const rect = e.currentTarget.getBoundingClientRect()
-    audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration
+    if (!audio || !audio.duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
 }
 
-function setVol(v) { if (audio) audio.volume = parseFloat(v) }
+function setVol(v) {
+    if (audio) audio.volume = parseFloat(v);
+}
 
 function onTimeUpdate() {
-    if (!audio || !audio.duration) return
-    const pct = (audio.currentTime / audio.duration) * 100
-    document.getElementById('progress-fill').style.width = pct + '%'
-    document.getElementById('time-cur').textContent = fmt(audio.currentTime)
-    showTimedComments(audio.currentTime)
+    if (!audio || !audio.duration) return;
+    const pct = (audio.currentTime / audio.duration) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('time-cur').textContent = fmt(audio.currentTime);
+    showTimedComments(audio.currentTime);
 }
 
-// ── Audio Visualizer ──
 function setupVisualizer() {
-    if (track.file_type === 'video/mp4') return
+    if (track.file_type === 'video/mp4') return;
     try {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-        const source = audioCtx.createMediaElementSource(audio)
-        analyser = audioCtx.createAnalyser()
-        analyser.fftSize = 256
-        source.connect(analyser)
-        analyser.connect(audioCtx.destination)
-        // Позволяем audioCtx запускаться после жеста пользователя
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioCtx.createMediaElementSource(audio);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
         audioCtx.resume();
-    } catch(e) { console.warn('Visualizer unavailable', e) }
+    } catch(e) { console.warn(e); }
 }
 
 function startVisualizer() {
-    if (!analyser || track.file_type === 'video/mp4') return
-    const canvas = document.getElementById('visualizer-canvas')
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    const buf = new Uint8Array(analyser.frequencyBinCount)
+    if (!analyser || track.file_type === 'video/mp4') return;
+    const canvas = document.getElementById('visualizer-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const buf = new Uint8Array(analyser.frequencyBinCount);
     function draw() {
-        animFrame = requestAnimationFrame(draw)
-        if (!analyser) return
-        analyser.getByteFrequencyData(buf)
-        const W = canvas.width = canvas.offsetWidth, H = canvas.height = 160
-        ctx.fillStyle = '#0d0d14'
-        ctx.fillRect(0, 0, W, H)
-        const bw = Math.max(2, W / buf.length * 2)
+        animFrame = requestAnimationFrame(draw);
+        if (!analyser) return;
+        analyser.getByteFrequencyData(buf);
+        const W = canvas.width = canvas.offsetWidth;
+        const H = canvas.height = 160;
+        ctx.fillStyle = '#0d0d14';
+        ctx.fillRect(0, 0, W, H);
+        const bw = Math.max(2, W / buf.length * 2);
         for (let i = 0; i < buf.length; i++) {
-            const h = (buf[i] / 255) * H
-            const hue = 220 + (buf[i] / 255) * 60
-            ctx.fillStyle = `hsl(${hue},80%,${40 + (buf[i]/255)*30}%)`
-            ctx.fillRect(i * bw, H - h, Math.max(1, bw-1), h)
+            const h = (buf[i] / 255) * H;
+            const hue = 220 + (buf[i] / 255) * 60;
+            ctx.fillStyle = `hsl(${hue},80%,${40 + (buf[i]/255)*30}%)`;
+            ctx.fillRect(i * bw, H - h, Math.max(1, bw-1), h);
         }
     }
-    draw()
+    draw();
 }
 
 function stopVisualizer() {
-    if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null }
-    const canvas = document.getElementById('visualizer-canvas')
+    if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+    const canvas = document.getElementById('visualizer-canvas');
     if (canvas && canvas.getContext) {
-        const ctx = canvas.getContext('2d')
-        ctx.fillStyle = '#0d0d14'
-        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#0d0d14';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 }
 
 function drawWaveform() {
-    const canvas = document.getElementById('wf-canvas')
-    if (!canvas) return
-    const W = canvas.width = canvas.offsetWidth || 600, H = 40
-    const ctx = canvas.getContext('2d')
-    ctx.fillStyle = '#0d0d14'
-    ctx.fillRect(0, 0, W, H)
-    ctx.strokeStyle = '#2a4b8d'
-    ctx.lineWidth = 1
-    ctx.beginPath()
-    // Простая псевдо‑волна, можно заменить на реальную при наличии данных
+    const canvas = document.getElementById('wf-canvas');
+    if (!canvas) return;
+    const W = canvas.width = canvas.offsetWidth || 600, H = 40;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#0d0d14';
+    ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = '#2a4b8d';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
     for (let x = 0; x < W; x++) {
-        const amp = Math.random() * 0.6 + 0.1
-        const h = amp * H * 0.8
-        ctx.moveTo(x, H/2 - h/2)
-        ctx.lineTo(x, H/2 + h/2)
+        const amp = Math.random() * 0.6 + 0.1;
+        const h = amp * H * 0.8;
+        ctx.moveTo(x, H/2 - h/2);
+        ctx.lineTo(x, H/2 + h/2);
     }
-    ctx.stroke()
-    renderWfMarkers()
+    ctx.stroke();
+    renderWfMarkers();
 }
 
 function renderWfMarkers() {
-    const wrap = document.getElementById('wf-wrap')
-    if (!wrap) return
-    wrap.querySelectorAll('.wf-marker').forEach(m => m.remove())
-    if (!audio || !audio.duration) return
+    const wrap = document.getElementById('wf-wrap');
+    if (!wrap) return;
+    wrap.querySelectorAll('.wf-marker').forEach(m => m.remove());
+    if (!audio || !audio.duration) return;
     comments.filter(c => c.timestamp_sec !== null).forEach(c => {
-        const pct = (c.timestamp_sec / audio.duration) * 100
-        const marker = document.createElement('div')
-        marker.className = 'wf-marker'
-        marker.style.left = pct + '%'
-        marker.title = fmt(c.timestamp_sec) + ' ' + c.username + ': ' + c.content
-        marker.onclick = () => { if(audio) audio.currentTime = c.timestamp_sec }
-        const tip = document.createElement('div')
-        tip.className = 'wf-marker-tip'
-        tip.textContent = fmt(c.timestamp_sec)
-        marker.appendChild(tip)
-        wrap.appendChild(marker)
-    })
+        const pct = (c.timestamp_sec / audio.duration) * 100;
+        const marker = document.createElement('div');
+        marker.className = 'wf-marker';
+        marker.style.left = pct + '%';
+        marker.title = fmt(c.timestamp_sec) + ' ' + c.username + ': ' + c.content;
+        marker.onclick = () => { if(audio) audio.currentTime = c.timestamp_sec; };
+        const tip = document.createElement('div');
+        tip.className = 'wf-marker-tip';
+        tip.textContent = fmt(c.timestamp_sec);
+        marker.appendChild(tip);
+        wrap.appendChild(marker);
+    });
 }
 
-// ── Timed comment popups ──
-let shownComments = new Set()
+let shownComments = new Set();
 function showTimedComments(sec) {
     comments.forEach(c => {
-        if (c.timestamp_sec === null) return
-        if (shownComments.has(c.id)) return
+        if (c.timestamp_sec === null) return;
+        if (shownComments.has(c.id)) return;
         if (Math.abs(c.timestamp_sec - sec) < 0.5) {
-            shownComments.add(c.id)
-            const stream = document.getElementById('tc-stream')
-            if (!stream) return
-            const bubble = document.createElement('div')
-            bubble.className = 'tc-bubble'
-            bubble.style.left = Math.random() * 60 + '%'
-            bubble.textContent = c.username + ': ' + c.content
-            stream.appendChild(bubble)
-            setTimeout(() => bubble.remove(), 4200)
+            shownComments.add(c.id);
+            const stream = document.getElementById('tc-stream');
+            if (!stream) return;
+            const bubble = document.createElement('div');
+            bubble.className = 'tc-bubble';
+            bubble.style.left = Math.random() * 60 + '%';
+            bubble.textContent = c.username + ': ' + c.content;
+            stream.appendChild(bubble);
+            setTimeout(() => bubble.remove(), 4200);
         }
-    })
+    });
 }
 
-// ── Comments ──
 async function loadComments() {
-    const { data } = await supabaseClient.from('track_comments').select('*').eq('track_id', trackId).order('timestamp_sec', { ascending: true, nullsFirst: false })
-    comments = data || []
-    shownComments = new Set()
-    renderComments()
-    renderWfMarkers()
+    const { data } = await supabaseClient.from('track_comments').select('*').eq('track_id', trackId).order('timestamp_sec', { ascending: true, nullsFirst: false });
+    comments = data || [];
+    shownComments = new Set();
+    renderComments();
+    renderWfMarkers();
 }
 
 function renderComments() {
-    const list = document.getElementById('tc-list')
-    if (!list) return
-    if (!comments.length) { list.innerHTML = '<p style="color:#a2a9b1;font-size:0.85em;">Нет комментариев</p>'; return }
+    const list = document.getElementById('tc-list');
+    if (!list) return;
+    if (!comments.length) { list.innerHTML = '<p style="color:#a2a9b1;font-size:0.85em;">Нет комментариев</p>'; return; }
     list.innerHTML = comments.map(c => `
         <div class="tc-item">
             ${c.timestamp_sec !== null ? `<span class="tc-ts" onclick="seekTo(${c.timestamp_sec})">${fmt(c.timestamp_sec)}</span>` : ''}
@@ -547,67 +588,67 @@ function renderComments() {
             ${currentUser && (currentUser.username === c.username || ['м.с.в.содрунник','м.с.в.основательность'].includes(currentUser.role))
                 ? `<span onclick="deleteComment(${c.id})" style="float:right;cursor:pointer;color:#a2a9b1;font-size:0.8em;">✕</span>` : ''}
         </div>
-    `).join('')
+    `).join('');
 }
 
 async function sendComment() {
-    const input = document.getElementById('tc-input')
-    const content = input.value.trim()
-    if (!content || !currentUser) return
-    const { data: { session } } = await supabaseClient.auth.getSession()
-    if (!session) return
-    const tsec = (audio && audio.duration) ? Math.floor(audio.currentTime) : null
+    const input = document.getElementById('tc-input');
+    const content = input.value.trim();
+    if (!content || !currentUser) return;
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) return;
+    const tsec = (audio && audio.duration) ? Math.floor(audio.currentTime) : null;
     await supabaseClient.from('track_comments').insert({
         track_id: trackId, user_id: session.user.id,
         username: currentUser.username, content, timestamp_sec: tsec
-    })
-    input.value = ''
-    loadComments()
+    });
+    input.value = '';
+    loadComments();
 }
 
 async function deleteComment(id) {
-    await supabaseClient.from('track_comments').delete().eq('id', id)
-    loadComments()
+    await supabaseClient.from('track_comments').delete().eq('id', id);
+    loadComments();
 }
 
 function seekTo(sec) {
-    if (!audio) return
-    audio.currentTime = sec
-    if (!isPlaying) togglePlay()
+    if (!audio) return;
+    audio.currentTime = sec;
+    if (!isPlaying) togglePlay();
 }
 
 async function toggleLike() {
-    if (!currentUser) return
-    const { data: { session } } = await supabaseClient.auth.getSession()
-    if (!session) return
-    const btn = document.getElementById('like-btn')
-    const cnt = document.getElementById('like-count')
+    if (!currentUser) return;
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) return;
+    const btn = document.getElementById('like-btn');
+    const cnt = document.getElementById('like-count');
     if (liked) {
-        await supabaseClient.from('track_likes').delete().eq('track_id', trackId).eq('user_id', session.user.id)
-        await supabaseClient.from('tracks').update({ likes_count: Math.max(0, (track.likes_count||0) - 1) }).eq('id', trackId)
-        track.likes_count = Math.max(0, (track.likes_count||0) - 1)
-        liked = false; btn.className = 'track-like-btn'
+        await supabaseClient.from('track_likes').delete().eq('track_id', trackId).eq('user_id', session.user.id);
+        await supabaseClient.from('tracks').update({ likes_count: Math.max(0, (track.likes_count||0) - 1) }).eq('id', trackId);
+        track.likes_count = Math.max(0, (track.likes_count||0) - 1);
+        liked = false; btn.className = 'track-like-btn';
     } else {
-        await supabaseClient.from('track_likes').insert({ track_id: trackId, user_id: session.user.id })
-        await supabaseClient.from('tracks').update({ likes_count: (track.likes_count||0) + 1 }).eq('id', trackId)
-        track.likes_count = (track.likes_count||0) + 1
-        liked = true; btn.className = 'track-like-btn liked'
+        await supabaseClient.from('track_likes').insert({ track_id: trackId, user_id: session.user.id });
+        await supabaseClient.from('tracks').update({ likes_count: (track.likes_count||0) + 1 }).eq('id', trackId);
+        track.likes_count = (track.likes_count||0) + 1;
+        liked = true; btn.className = 'track-like-btn liked';
     }
-    cnt.textContent = track.likes_count
+    cnt.textContent = track.likes_count;
 }
 
 async function loadRelated() {
-    const { data } = await supabaseClient.from('tracks').select('id,title,author').eq('status','published').neq('id', trackId).limit(5)
-    if (!data||!data.length) { document.getElementById('sidebar-related').style.display = 'none'; return }
+    const { data } = await supabaseClient.from('tracks').select('id,title,author').eq('status','published').neq('id', trackId).limit(5);
+    if (!data||!data.length) { document.getElementById('sidebar-related').style.display = 'none'; return; }
     document.getElementById('related-list').innerHTML = data.map(t =>
         `<div style="padding:4px 0;border-bottom:1px solid #eaecf0;font-size:0.85em;">
             <a href="track.html?id=${t.id}" style="color:#0645ad;">${safe(t.title)}</a>
             <div style="color:#a2a9b1;font-size:0.78em;">@${safe(t.author)}</div>
         </div>`
-    ).join('')
+    ).join('');
 }
 
-init()
+init();
 </script>
 </body>
 </html>
