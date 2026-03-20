@@ -64,13 +64,6 @@
             border-radius: 2px; width: 0%;
             pointer-events: none;
         }
-        .progress-marker {
-            position: absolute; top: -6px;
-            width: 2px; height: 16px;
-            background: rgba(255,200,0,0.7);
-            transform: translateX(-50%);
-            pointer-events: none;
-        }
         .time-label { font-size: 0.78em; color: #a1a1aa; white-space: nowrap; min-width: 32px; }
         .vol-wrap { display: flex; align-items: center; gap: 5px; }
         .vol-wrap span { color: #a1a1aa; font-size: 0.9em; }
@@ -201,7 +194,7 @@
 
 <div class="container">
     <div class="main-content" id="main-content">
-        <p style="color:#54595d;">Загружати...</p>
+        <p style="color:#54595d;">Загружаем...</p>
     </div>
     <div class="sidebar">
         <div class="sidebar-box">
@@ -220,7 +213,7 @@
 
 <footer>
     Муринопедия — 2026 год.<br>
-    Ч илу доной, пока естч светл. Мурино стояти, Фог дрожати.
+    Чилу доной, пока есть свет. Мурино стояти, Фог дрожати.
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -228,7 +221,6 @@
 <script src="js/alert.js"></script>
 <script src="js/ban_check.js"></script>
 <script src="js/theme.js"></script>
-<script src="js/player.js"></script>
 <script>
 let currentUser = null, track = null, audio = null, audioCtx = null, analyser = null, animFrame = null
 let isPlaying = false, isRepeat = false, liked = false, comments = []
@@ -250,17 +242,15 @@ async function init() {
                 <a href="settings.html" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;font-size:0.85em;color:#202122;text-decoration:none;">Настройки</a>&nbsp;
                 <button onclick="supabaseClient.auth.signOut().then(()=>location.reload())" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;">Выйти</button>
             `
-            if (session) {
-                const { data: lk } = await supabaseClient.from('track_likes').select('track_id').eq('track_id', trackId).eq('user_id', session.user.id)
-                liked = !!(lk && lk.length > 0)
-            }
+            const { data: lk } = await supabaseClient.from('track_likes').select('track_id').eq('track_id', trackId).eq('user_id', session.user.id)
+            liked = !!(lk && lk.length > 0)
         }
     }
 
-    if (!trackId) { document.getElementById('main-content').innerHTML = '<p style="color:#d33;">Трек не знайдено.</p>'; return }
+    if (!trackId) { document.getElementById('main-content').innerHTML = '<p style="color:#d33;">Трек не найден.</p>'; return }
 
     const { data: t } = await supabaseClient.from('tracks').select('*').eq('id', trackId).eq('status', 'published').single()
-    if (!t) { document.getElementById('main-content').innerHTML = '<p style="color:#d33;">Трек не знайдено или ещё на проверке.</p>'; return }
+    if (!t) { document.getElementById('main-content').innerHTML = '<p style="color:#d33;">Трек не найден или ещё на проверке.</p>'; return }
     track = t
 
     document.title = `${t.title} — Мурино FM`
@@ -277,7 +267,7 @@ function renderPage() {
         <div class="track-stage" id="track-stage">
             ${isVideo ? `
                 <div class="track-video-wrap">
-                    <video id="track-media" src="${track.file_url}" controls preload="auto" style="width:100%;max-height:320px;display:block;" onclick="togglePlay()"></video>
+                    <video id="track-media" src="${track.file_url}" preload="auto" style="width:100%;max-height:320px;display:block;" onclick="togglePlay()"></video>
                 </div>
             ` : `
                 <canvas id="visualizer-canvas" height="160"></canvas>
@@ -316,7 +306,7 @@ function renderPage() {
             <h3>Комментарии к треку</h3>
             <div style="font-size:0.78em;color:#a2a9b1;margin-bottom:8px;">Нажми на таймкод чтобы перемотать. Комментарий привязывается к текущей позиции трека.</div>
             <div class="tc-stream" id="tc-stream" style="height:32px;"></div>
-            <div class="tc-list" id="tc-list"><p style="color:#a2a9b1;font-size:0.85em;">Нрт комментариев</p></div>
+            <div class="tc-list" id="tc-list"><p style="color:#a2a9b1;font-size:0.85em;">Нет комментариев</p></div>
             ${currentUser ? `
             <div class="tc-input-row">
                 <input type="text" id="tc-input" placeholder="Оставить комментарий..." maxlength="200" onkeydown="if(event.key==='Enter')sendComment()">
@@ -334,22 +324,29 @@ function setupAudio() {
     const isVideo = track.file_type === 'video/mp4'
 
     if (isVideo) {
-        // Для видео — показываем встроенный плеер браузера, глобальный FM не используем
         const vid = document.getElementById('track-media')
         if (vid) {
             audio = vid
+            audio.volume = 0.8
             audio.addEventListener('loadedmetadata', () => {
                 document.getElementById('time-dur').textContent = fmt(audio.duration)
                 drawWaveform()
             })
             audio.addEventListener('timeupdate', onTimeUpdate)
             audio.addEventListener('ended', () => {
-                if (isRepeat) { audio.currentTime = 0; audio.play() }
-                else { document.getElementById('btn-play').textContent = '▶'; isPlaying = false }
+                if (isRepeat) {
+                    audio.currentTime = 0;
+                    audio.play().catch(e => console.warn('repeat play error', e));
+                } else {
+                    isPlaying = false;
+                    document.getElementById('btn-play').textContent = '▶';
+                }
             })
+            // Синхронизация громкости
+            const volSlider = document.querySelector('.vol-wrap input');
+            if (volSlider) audio.volume = parseFloat(volSlider.value);
         }
     } else {
-        // Для аудио — используем глобальный MurinoFM плеер + локальный Audio для визуализатора
         audio = new Audio(track.file_url)
         audio.crossOrigin = 'anonymous'
         audio.volume = 0.8
@@ -359,33 +356,49 @@ function setupAudio() {
         })
         audio.addEventListener('timeupdate', onTimeUpdate)
         audio.addEventListener('ended', () => {
-            if (isRepeat) { audio.currentTime = 0; audio.play() }
-            else { document.getElementById('btn-play').textContent = '▶'; isPlaying = false; stopVisualizer() }
+            if (isRepeat) {
+                audio.currentTime = 0;
+                audio.play().catch(e => console.warn('repeat play error', e));
+            } else {
+                isPlaying = false;
+                document.getElementById('btn-play').textContent = '▶';
+                stopVisualizer();
+            }
         })
-        // Также запускаем в глобальном плеере
-        MurinoFM.play(track)
+        // Синхронизация громкости
+        const volSlider = document.querySelector('.vol-wrap input');
+        if (volSlider) audio.volume = parseFloat(volSlider.value);
     }
 }
 
 function togglePlay() {
     if (!audio) return
     if (isPlaying) {
-        audio.pause(); isPlaying = false
-        document.getElementById('btn-play').textContent = '▶'
-        stopVisualizer()
+        audio.pause();
+        isPlaying = false;
+        document.getElementById('btn-play').textContent = '▶';
+        if (track.file_type !== 'video/mp4') stopVisualizer();
     } else {
-        if (!audioCtx && track.file_type !== 'video/mp4') setupVisualizer()
-        const p = audio.play()
-        if (p !== undefined) p.catch(e => console.warn('play error', e))
-        isPlaying = true
-        document.getElementById('btn-play').textContent = '⏸'
-        if (track.file_type !== 'video/mp4') startVisualizer()
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(e => {
+                console.warn('Playback failed', e);
+                // Если автоплей заблокирован — просто игнорируем
+            });
+        }
+        isPlaying = true;
+        document.getElementById('btn-play').textContent = '⏸';
+        if (track.file_type !== 'video/mp4') {
+            if (!audioCtx) setupVisualizer();
+            startVisualizer();
+        }
     }
 }
 
 function toggleRepeat() {
     isRepeat = !isRepeat
-    document.getElementById('btn-repeat').style.color = isRepeat ? '#3366cc' : ''
+    const btn = document.getElementById('btn-repeat')
+    if (btn) btn.style.color = isRepeat ? '#3366cc' : ''
 }
 
 function seekClick(e) {
@@ -406,6 +419,7 @@ function onTimeUpdate() {
 
 // ── Audio Visualizer ──
 function setupVisualizer() {
+    if (track.file_type === 'video/mp4') return
     try {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)()
         const source = audioCtx.createMediaElementSource(audio)
@@ -413,26 +427,30 @@ function setupVisualizer() {
         analyser.fftSize = 256
         source.connect(analyser)
         analyser.connect(audioCtx.destination)
+        // Позволяем audioCtx запускаться после жеста пользователя
+        audioCtx.resume();
     } catch(e) { console.warn('Visualizer unavailable', e) }
 }
 
 function startVisualizer() {
+    if (!analyser || track.file_type === 'video/mp4') return
     const canvas = document.getElementById('visualizer-canvas')
-    if (!canvas || !analyser) return
+    if (!canvas) return
     const ctx = canvas.getContext('2d')
     const buf = new Uint8Array(analyser.frequencyBinCount)
     function draw() {
         animFrame = requestAnimationFrame(draw)
+        if (!analyser) return
         analyser.getByteFrequencyData(buf)
         const W = canvas.width = canvas.offsetWidth, H = canvas.height = 160
         ctx.fillStyle = '#0d0d14'
         ctx.fillRect(0, 0, W, H)
-        const bw = W / buf.length * 2.5
+        const bw = Math.max(2, W / buf.length * 2)
         for (let i = 0; i < buf.length; i++) {
             const h = (buf[i] / 255) * H
             const hue = 220 + (buf[i] / 255) * 60
             ctx.fillStyle = `hsl(${hue},80%,${40 + (buf[i]/255)*30}%)`
-            ctx.fillRect(i * (bw + 1), H - h, bw, h)
+            ctx.fillRect(i * bw, H - h, Math.max(1, bw-1), h)
         }
     }
     draw()
@@ -441,7 +459,7 @@ function startVisualizer() {
 function stopVisualizer() {
     if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null }
     const canvas = document.getElementById('visualizer-canvas')
-    if (canvas) {
+    if (canvas && canvas.getContext) {
         const ctx = canvas.getContext('2d')
         ctx.fillStyle = '#0d0d14'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
@@ -458,11 +476,12 @@ function drawWaveform() {
     ctx.strokeStyle = '#2a4b8d'
     ctx.lineWidth = 1
     ctx.beginPath()
+    // Простая псевдо‑волна, можно заменить на реальную при наличии данных
     for (let x = 0; x < W; x++) {
         const amp = Math.random() * 0.6 + 0.1
         const h = amp * H * 0.8
-        ctx.moveTo(x, H / 2 - h / 2)
-        ctx.lineTo(x, H / 2 + h / 2)
+        ctx.moveTo(x, H/2 - h/2)
+        ctx.lineTo(x, H/2 + h/2)
     }
     ctx.stroke()
     renderWfMarkers()
@@ -470,6 +489,7 @@ function drawWaveform() {
 
 function renderWfMarkers() {
     const wrap = document.getElementById('wf-wrap')
+    if (!wrap) return
     wrap.querySelectorAll('.wf-marker').forEach(m => m.remove())
     if (!audio || !audio.duration) return
     comments.filter(c => c.timestamp_sec !== null).forEach(c => {
@@ -478,7 +498,7 @@ function renderWfMarkers() {
         marker.className = 'wf-marker'
         marker.style.left = pct + '%'
         marker.title = fmt(c.timestamp_sec) + ' ' + c.username + ': ' + c.content
-        marker.onclick = () => { audio.currentTime = c.timestamp_sec }
+        marker.onclick = () => { if(audio) audio.currentTime = c.timestamp_sec }
         const tip = document.createElement('div')
         tip.className = 'wf-marker-tip'
         tip.textContent = fmt(c.timestamp_sec)
@@ -519,7 +539,7 @@ async function loadComments() {
 function renderComments() {
     const list = document.getElementById('tc-list')
     if (!list) return
-    if (!comments.length) { list.innerHTML = '<p style="color:#a2a9b1;font-size:0.85em;">Нрт комментариев</p>'; return }
+    if (!comments.length) { list.innerHTML = '<p style="color:#a2a9b1;font-size:0.85em;">Нет комментариев</p>'; return }
     list.innerHTML = comments.map(c => `
         <div class="tc-item">
             ${c.timestamp_sec !== null ? `<span class="tc-ts" onclick="seekTo(${c.timestamp_sec})">${fmt(c.timestamp_sec)}</span>` : ''}
