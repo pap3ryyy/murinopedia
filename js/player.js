@@ -85,5 +85,5 @@ window.MurinoFM = (function () {
         currentTrack = null
     }
 
-    return { play, toggle, toggleRepeat, seek, setVolume, close, getCurrentTime }
+    return { play, toggle, toggleRepeat, seek, setVolume, close, getCurrentTime, getAudio: () => audio }
 })()
