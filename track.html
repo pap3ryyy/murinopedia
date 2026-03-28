@@ -211,7 +211,10 @@ const trackId     = parseInt(params.get('id'))
 let currentUser   = null
 let currentUserId = null
 let track         = null
+let isVideo       = false
+
 let mediaEl       = null
+
 let audioCtx      = null
 let analyser      = null
 let animFrame     = null
@@ -263,8 +266,10 @@ async function init() {
         document.getElementById('main-content').innerHTML = '<p style="color:#d33;">Трек не знайдено или ещё на проверке.</p>'
         return
     }
-    track = t
+    track   = t
+    isVideo = track.file_type === 'video/mp4'
     document.title = `${t.title} — Мурино FM`
+
     renderPage()
     loadRelated()
     loadComments()
@@ -287,8 +292,8 @@ async function recordPlay() {
     if (el) el.textContent = newCount
 }
 
+/* ── RENDER ── */
 function renderPage() {
-    const isVideo = track.file_type === 'video/mp4'
     document.getElementById('main-content').innerHTML = `
         <div class="player-block">
             ${isVideo
@@ -343,46 +348,66 @@ function renderPage() {
     setupMedia()
 }
 
+
 function setupMedia() {
-    const isVideo = track.file_type === 'video/mp4'
     if (isVideo) {
         mediaEl = document.getElementById('media-el')
+        mediaEl.volume = 0.8
     } else {
-        mediaEl = new Audio(track.file_url)
-        mediaEl.crossOrigin = 'anonymous'
         MurinoFM.play(track)
+        mediaEl = MurinoFM.getAudio()
     }
-    mediaEl.volume = 0.8
+
     mediaEl.addEventListener('loadedmetadata', () => {
         document.getElementById('time-dur').textContent = fmt(mediaEl.duration)
         drawWaveform()
     })
+    if (mediaEl.readyState >= 1 && mediaEl.duration) {
+        document.getElementById('time-dur').textContent = fmt(mediaEl.duration)
+        drawWaveform()
+    }
+
     mediaEl.addEventListener('timeupdate', onTimeUpdate)
+
+    mediaEl.addEventListener('play', () => {
+        isPlaying = true
+        document.getElementById('btn-play').textContent = '⏸'
+        if (!isVideo) startViz()
+    })
+    mediaEl.addEventListener('pause', () => {
+        isPlaying = false
+        document.getElementById('btn-play').textContent = '▶'
+        if (!isVideo) stopViz()
+    })
     mediaEl.addEventListener('ended', () => {
         if (isRepeat) {
             mediaEl.currentTime = 0
             mediaEl.play()
-        } else {
-            isPlaying = false
-            document.getElementById('btn-play').textContent = '▶'
-            if (!isVideo) stopViz()
         }
     })
+
+    if (!isVideo && !mediaEl.paused) {
+        isPlaying = true
+        document.getElementById('btn-play').textContent = '⏸'
+        setupViz()
+        startViz()
+    }
 }
 
 function togglePlay() {
     if (!mediaEl) return
     if (isPlaying) {
         mediaEl.pause()
-        isPlaying = false
-        document.getElementById('btn-play').textContent = '▶'
-        stopViz()
+        if (!isVideo) {
+            const fmpBtn = document.getElementById('fmp-play')
+            if (fmpBtn) fmpBtn.textContent = '▶'
+        }
     } else {
-        if (!audioCtx && track.file_type !== 'video/mp4') setupViz()
         mediaEl.play().catch(e => console.warn('play:', e))
-        isPlaying = true
-        document.getElementById('btn-play').textContent = '⏸'
-        if (track.file_type !== 'video/mp4') startViz()
+        if (!isVideo) {
+            const fmpBtn = document.getElementById('fmp-play')
+            if (fmpBtn) fmpBtn.textContent = '⏸'
+        }
     }
 }
 
@@ -403,7 +428,9 @@ function wfSeek(e) {
     mediaEl.currentTime = ((e.clientX - rect.left) / rect.width) * mediaEl.duration
 }
 
-function setVol(v) { if (mediaEl) mediaEl.volume = parseFloat(v) }
+function setVol(v) {
+    if (mediaEl) mediaEl.volume = parseFloat(v)
+}
 
 function onTimeUpdate() {
     if (!mediaEl || !mediaEl.duration) return
@@ -414,6 +441,7 @@ function onTimeUpdate() {
 }
 
 function setupViz() {
+    if (audioCtx) return
     try {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)()
         const src = audioCtx.createMediaElementSource(mediaEl)
@@ -425,8 +453,10 @@ function setupViz() {
 }
 
 function startViz() {
+    if (!analyser) { setupViz(); if (!analyser) return }
+    if (animFrame) return
     const canvas = document.getElementById('viz-canvas')
-    if (!canvas || !analyser) return
+    if (!canvas) return
     const ctx = canvas.getContext('2d')
     const buf = new Uint8Array(analyser.frequencyBinCount)
     function draw() {
