@@ -7,7 +7,6 @@
     <title>Трек — Мурино FM</title>
     <link rel="stylesheet" href="css/wiki.css">
     <style>
-        /* ── Visualizer stage ── */
         .track-stage {
             background: #0d0d14;
             border: 1px solid #3366cc;
@@ -30,8 +29,6 @@
             max-height: 320px;
             display: block;
         }
-
-        /* ── Player controls ── */
         .track-controls {
             background: #111118;
             padding: 12px 16px;
@@ -75,8 +72,6 @@
         .vol-wrap { display: flex; align-items: center; gap: 5px; }
         .vol-wrap span { color: #a1a1aa; font-size: 0.9em; }
         .vol-wrap input { width: 60px; cursor: pointer; }
-
-        /* ── Track info ── */
         .track-info-block {
             background: #fff;
             border: 1px solid #a2a9b1;
@@ -101,8 +96,6 @@
         }
         .track-like-btn.liked { border-color: #d33; color: #d33; background: #fff0f0; }
         .track-like-btn:hover { background: #eaf0fb; }
-
-        /* ── Timed comments ── */
         .tcomments {
             background: #fff;
             border: 1px solid #a2a9b1;
@@ -158,8 +151,6 @@
         }
         .tc-input-row input:focus { border-color: #3366cc; background: #fff; }
         .tc-hint { font-size: 0.76em; color: #a2a9b1; margin-top: 3px; }
-
-        /* ── Waveform markers ── */
         .waveform-wrap {
             position: relative; height: 40px;
             background: #0d0d14; cursor: pointer;
@@ -231,11 +222,11 @@
 <script src="js/theme.js"></script>
 <script src="js/player.js"></script>
 <script>
-let currentUser = null, track = null, audio = null, audioCtx = null, analyser = null, animFrame = null
+let currentUser = null, currentUserId = null, track = null, audio = null, audioCtx = null, analyser = null, animFrame = null
 let isPlaying = false, isRepeat = false, liked = false, comments = []
 
-function safe(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
-function fmt(s){if(!s||isNaN(s))return '0:00';const m=Math.floor(s/60),sc=Math.floor(s%60);return m+':'+(sc<10?'0':'')+sc}
+function safe(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;') }
+function fmt(s) { if (!s || isNaN(s)) return '0:00'; const m = Math.floor(s / 60), sc = Math.floor(s % 60); return m + ':' + (sc < 10 ? '0' : '') + sc }
 
 const params = new URLSearchParams(location.search)
 const trackId = parseInt(params.get('id'))
@@ -246,15 +237,14 @@ async function init() {
         const { data: u } = await supabaseClient.from('users').select('username,role,public_id').eq('id', session.user.id).single()
         if (u) {
             currentUser = u
+            currentUserId = session.user.id
             document.getElementById('header-user').innerHTML = `
                 <a href="profile.html?id=${u.public_id}" style="color:#0645ad;font-size:0.85em;">${safe(u.username)}</a>&nbsp;
                 <a href="settings.html" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;font-size:0.85em;color:#202122;text-decoration:none;">Настройки</a>&nbsp;
                 <button onclick="supabaseClient.auth.signOut().then(()=>location.reload())" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;">Выйти</button>
             `
-            if (session) {
-                const { data: lk } = await supabaseClient.from('track_likes').select('track_id').eq('track_id', trackId).eq('user_id', session.user.id)
-                liked = !!(lk && lk.length > 0)
-            }
+            const { data: lk } = await supabaseClient.from('track_likes').select('track_id').eq('track_id', trackId).eq('user_id', session.user.id)
+            liked = !!(lk && lk.length > 0)
         }
     }
 
@@ -268,8 +258,27 @@ async function init() {
     renderPage()
     loadRelated()
     loadComments()
+    recordPlay()
+}
 
-    await supabaseClient.from('tracks').update({ plays_count: (t.plays_count || 0) + 1 }).eq('id', trackId)
+async function recordPlay() {
+    if (!currentUserId) return
+
+    const { data: existing } = await supabaseClient
+        .from('track_plays')
+        .select('id')
+        .eq('track_id', trackId)
+        .eq('user_id', currentUserId)
+        .single()
+
+    if (existing) return
+
+    await supabaseClient.from('track_plays').insert({ track_id: trackId, user_id: currentUserId })
+    await supabaseClient.from('tracks').update({ plays_count: (track.plays_count || 0) + 1 }).eq('id', trackId)
+    track.plays_count = (track.plays_count || 0) + 1
+
+    const playsEl = document.getElementById('plays-count')
+    if (playsEl) playsEl.textContent = track.plays_count
 }
 
 function renderPage() {
@@ -306,7 +315,7 @@ function renderPage() {
             <div class="track-info-row">Автор: <b>@${safe(track.author)}</b></div>
             ${track.mashup_source ? `<div class="track-info-row">Оригинал: <b>${safe(track.mashup_source)}</b> &nbsp;<span class="track-badge">Мешап</span></div>` : ''}
             <div class="track-info-row">Загружено: <b>${safe(track.uploaded_by)}</b> · ${new Date(track.created_at).toLocaleDateString('ru-RU')}</div>
-            <div class="track-info-row">Прослушиваний: <b>${track.plays_count || 0}</b></div>
+            <div class="track-info-row">Прослушиваний: <b id="plays-count">${track.plays_count || 0}</b></div>
             <button class="track-like-btn ${liked ? 'liked' : ''}" id="like-btn" onclick="toggleLike()">
                 ♥ <span id="like-count">${track.likes_count || 0}</span>
             </button>
@@ -335,7 +344,6 @@ function setupAudio() {
     const isVideo = track.file_type === 'video/mp4'
 
     if (isVideo) {
-        // Для видео — показываем встроенный плеер браузера, глобальный FM не используем
         const vid = document.getElementById('track-media')
         if (vid) {
             audio = vid
@@ -350,7 +358,6 @@ function setupAudio() {
             })
         }
     } else {
-        // Для аудио — используем глобальный MurinoFM плеер + локальный Audio для визуализатора
         audio = new Audio(track.file_url)
         audio.crossOrigin = 'anonymous'
         audio.volume = 0.8
@@ -363,7 +370,6 @@ function setupAudio() {
             if (isRepeat) { audio.currentTime = 0; audio.play() }
             else { document.getElementById('btn-play').textContent = '▶'; isPlaying = false; stopVisualizer() }
         })
-        // Также запускаем в глобальном плеере
         MurinoFM.play(track)
     }
 }
@@ -405,7 +411,6 @@ function onTimeUpdate() {
     showTimedComments(audio.currentTime)
 }
 
-// ── Audio Visualizer ──
 function setupVisualizer() {
     try {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)()
@@ -488,7 +493,6 @@ function renderWfMarkers() {
     })
 }
 
-// ── Timed comment popups ──
 let shownComments = new Set()
 function showTimedComments(sec) {
     comments.forEach(c => {
@@ -508,7 +512,6 @@ function showTimedComments(sec) {
     })
 }
 
-// ── Comments ──
 async function loadComments() {
     const { data } = await supabaseClient.from('track_comments').select('*').eq('track_id', trackId).order('timestamp_sec', { ascending: true, nullsFirst: false })
     comments = data || []
@@ -579,7 +582,7 @@ async function toggleLike() {
 
 async function loadRelated() {
     const { data } = await supabaseClient.from('tracks').select('id,title,author').eq('status','published').neq('id', trackId).limit(5)
-    if (!data||!data.length) { document.getElementById('sidebar-related').style.display = 'none'; return }
+    if (!data || !data.length) { document.getElementById('sidebar-related').style.display = 'none'; return }
     document.getElementById('related-list').innerHTML = data.map(t =>
         `<div style="padding:4px 0;border-bottom:1px solid #eaecf0;font-size:0.85em;">
             <a href="track.html?id=${t.id}" style="color:#0645ad;">${safe(t.title)}</a>
