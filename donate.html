@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пожертвованиость — Муринопедия</title>
+    <link rel="icon" type="image/png" href="asset/logo.ico">
+    <link rel="stylesheet" href="css/wiki.css">
+    <style>
+        .donate-container {
+            border: 1px solid #a2a9b1;
+            background: #f8f9fa;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .donate-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid #a2a9b1;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+        .donate-header img { width: 64px; height: 64px; }
+        .donate-header h2 { font-family: serif; margin: 0; font-weight: normal; font-size: 1.5em; }
+        .sum-selector {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+        .sum-selector button {
+            background: #f8f9fa;
+            border: 1px solid #a2a9b1;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 0.95em;
+            border-radius: 2px;
+            transition: 0.1s;
+        }
+        .sum-selector button:hover { background: #eaf3ff; border-color: #3366cc; color: #0645ad; }
+        .sum-selector button.active { background: #3366cc; color: #fff; border-color: #3366cc; }
+        .widget-wrap {
+            background: #fff;
+            border: 1px solid #c8ccd1;
+            box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-area">
+        <img src="asset/logo.png" alt="М.С.В." class="logo-img">
+        <a href="index.html" class="logo-text">Муринопедия</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+        <div class="status-bar">
+            Оперативная обстановка: <span style="color: #d33; font-weight: bold;">СТАБИЛЬНАЯ</span>
+        </div>
+        <div id="header-user" style="font-size:0.85em;color:#54595d;"></div>
+    </div>
+</header>
+
+<div class="container">
+    <main>
+        <h1>Пожертвованиость Знань</h1>
+
+        <div class="donate-container">
+            <div class="donate-header">
+                <img src="asset/logo.png" alt="MSV">
+                <div>
+                    <h2>Людич, поддержи Гранч</h2>
+                    <p style="margin:4px 0 0 0; color:#54595d; font-size:0.9em;">Муринопедия стояти на твоей доброте.</p>
+                </div>
+            </div>
+
+            <p>Мыч нрт берем налоги за Знань. Каждый копейка идути на поддержку серверов и защиту от Фог-глючность. Ч илу доной, пока естч светл.</p>
+
+            <div class="sum-selector" id="sum-btns">
+                <button onclick="changeSum(100, this)">100 ₽</button>
+                <button onclick="changeSum(200, this)" class="active">200 ₽</button>
+                <button onclick="changeSum(500, this)">500 ₽</button>
+                <button onclick="changeSum(1000, this)">1000 ₽</button>
+            </div>
+
+            <div class="widget-wrap">
+                <iframe id="donate-frame" src="https://widget.donatepay.ru/widgets/page/cc2232eea5bb5e2de2c5cf24afcebae4cab967c17e60f4debd96a6e148176f8e?widget_id=7553832&sum=200" width="100%" height="220" frameBorder="0" scrolling="no"></iframe>
+            </div>
+        </div>
+    </main>
+
+    <aside>
+        <div class="sidebar-box">
+            <h4>Навигация</h4>
+            <p>
+                <a href="index.html">Заглавная</a><br>
+                <a href="articles.html">Архив Знань</a><br>
+                <a href="badges.html">Значки</a>
+            </p>
+        </div>
+        <div class="sidebar-box" style="border-color: #d33; background: #fee7e6;">
+            <h4 style="color:#d33;">Важнолсть</h4>
+            Донатность — это нрт обязанность, а честь Людич.
+        </div>
+    </aside>
+</div>
+
+<footer>
+    Муринопедия — 2026 год. <br>
+    Ч илу доной, пока естч светл.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/theme.js"></script>
+<script>
+function changeSum(val, el) {
+    const frame = document.getElementById('donate-frame');
+    frame.src = "https://widget.donatepay.ru/widgets/page/cc2232eea5bb5e2de2c5cf24afcebae4cab967c17e60f4debd96a6e148176f8e?widget_id=7553832&sum=" + val;
+    document.querySelectorAll('#sum-btns button').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+}
+
+async function init() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session) {
+        const { data: me } = await supabaseClient.from('users').select('username, public_id').eq('id', session.user.id).single();
+        if (me) {
+            document.getElementById('header-user').innerHTML = '<a href="profile.html?id=' + me.public_id + '" style="color:#0645ad;">' + me.username + '</a>';
+        }
+    } else {
+        document.getElementById('header-user').innerHTML = '<a href="login.html">Войти</a>';
+    }
+}
+init();
+</script>
+</body>
+</html>
