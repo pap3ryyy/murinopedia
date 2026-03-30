@@ -8,217 +8,35 @@
     <link rel="icon" type="image/png" href="asset/logo.ico">
     <link rel="stylesheet" href="css/wiki.css">
     <style>
-        .market-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #a2a9b1;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        .wallet-bar {
-            background: #f0f4ff;
-            border: 1px solid #3366cc;
-            padding: 8px 14px;
-            font-size: 0.9em;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        .wallet-balance {
-            font-weight: bold;
-            color: #3366cc;
-            font-size: 1.1em;
-        }
-        .tier-badge {
-            font-size: 0.78em;
-            padding: 2px 8px;
-            border: 1px solid #a2a9b1;
-            background: #f8f9fa;
-            color: #54595d;
-        }
-        .market-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 14px;
-            margin-top: 16px;
-        }
-        .listing-card {
-            border: 1px solid #a2a9b1;
-            background: #f8f9fa;
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            text-align: center;
-        }
-        .listing-card:hover {
-            border-color: #3366cc;
-            background: #f0f4ff;
-        }
-        .listing-icon {
-            width: 56px;
-            height: 56px;
-            object-fit: contain;
-            border: 1px solid #eaecf0;
-            padding: 4px;
-            background: #fff;
-        }
-        .listing-name {
-            font-family: serif;
-            font-size: 1em;
-            font-weight: bold;
-        }
-        .listing-rarity {
-            font-size: 0.72em;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            color: #a2a9b1;
-        }
-        .listing-rarity.rare { color: #3366cc; }
-        .listing-rarity.legendary { color: #c8a850; }
-        .listing-price {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #202122;
-        }
-        .listing-seller {
-            font-size: 0.78em;
-            color: #a2a9b1;
-        }
-        .listing-emission {
-            font-size: 0.72em;
-            background: #fef6e4;
-            border: 1px solid #c8a850;
-            color: #7a6000;
-            padding: 1px 6px;
-        }
-        .tabs {
-            display: flex;
-            gap: 0;
-            border-bottom: 1px solid #a2a9b1;
-            margin-bottom: 20px;
-        }
-        .tab {
-            padding: 8px 16px;
-            cursor: pointer;
-            font-size: 0.9em;
-            border: 1px solid transparent;
-            border-bottom: none;
-            background: none;
-            color: #54595d;
-        }
-        .tab.active {
-            border-color: #a2a9b1;
-            border-bottom-color: #fff;
-            background: #fff;
-            color: #202122;
-            margin-bottom: -1px;
-        }
-        .sell-form {
-            background: #f8f9fa;
-            border: 1px solid #a2a9b1;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .sell-form h3 {
-            font-family: serif;
-            font-weight: normal;
-            margin: 0 0 14px 0;
-        }
-        .form-row {
-            display: flex;
-            gap: 10px;
-            align-items: flex-end;
-            flex-wrap: wrap;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            flex: 1;
-            min-width: 140px;
-        }
-        .form-group label {
-            font-size: 0.82em;
-            color: #54595d;
-        }
-        .form-group select,
-        .form-group input {
-            padding: 6px 10px;
-            border: 1px solid #a2a9b1;
-            font-size: 0.9em;
-            font-family: inherit;
-            background: #fff;
-        }
-        .state-box {
-            padding: 40px 20px;
-            text-align: center;
-            border: 1px solid #a2a9b1;
-            background: #f8f9fa;
-        }
-        .state-box-title {
-            font-family: serif;
-            font-size: 1.3em;
-            margin-bottom: 8px;
-        }
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
-        .modal {
-            background: #fff;
-            border: 1px solid #a2a9b1;
-            padding: 28px;
-            max-width: 360px;
-            width: 100%;
-        }
-        .modal h3 {
-            font-family: serif;
-            font-weight: normal;
-            margin: 0 0 14px 0;
-            font-size: 1.3em;
-        }
-        .modal-badge {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-            padding: 10px;
-            background: #f8f9fa;
-            border: 1px solid #eaecf0;
-        }
-        .modal-badge img {
-            width: 40px;
-            height: 40px;
-            object-fit: contain;
-        }
-        .modal-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 16px;
-        }
-        .commission-note {
-            font-size: 0.8em;
-            color: #a2a9b1;
-            margin-top: 8px;
-        }
+        .market-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:14px; margin-top:16px; }
+        .market-card { border:1px solid #a2a9b1; background:#f8f9fa; padding:16px; display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; text-decoration:none; color:inherit; }
+        .market-card:hover { border-color:#3366cc; background:#f0f4ff; text-decoration:none; }
+        .market-icon { width:56px; height:56px; object-fit:contain; border:1px solid #eaecf0; padding:4px; background:#fff; }
+        .market-name { font-family:serif; font-size:1em; font-weight:bold; color:#202122; }
+        .market-rarity { font-size:0.72em; text-transform:uppercase; letter-spacing:0.04em; color:#a2a9b1; }
+        .market-rarity.rare { color:#3366cc; }
+        .market-rarity.legendary { color:#c8a850; }
+        .market-price { font-size:1.05em; font-weight:bold; color:#202122; }
+        .market-lots { font-size:0.78em; color:#54595d; }
+        .emission-tag { font-size:0.7em; background:#fef6e4; border:1px solid #c8a850; color:#7a6000; padding:1px 6px; }
+        .wallet-bar { background:#f0f4ff; border:1px solid #3366cc; padding:8px 14px; font-size:0.9em; display:flex; align-items:center; gap:16px; margin-bottom:20px; }
+        .wallet-balance { font-weight:bold; color:#3366cc; font-size:1.1em; }
+        .tier-badge { font-size:0.78em; padding:2px 8px; border:1px solid #a2a9b1; background:#f8f9fa; color:#54595d; }
+        .state-box { padding:40px 20px; text-align:center; border:1px solid #a2a9b1; background:#f8f9fa; }
+        .state-box-title { font-family:serif; font-size:1.3em; margin-bottom:8px; }
+        .tabs { display:flex; gap:0; border-bottom:1px solid #a2a9b1; margin-bottom:20px; }
+        .tab { padding:8px 16px; cursor:pointer; font-size:0.9em; border:1px solid transparent; border-bottom:none; background:none; color:#54595d; }
+        .tab.active { border-color:#a2a9b1; border-bottom-color:#fff; background:#fff; color:#202122; margin-bottom:-1px; }
 
-        body.dark .wallet-bar { background: #1e293b; border-color: #3366cc; }
-        body.dark .listing-card { background: #27272a; border-color: #3f3f46; }
-        body.dark .listing-card:hover { background: #1e293b; border-color: #3366cc; }
-        body.dark .listing-icon { background: #1c1c1f; border-color: #3f3f46; }
-        body.dark .tab.active { background: #1c1c1f; border-color: #3f3f46; border-bottom-color: #1c1c1f; }
-        body.dark .sell-form { background: #27272a; border-color: #3f3f46; }
-        body.dark .modal { background: #1c1c1f; border-color: #3f3f46; }
-        body.dark .modal-badge { background: #27272a; border-color: #3f3f46; }
-        body.dark .state-box { background: #27272a; border-color: #3f3f46; }
+        body.dark .wallet-bar { background:#1e293b; border-color:#3366cc; }
+        body.dark .market-card { background:#27272a; border-color:#3f3f46; }
+        body.dark .market-card:hover { background:#1e293b; border-color:#3366cc; }
+        body.dark .market-icon { background:#1c1c1f; border-color:#3f3f46; }
+        body.dark .market-name { color:#e4e4e7; }
+        body.dark .market-price { color:#e4e4e7; }
+        body.dark .tab.active { background:#1c1c1f; border-color:#3f3f46; border-bottom-color:#1c1c1f; }
+        body.dark .state-box { background:#27272a; border-color:#3f3f46; }
+        body.dark .tier-badge { background:#27272a; border-color:#3f3f46; color:#a1a1aa; }
     </style>
 </head>
 <body>
@@ -238,49 +56,23 @@
 
 <div class="container">
     <main>
-        <div class="market-header">
-            <h1 style="margin:0;">Рынок Значков</h1>
-            <div id="wallet-display" style="display:none;">
-                <div class="wallet-bar">
-                    <span>Баланс: <span class="wallet-balance" id="wallet-balance">0</span> денег</span>
-                    <span class="tier-badge" id="tier-badge">—</span>
-                </div>
+        <h1>Рынок Значков</h1>
+
+        <div id="wallet-bar" style="display:none;">
+            <div class="wallet-bar">
+                <span>Баланс: <span class="wallet-balance" id="wallet-balance">0</span> денег</span>
+                <span class="tier-badge" id="tier-badge">—</span>
             </div>
         </div>
 
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('market', this)">Рынок</button>
-            <button class="tab" onclick="switchTab('sell', this)" id="sell-tab" style="display:none;">Продати</button>
-            <button class="tab" onclick="switchTab('history', this)">История цен</button>
+            <button class="tab active" onclick="switchTab('market', this)">Все лоты</button>
+            <button class="tab" onclick="switchTab('history', this)">История сделок</button>
         </div>
 
         <div id="tab-market">
-            <div id="listings-wrap">
+            <div id="market-wrap">
                 <div class="state-box"><div class="state-box-title">Загружати...</div></div>
-            </div>
-        </div>
-
-        <div id="tab-sell" style="display:none;">
-            <div class="sell-form">
-                <h3>Выставити значок на продажу</h3>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Значок</label>
-                        <select id="sell-badge-select">
-                            <option value="">Загружати...</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Цена (деньги)</label>
-                        <input type="number" id="sell-price" min="1" placeholder="100">
-                    </div>
-                    <button class="btn btn-primary" onclick="listBadge()">Выставити</button>
-                </div>
-                <div class="commission-note">Комиссия рынка 30% — продавец получает 70% от цены</div>
-            </div>
-            <div id="my-listings-wrap">
-                <h2 style="font-family:serif;font-weight:normal;font-size:1.2em;border-bottom:1px solid #a2a9b1;padding-bottom:4px;margin-bottom:14px;">Мои лоты</h2>
-                <div id="my-listings"><p style="color:#a2a9b1;font-size:0.85em;">Загружати...</p></div>
             </div>
         </div>
 
@@ -312,30 +104,9 @@
         </div>
         <div class="sidebar-box" style="border-color:#d33;background:#fee7e6;">
             <h4 style="color:#d33;">Правила рынка</h4>
-            <p style="font-size:0.82em;">Комиссия 30% с каждой сделки. Лот можно снять в любой момент.</p>
+            <p style="font-size:0.82em;">Комиссия 30% с каждой сделки. Управляй лотами на странице значка.</p>
         </div>
     </aside>
-</div>
-
-<div id="buy-modal" style="display:none;">
-    <div class="modal-overlay" onclick="closeModal()">
-        <div class="modal" onclick="event.stopPropagation()">
-            <h3>Подтверди покупку</h3>
-            <div class="modal-badge">
-                <img id="modal-icon" src="" alt="">
-                <div>
-                    <div id="modal-name" style="font-weight:bold;"></div>
-                    <div id="modal-seller" style="font-size:0.82em;color:#54595d;"></div>
-                </div>
-            </div>
-            <div>Цена: <b id="modal-price"></b> денег</div>
-            <div style="font-size:0.82em;color:#a2a9b1;margin-top:4px;">Твой баланс после покупки: <b id="modal-after"></b> денег</div>
-            <div class="modal-actions">
-                <button class="btn btn-primary" onclick="confirmBuy()">Купити</button>
-                <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
-            </div>
-        </div>
-    </div>
 </div>
 
 <footer>
@@ -351,11 +122,11 @@
 <script src="js/theme.js"></script>
 <script>
 const TIERS = [
-    { min: 0,      max: 500,    label: 'Бедность' },
-    { min: 500,    max: 5000,   label: 'Изи бриджи' },
-    { min: 5000,   max: 50000,  label: 'Начинаем наше лудо приключение' },
-    { min: 50000,  max: 500000, label: 'Что за бизнес сука' },
-    { min: 500000, max: Infinity, label: 'Хаха парни прикиньте для него это деньги' },
+    { min: 0,       max: 500,      label: 'Бедность' },
+    { min: 500,     max: 5000,     label: 'Изи бриджи' },
+    { min: 5000,    max: 50000,    label: 'Начинаем наше лудо приключение' },
+    { min: 50000,   max: 500000,   label: 'Что за бизнес сука' },
+    { min: 500000,  max: Infinity, label: 'Хаха парни прикиньте для него это деньги' },
 ]
 
 function getTier(total) {
@@ -363,16 +134,13 @@ function getTier(total) {
 }
 
 let currentUser = null
-let walletBalance = 0
-let selectedListing = null
 
 async function init() {
     const { data: { session } } = await supabaseClient.auth.getSession()
 
     if (session) {
         const { data: me } = await supabaseClient
-            .from('users').select('id, username, public_id, role').eq('id', session.user.id).single()
-
+            .from('users').select('id, username, public_id').eq('id', session.user.id).single()
         if (me) {
             currentUser = me
             document.getElementById('header-user').innerHTML = `
@@ -380,156 +148,91 @@ async function init() {
                 &nbsp;
                 <button onclick="logout()" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;">Выйти</button>
             `
-            document.getElementById('sell-tab').style.display = 'block'
-            document.getElementById('wallet-display').style.display = 'block'
-            await loadWallet()
-            await loadMyBadges()
-            await loadMyListings()
+            await loadWallet(me.id)
         }
     } else {
         document.getElementById('header-user').innerHTML = `<a href="login.html" style="font-size:0.85em;">Войти</a>`
     }
 
-    await loadListings()
+    await loadMarket()
 }
 
-async function loadWallet() {
-    const { data } = await supabaseClient
-        .from('wallets').select('balance').eq('user_id', currentUser.id).single()
+async function loadWallet(userId) {
+    const { data: wallet } = await supabaseClient
+        .from('wallets').select('balance').eq('user_id', userId).single()
+    if (!wallet) return
 
-    if (data) {
-        walletBalance = data.balance
+    const { data: userBadges } = await supabaseClient
+        .from('user_badges').select('badge_id').eq('user_id', userId)
 
-        const { data: userBadges } = await supabaseClient
-            .from('user_badges').select('badge_id').eq('user_id', currentUser.id)
-
-        let portfolioValue = 0
-        if (userBadges && userBadges.length > 0) {
-            for (const ub of userBadges) {
-                const { data: lastPrice } = await supabaseClient
-                    .from('badge_prices').select('price')
-                    .eq('badge_id', ub.badge_id)
-                    .order('sold_at', { ascending: false })
-                    .limit(1).single()
-                if (lastPrice) portfolioValue += lastPrice.price
-            }
+    let portfolioValue = 0
+    if (userBadges && userBadges.length > 0) {
+        for (const ub of userBadges) {
+            const { data: lastPrice } = await supabaseClient
+                .from('badge_prices').select('price')
+                .eq('badge_id', ub.badge_id)
+                .order('sold_at', { ascending: false })
+                .limit(1).single()
+            if (lastPrice) portfolioValue += lastPrice.price
         }
-
-        const total = walletBalance + portfolioValue
-        const tier = getTier(total)
-
-        document.getElementById('wallet-balance').textContent = Math.floor(walletBalance).toLocaleString('ru-RU')
-        document.getElementById('tier-badge').textContent = tier.label
     }
+
+    const total = wallet.balance + portfolioValue
+    const tier = getTier(total)
+
+    document.getElementById('wallet-bar').style.display = 'block'
+    document.getElementById('wallet-balance').textContent = Math.floor(wallet.balance).toLocaleString('ru-RU')
+    document.getElementById('tier-badge').textContent = tier.label
 }
 
-async function loadListings() {
+async function loadMarket() {
     const { data: listings } = await supabaseClient
-        .from('badge_market')
-        .select('id, price, is_emission, seller_id, badge_id, created_at')
+        .from('badge_market').select('id, price, is_emission, badge_id')
         .order('created_at', { ascending: false })
 
     if (!listings || listings.length === 0) {
-        document.getElementById('listings-wrap').innerHTML = `
+        document.getElementById('market-wrap').innerHTML = `
             <div class="state-box">
                 <div class="state-box-title">Рынок пустой</div>
-                <div style="color:#54595d;font-size:0.9em;">Нрт лотов — стань первым продавцом</div>
+                <div style="color:#54595d;font-size:0.9em;">Нрт лотов — выставляй значки на <a href="badges.html">странице значка</a></div>
             </div>`
         return
     }
 
     const badgeIds = [...new Set(listings.map(l => l.badge_id))]
-    const sellerIds = [...new Set(listings.map(l => l.seller_id))]
-
-    const { data: badges } = await supabaseClient.from('badges').select('id, name, icon_url, rarity').in('id', badgeIds)
-    const { data: sellers } = await supabaseClient.from('users').select('id, username, public_id').in('id', sellerIds)
-
+    const { data: badges } = await supabaseClient
+        .from('badges').select('id, name, icon_url, rarity').in('id', badgeIds)
     const badgeMap = {}
-    const sellerMap = {}
     badges?.forEach(b => badgeMap[b.id] = b)
-    sellers?.forEach(s => sellerMap[s.id] = s)
 
-    document.getElementById('listings-wrap').innerHTML = `
+    const badgeLots = {}
+    listings.forEach(l => {
+        if (!badgeLots[l.badge_id]) badgeLots[l.badge_id] = []
+        badgeLots[l.badge_id].push(l)
+    })
+
+    const uniqueBadges = Object.keys(badgeLots)
+
+    document.getElementById('market-wrap').innerHTML = `
+        <p style="font-size:0.85em;color:#54595d;margin-bottom:12px;">Найдено лотов: <b>${listings.length}</b> · Значков на рынке: <b>${uniqueBadges.length}</b></p>
         <div class="market-grid">
-            ${listings.map(l => {
-                const b = badgeMap[l.badge_id]
-                const s = sellerMap[l.seller_id]
+            ${uniqueBadges.map(bid => {
+                const b = badgeMap[bid]
                 if (!b) return ''
-                const isOwn = currentUser && l.seller_id === currentUser.id
+                const lots = badgeLots[bid]
+                const minPrice = Math.min(...lots.map(l => l.price))
+                const hasEmission = lots.some(l => l.is_emission)
                 const rarityLabel = { common: 'Обычный', rare: 'Редкий', legendary: 'Легендарный' }[b.rarity] ?? b.rarity
-                return `<div class="listing-card">
-                    <img src="${b.icon_url}" class="listing-icon" alt="${b.name}">
-                    ${l.is_emission ? '<span class="listing-emission">Эмиссия</span>' : ''}
-                    <div class="listing-name">${b.name}</div>
-                    <div class="listing-rarity ${b.rarity}">${rarityLabel}</div>
-                    <div class="listing-price">${Number(l.price).toLocaleString('ru-RU')} денег</div>
-                    ${s ? `<div class="listing-seller">Продавец: <a href="profile.html?id=${s.public_id}">${s.username}</a></div>` : ''}
-                    ${!isOwn && currentUser
-                        ? `<button class="btn btn-primary" style="width:100%;margin-top:4px;" onclick="openBuyModal(${l.id}, '${b.name}', '${b.icon_url}', ${l.price}, '${s?.username ?? ''}')">Купити</button>`
-                        : isOwn
-                        ? `<button class="btn btn-danger" style="width:100%;margin-top:4px;" onclick="cancelListing(${l.id})">Снять лот</button>`
-                        : `<a href="login.html" class="btn btn-secondary" style="width:100%;margin-top:4px;">Войти</a>`
-                    }
-                </div>`
+                return `<a href="badge.html?id=${b.id}" class="market-card">
+                    <img src="${b.icon_url}" class="market-icon" alt="${b.name}">
+                    ${hasEmission ? '<span class="emission-tag">Эмиссия</span>' : ''}
+                    <div class="market-name">${b.name}</div>
+                    <div class="market-rarity ${b.rarity}">${rarityLabel}</div>
+                    <div class="market-price">от ${Number(minPrice).toLocaleString('ru-RU')} денег</div>
+                    <div class="market-lots">${lots.length} ${lots.length === 1 ? 'лот' : lots.length < 5 ? 'лота' : 'лотов'}</div>
+                </a>`
             }).join('')}
         </div>`
-}
-
-async function loadMyBadges() {
-    const { data: userBadges } = await supabaseClient
-        .from('user_badges').select('badge_id').eq('user_id', currentUser.id)
-
-    if (!userBadges || userBadges.length === 0) {
-        document.getElementById('sell-badge-select').innerHTML = '<option value="">Нрт значков для продажи</option>'
-        return
-    }
-
-    const { data: listedBadges } = await supabaseClient
-        .from('badge_market').select('badge_id').eq('seller_id', currentUser.id)
-    const listedIds = new Set(listedBadges?.map(l => l.badge_id) ?? [])
-
-    const badgeIds = userBadges.map(u => u.badge_id).filter(id => !listedIds.has(id))
-
-    if (badgeIds.length === 0) {
-        document.getElementById('sell-badge-select').innerHTML = '<option value="">Все значки уже выставлены</option>'
-        return
-    }
-
-    const { data: badges } = await supabaseClient
-        .from('badges').select('id, name, transferable').in('id', badgeIds)
-
-    const transferable = badges?.filter(b => b.transferable !== false) ?? []
-
-    document.getElementById('sell-badge-select').innerHTML =
-        transferable.length === 0
-            ? '<option value="">Нрт доступных для продажи</option>'
-            : transferable.map(b => `<option value="${b.id}">${b.name}</option>`).join('')
-}
-
-async function loadMyListings() {
-    const { data: listings } = await supabaseClient
-        .from('badge_market').select('id, price, badge_id, is_emission').eq('seller_id', currentUser.id)
-
-    if (!listings || listings.length === 0) {
-        document.getElementById('my-listings').innerHTML = '<p style="color:#a2a9b1;font-size:0.85em;">Нрт активных лотов</p>'
-        return
-    }
-
-    const badgeIds = listings.map(l => l.badge_id)
-    const { data: badges } = await supabaseClient.from('badges').select('id, name, icon_url').in('id', badgeIds)
-    const badgeMap = {}
-    badges?.forEach(b => badgeMap[b.id] = b)
-
-    document.getElementById('my-listings').innerHTML = listings.map(l => {
-        const b = badgeMap[l.badge_id]
-        if (!b) return ''
-        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid #eaecf0;background:#f8f9fa;margin-bottom:6px;">
-            <img src="${b.icon_url}" style="width:32px;height:32px;object-fit:contain;">
-            <span style="flex:1;">${b.name} ${l.is_emission ? '<span class="listing-emission">Эмиссия</span>' : ''}</span>
-            <span style="font-weight:bold;">${Number(l.price).toLocaleString('ru-RU')} денег</span>
-            <button class="btn btn-danger" onclick="cancelListing(${l.id})">Снять</button>
-        </div>`
-    }).join('')
 }
 
 async function loadHistory() {
@@ -544,7 +247,8 @@ async function loadHistory() {
     }
 
     const badgeIds = [...new Set(prices.map(p => p.badge_id))]
-    const { data: badges } = await supabaseClient.from('badges').select('id, name, icon_url').in('id', badgeIds)
+    const { data: badges } = await supabaseClient
+        .from('badges').select('id, name, icon_url').in('id', badgeIds)
     const badgeMap = {}
     badges?.forEach(b => badgeMap[b.id] = b)
 
@@ -556,10 +260,10 @@ async function loadHistory() {
                     const b = badgeMap[p.badge_id]
                     if (!b) return ''
                     return `<tr>
-                        <td style="display:flex;align-items:center;gap:8px;">
+                        <td><a href="badge.html?id=${b.id}" style="display:flex;align-items:center;gap:8px;">
                             <img src="${b.icon_url}" style="width:24px;height:24px;object-fit:contain;">
-                            <a href="badge.html?id=${b.id}">${b.name}</a>
-                        </td>
+                            ${b.name}
+                        </a></td>
                         <td><b>${Number(p.price).toLocaleString('ru-RU')}</b> денег</td>
                         <td style="color:#a2a9b1;">${new Date(p.sold_at).toLocaleDateString('ru-RU')}</td>
                     </tr>`
@@ -568,70 +272,10 @@ async function loadHistory() {
         </table>`
 }
 
-async function listBadge() {
-    const badgeId = document.getElementById('sell-badge-select').value
-    const price = parseFloat(document.getElementById('sell-price').value)
-
-    if (!badgeId) return alert('Выбери значок')
-    if (!price || price < 1) return alert('Укажи цену')
-
-    const { error } = await supabaseClient.from('badge_market').insert({
-        seller_id: currentUser.id,
-        badge_id: parseInt(badgeId),
-        price,
-        is_emission: false
-    })
-
-    if (error) { alert('Ошибка: ' + error.message); return }
-
-    document.getElementById('sell-price').value = ''
-    await loadMyBadges()
-    await loadMyListings()
-    await loadListings()
-}
-
-function openBuyModal(listingId, name, icon, price, seller) {
-    selectedListing = listingId
-    document.getElementById('modal-name').textContent = name
-    document.getElementById('modal-icon').src = icon
-    document.getElementById('modal-price').textContent = Number(price).toLocaleString('ru-RU')
-    document.getElementById('modal-seller').textContent = 'Продавец: ' + seller
-    document.getElementById('modal-after').textContent = Math.floor(walletBalance - price).toLocaleString('ru-RU')
-    document.getElementById('buy-modal').style.display = 'block'
-}
-
-function closeModal() {
-    document.getElementById('buy-modal').style.display = 'none'
-    selectedListing = null
-}
-
-async function confirmBuy() {
-    if (!selectedListing || !currentUser) return
-    const { error } = await supabaseClient.rpc('buy_badge', {
-        listing_id: selectedListing,
-        buyer_id: currentUser.id
-    })
-    if (error) { alert('Ошибка: ' + error.message); return }
-    closeModal()
-    await loadWallet()
-    await loadListings()
-    await loadMyBadges()
-    await loadMyListings()
-}
-
-async function cancelListing(listingId) {
-    const { error } = await supabaseClient.from('badge_market').delete().eq('id', listingId).eq('seller_id', currentUser.id)
-    if (error) { alert('Ошибка: ' + error.message); return }
-    await loadListings()
-    await loadMyBadges()
-    await loadMyListings()
-}
-
 function switchTab(tab, btn) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
     btn.classList.add('active')
     document.getElementById('tab-market').style.display = tab === 'market' ? 'block' : 'none'
-    document.getElementById('tab-sell').style.display = tab === 'sell' ? 'block' : 'none'
     document.getElementById('tab-history').style.display = tab === 'history' ? 'block' : 'none'
     if (tab === 'history') loadHistory()
 }
@@ -645,3 +289,4 @@ init()
 </script>
 </body>
 </html>
+```
