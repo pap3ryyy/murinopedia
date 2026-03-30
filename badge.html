@@ -1,9 +1,8 @@
-```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-<script src="js/security.js"></script>
+    <script src="js/security.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Значок — Муринопедия</title>
     <link rel="icon" type="image/png" href="asset/logo.ico">
@@ -25,6 +24,7 @@
         .market-section h2 { font-family:serif; font-weight:normal; font-size:1.3em; border-bottom:1px solid #a2a9b1; padding-bottom:4px; margin-bottom:14px; margin-top:30px; }
         .listing-row { display:flex; align-items:center; gap:12px; padding:10px 14px; border:1px solid #eaecf0; background:#f8f9fa; margin-bottom:6px; }
         .emission-tag { font-size:0.72em; background:#fef6e4; border:1px solid #c8a850; color:#7a6000; padding:1px 6px; }
+        .sell-box { margin-top:16px; padding:14px; border:1px solid #a2a9b1; background:#f8f9fa; }
         .state-box { padding:40px 20px; text-align:center; border:1px solid #a2a9b1; background:#f8f9fa; }
         .state-box-title { font-family:serif; font-size:1.3em; margin-bottom:8px; }
         .state-box.error { border-color:#d33; background:#fee7e6; }
@@ -80,7 +80,6 @@
 <script>
 let currentUserId = null
 let walletBalance = 0
-let badgeData = null
 
 async function init() {
     const params = new URLSearchParams(window.location.search)
@@ -109,7 +108,6 @@ async function init() {
     const { data: badge, error } = await supabaseClient
         .from('badges').select('*').eq('id', badgeId).single()
     if (error || !badge) { showError('Значок нрт найденол вч реестре'); return }
-    badgeData = badge
 
     const { data: holderRows } = await supabaseClient
         .from('user_badges').select('user_id, granted_at').eq('badge_id', badgeId)
@@ -136,6 +134,9 @@ async function init() {
             .from('users').select('id, username, public_id').in('id', sellerIds)
         sellers?.forEach(s => sellerMap[s.id] = s)
     }
+
+    const iHolder = holderRows?.some(r => r.user_id === currentUserId)
+    const hasListing = listings?.some(l => l.seller_id === currentUserId)
 
     document.title = badge.name + ' — Муринопедия'
     const created = new Date(badge.created_at).toLocaleDateString('ru-RU')
@@ -165,7 +166,7 @@ async function init() {
         <div class="market-section">
             <h2>Рынок <span style="font-size:0.7em;color:#a2a9b1;font-family:sans-serif;">${listings?.length ?? 0} лотов</span></h2>
             ${!listings || listings.length === 0
-                ? '<p style="color:#a2a9b1;font-style:italic;font-size:0.9em;">Нрт активных лотов — <a href="market.html">перейти на рынок</a></p>'
+                ? '<p style="color:#a2a9b1;font-style:italic;font-size:0.9em;">Нрт активных лотов</p>'
                 : listings.map(l => {
                     const s = sellerMap[l.seller_id]
                     const isOwn = currentUserId && l.seller_id === currentUserId
@@ -182,7 +183,17 @@ async function init() {
                     </div>`
                 }).join('')
             }
-            <p style="font-size:0.82em;color:#a2a9b1;margin-top:8px;">Комиссия 30% · <a href="market.html">Открыти рынок →</a></p>
+            ${iHolder && !hasListing && badge.transferable !== false ? `
+            <div class="sell-box">
+                <b style="font-size:0.9em;">Выставити на продажу</b>
+                <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+                    <input type="number" id="sell-price-input" placeholder="Цена в деньгах" min="1"
+                        style="padding:6px 10px;border:1px solid #a2a9b1;font-family:inherit;font-size:0.9em;flex:1;">
+                    <button class="btn btn-primary" onclick="listBadge(${badge.id})">Выставити</button>
+                </div>
+                <div style="font-size:0.78em;color:#a2a9b1;margin-top:6px;">Комиссия 30% — получишь 70% от цены</div>
+            </div>` : ''}
+            <p style="font-size:0.82em;color:#a2a9b1;margin-top:8px;"><a href="market.html">Открыти рынок →</a></p>
         </div>
 
         <div class="holders-section" style="margin-top:30px;">
@@ -210,6 +221,19 @@ async function init() {
             }
         </div>
     `
+}
+
+async function listBadge(badgeId) {
+    const price = parseFloat(document.getElementById('sell-price-input').value)
+    if (!price || price < 1) return alert('Укажи цену')
+    const { error } = await supabaseClient.from('badge_market').insert({
+        seller_id: currentUserId,
+        badge_id: badgeId,
+        price,
+        is_emission: false
+    })
+    if (error) { alert('Ошибка: ' + error.message); return }
+    window.location.reload()
 }
 
 async function buyListing(listingId, price) {
@@ -248,4 +272,3 @@ init()
 </script>
 </body>
 </html>
-```
