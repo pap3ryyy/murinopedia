@@ -1,311 +1,307 @@
-
 <!DOCTYPE html>
-
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Значок — Муринопедия</title>
-<link rel="icon" type="image/png" href="asset/logo.ico">
-<link rel="stylesheet" href="css/wiki.css">
-<style>
-.badge-hero { display:flex; gap:20px; align-items:center; padding:20px 0; border-bottom:1px solid #a2a9b1; margin-bottom:20px; }
-.badge-icon-big { width:80px; height:80px; object-fit:contain; flex-shrink:0; border:1px solid #eaecf0; padding:6px; background:#f8f9fa; }
-.badge-title { font-family:serif; font-size:1.8em; font-weight:normal; margin:0 0 6px 0; }
-.badge-desc { color:#54595d; font-size:0.95em; margin:0 0 8px 0; }
-.badge-meta { font-size:0.8em; color:#a2a9b1; }
-.how-to-box { background:#f0f4ff; border:1px solid #3366cc; border-left:4px solid #3366cc; padding:12px 16px; margin-bottom:20px; font-size:0.92em; }
-.how-to-box h3 { font-family:serif; font-weight:normal; font-size:1.05em; margin:0 0 6px 0; color:#3366cc; }
-.section-title { font-family:serif; font-weight:normal; font-size:1.3em; border-bottom:1px solid #a2a9b1; padding-bottom:4px; margin-bottom:14px; margin-top:30px; }
-.emission-tag { font-size:0.72em; background:#fef6e4; border:1px solid #c8a850; color:#7a6000; padding:1px 6px; display:inline-block; margin-top:4px; }
-.state-box { padding:40px 20px; text-align:center; border:1px solid #a2a9b1; background:#f8f9fa; }
-.state-box-title { font-family:serif; font-size:1.3em; margin-bottom:8px; }
-.state-box.error { border-color:#d33; background:#fee7e6; }
-.state-box.error .state-box-title { color:#d33; }
-body.dark .badge-icon-big { background:#27272a; border-color:#3f3f46; }
-body.dark .how-to-box { background:#1e293b; border-color:#3366cc; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Значок — Муринопедия</title>
+    <link rel="icon" type="image/png" href="asset/logo.ico">
+    <link rel="stylesheet" href="css/wiki.css">
+    <style>
+        .badge-hero { display:flex; gap:20px; align-items:center; padding:20px 0; border-bottom:1px solid #a2a9b1; margin-bottom:20px; }
+        .badge-icon-big { width:80px; height:80px; object-fit:contain; flex-shrink:0; border:1px solid #eaecf0; padding:6px; background:#f8f9fa; }
+        .badge-title { font-family:serif; font-size:1.8em; font-weight:normal; margin:0 0 6px 0; }
+        .badge-desc { color:#54595d; font-size:0.95em; margin:0 0 8px 0; }
+        .badge-meta { font-size:0.8em; color:#a2a9b1; }
+        .how-to-box { background:#f0f4ff; border:1px solid #3366cc; border-left:4px solid #3366cc; padding:12px 16px; margin-bottom:20px; font-size:0.92em; }
+        .how-to-box h3 { font-family:serif; font-weight:normal; font-size:1.05em; margin:0 0 6px 0; color:#3366cc; }
+        .section-title { font-family:serif; font-weight:normal; font-size:1.3em; border-bottom:1px solid #a2a9b1; padding-bottom:4px; margin-bottom:14px; margin-top:30px; }
+        .emission-tag { font-size:0.72em; background:#fef6e4; border:1px solid #c8a850; color:#7a6000; padding:1px 6px; display:inline-block; margin-top:4px; }
+        .state-box { padding:40px 20px; text-align:center; border:1px solid #a2a9b1; background:#f8f9fa; }
+        .state-box-title { font-family:serif; font-size:1.3em; margin-bottom:8px; }
+        .state-box.error { border-color:#d33; background:#fee7e6; }
+        .state-box.error .state-box-title { color:#d33; }
+        body.dark .badge-icon-big { background:#27272a; border-color:#3f3f46; }
+        body.dark .how-to-box { background:#1e293b; border-color:#3366cc; }
+    </style>
 </head>
 <body>
 
 <header>
-<div class="logo-area">
-<img src="asset/logo.png" alt="М.С.В." class="logo-img">
-<a href="index.html" class="logo-text">Муринопедия</a>
-</div>
-<div style="display:flex;align-items:center;gap:12px;">
-<div class="status-bar">
-Оперативная обстановка: <span style="color:#d33;font-weight:bold;">СТАБИЛЬНАЯ</span>
-</div>
-<div id="header-user" style="font-size:0.85em;color:#54595d;"></div>
-</div>
+    <div class="logo-area">
+        <img src="asset/logo.png" alt="М.С.В." class="logo-img">
+        <a href="index.html" class="logo-text">Муринопедия</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+        <div class="status-bar">
+            Оперативная обстановка: <span style="color:#d33;font-weight:bold;">СТАБИЛЬНАЯ</span>
+        </div>
+        <div id="header-user" style="font-size:0.85em;color:#54595d;"></div>
+    </div>
 </header>
 
 <div class="container">
-<main id="main-content">
-<p style="color:#54595d;">Загружати...</p>
-</main>
-<aside>
-<div class="sidebar-box">
-<h4>Навигация</h4>
-<p>
-<a href="index.html">Главная</a>
-
-<a href="badges.html">Все значки</a>
-
-<a href="market.html">Рынок</a>
-</p>
-</div>
-<div class="sidebar-box" style="border-color:#d33;background:#fee7e6;">
-<h4 style="color:#d33;">Напоминание</h4>
-Видл слово «Друг»? Ог — мимикрия Фога. Говори <b>Друн</b>.
-</div>
-</aside>
+    <main id="main-content">
+        <p style="color:#54595d;">Загружати...</p>
+    </main>
+    <aside>
+        <div class="sidebar-box">
+            <h4>Навигация</h4>
+            <p>
+                <a href="index.html">Главная</a><br>
+                <a href="badges.html">Все значки</a><br>
+                <a href="market.html">Рынок</a>
+            </p>
+        </div>
+        <div class="sidebar-box" style="border-color:#d33;background:#fee7e6;">
+            <h4 style="color:#d33;">Напоминание</h4>
+            Видл слово «Друг»? Ог — мимикрия Фога. Говори <b>Друн</b>.
+        </div>
+    </aside>
 </div>
 
 <footer>
-Муринопедия — 2026 год.
-
-Ч илу доной, пока естч светл. Мурино стояти, Фог дрожати.
+    Муринопедия — 2026 год.<br>
+    Ч илу доной, пока естч светл. Мурино стояти, Фог дрожати.
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script src="js/config.js"></script>
-
 <script src="js/maintenance.js"></script>
-
 <script src="js/alert.js"></script>
-
 <script src="js/ban_check.js"></script>
-
 <script src="js/theme.js"></script>
-
 <script>
 let currentUserId = null
 let userRole = null
 let walletBalance = 0
 
 async function init() {
-const params = new URLSearchParams(window.location.search)
-const badgeId = params.get('id')
-if (!badgeId) { showError('Нрт идентификатора значка'); return }
+    const params = new URLSearchParams(window.location.search)
+    const badgeId = params.get('id')
+    if (!badgeId) { showError('Нрт идентификатора значка'); return }
 
-const { data: { session } } = await supabaseClient.auth.getSession()
-if (session) {
-    currentUserId = session.user.id
-    const { data: me } = await supabaseClient
-        .from(&#39;users&#39;).select(&#39;username, public_id, role&#39;).eq(&#39;id&#39;, session.user.id).single()
-    if (me) {
-        userRole = me.role
-        document.getElementById(&#39;header-user&#39;).innerHTML = `
-            &lt;a href=&quot;profile.html?id=${me.public_id}&quot; style=&quot;color:#0645ad;&quot;&gt;${me.username}&lt;/a&gt;
-            &amp;nbsp;
-            &lt;button onclick=&quot;logout()&quot; style=&quot;padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;&quot;&gt;Выйти&lt;/button&gt;
-        `
-    }
-    const { data: wallet } = await supabaseClient
-        .from(&#39;wallets&#39;).select(&#39;balance&#39;).eq(&#39;user_id&#39;, currentUserId).single()
-    if (wallet) walletBalance = wallet.balance
-} else {
-    document.getElementById(&#39;header-user&#39;).innerHTML = `&lt;a href=&quot;login.html&quot; style=&quot;font-size:0.85em;&quot;&gt;Войти&lt;/a&gt;`
-}
-
-const { data: badge, error } = await supabaseClient
-    .from(&#39;badges&#39;).select(&#39;*&#39;).eq(&#39;id&#39;, badgeId).single()
-if (error || !badge) { showError(&#39;Значок нрт найденол вч реестре&#39;); return }
-
-const { data: holderRows } = await supabaseClient
-    .from(&#39;user_badges&#39;).select(&#39;user_id, granted_at&#39;).eq(&#39;badge_id&#39;, badgeId)
-    .order(&#39;granted_at&#39;, { ascending: true })
-
-let holders = []
-if (holderRows &amp;&amp; holderRows.length &gt; 0) {
-    const userIds = holderRows.map(r =&gt; r.user_id)
-    const { data: usersData } = await supabaseClient
-        .from(&#39;users&#39;).select(&#39;id, username, public_id, avatar_url, name_color&#39;).in(&#39;id&#39;, userIds)
-    const userMap = {}
-    if (usersData) usersData.forEach(u =&gt; { userMap[u.id] = u })
-    holders = holderRows.map(r =&gt; ({ granted_at: r.granted_at, users: userMap[r.user_id] ?? null }))
-}
-
-const { data: listings } = await supabaseClient
-    .from(&#39;badge_market&#39;).select(&#39;id, price, is_emission, seller_id&#39;)
-    .eq(&#39;badge_id&#39;, badgeId).order(&#39;price&#39;, { ascending: true })
-
-let sellerMap = {}
-if (listings &amp;&amp; listings.length &gt; 0) {
-    const sellerIds = [...new Set(listings.map(l =&gt; l.seller_id))]
-    const { data: sellers } = await supabaseClient
-        .from(&#39;users&#39;).select(&#39;id, username, public_id, avatar_url, name_color&#39;).in(&#39;id&#39;, sellerIds)
-    sellers?.forEach(s =&gt; sellerMap[s.id] = s)
-}
-
-const iHolder = holderRows?.some(r =&gt; r.user_id === currentUserId)
-const hasListing = listings?.some(l =&gt; l.seller_id === currentUserId)
-const isOsnov = userRole === &#39;м.с.в. основательность&#39;
-const rarityLabel = { common: &#39;Обычный&#39;, rare: &#39;Редкий&#39;, legendary: &#39;Легендарный&#39; }[badge.rarity] ?? &#39;&#39;
-
-document.title = badge.name + &#39; — Муринопедия&#39;
-
-document.getElementById(&#39;main-content&#39;).innerHTML = `
-    &lt;div class=&quot;badge-hero&quot;&gt;
-        &lt;img src=&quot;${badge.icon_url}&quot; class=&quot;badge-icon-big&quot; alt=&quot;${badge.name}&quot;&gt;
-        &lt;div&gt;
-            &lt;h1 class=&quot;badge-title&quot;&gt;${badge.name}&lt;/h1&gt;
-            ${badge.description ? `&lt;p class=&quot;badge-desc&quot;&gt;${badge.description}&lt;/p&gt;` : &#39;&#39;}
-            &lt;div class=&quot;badge-meta&quot;&gt;
-                Добавленол: ${new Date(badge.created_at).toLocaleDateString(&#39;ru-RU&#39;)} · Выдано: ${holders.length} Людич
-                ${rarityLabel ? ` · ${rarityLabel}` : &#39;&#39;}
-                ${badge.max_supply ? ` · Лимит: ${badge.max_supply} шт.` : &#39;&#39;}
-            &lt;/div&gt;
-        &lt;/div&gt;
-    &lt;/div&gt;
-
-    ${badge.how_to_get ? `
-    &lt;div class=&quot;how-to-box&quot;&gt;
-        &lt;h3&gt;Как получити&lt;/h3&gt;
-        ${badge.how_to_get}
-    &lt;/div&gt;` : &#39;&#39;}
-
-    &lt;h2 class=&quot;section-title&quot;&gt;Рынок &lt;span style=&quot;font-size:0.7em;color:#a2a9b1;font-family:sans-serif;&quot;&gt;${listings?.length ?? 0} лотов&lt;/span&gt;&lt;/h2&gt;
-
-    ${!listings || listings.length === 0
-        ? &#39;&lt;p style=&quot;color:#a2a9b1;font-style:italic;font-size:0.9em;&quot;&gt;Нрт активных лотов&lt;/p&gt;&#39;
-        : listings.map(l =&gt; {
-            const s = sellerMap[l.seller_id]
-            const isOwn = currentUserId &amp;&amp; l.seller_id === currentUserId
-            const nameColor = s?.name_color ? `color:${s.name_color};` : &#39;&#39;
-            return `&lt;div class=&quot;sidebar-box&quot; style=&quot;display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:6px;&quot;&gt;
-                &lt;img src=&quot;${badge.icon_url}&quot; style=&quot;width:40px;height:40px;object-fit:contain;border:1px solid #eaecf0;padding:3px;background:#fff;flex-shrink:0;&quot;&gt;
-                &lt;div style=&quot;flex:1;min-width:0;&quot;&gt;
-                    &lt;div style=&quot;font-weight:bold;font-size:1.05em;&quot;&gt;💰 ${Number(l.price).toLocaleString(&#39;ru-RU&#39;, { minimumFractionDigits: 2 })} денег&lt;/div&gt;
-                    ${s ? `&lt;div style=&quot;display:flex;align-items:center;gap:6px;margin-top:4px;&quot;&gt;
-                        ${s.avatar_url
-                            ? `&lt;img src=&quot;${s.avatar_url}&quot; style=&quot;width:18px;height:18px;border-radius:2px;object-fit:cover;&quot;&gt;`
-                            : `&lt;span style=&quot;width:18px;height:18px;background:#eaecf0;border-radius:2px;display:inline-flex;align-items:center;justify-content:center;font-size:0.7em;flex-shrink:0;&quot;&gt;${s.username[0].toUpperCase()}&lt;/span&gt;`
-                        }
-                        &lt;a href=&quot;profile.html?id=${s.public_id}&quot; style=&quot;font-size:0.82em;${nameColor}&quot;&gt;${s.username}&lt;/a&gt;
-                    &lt;/div&gt;` : &#39;&#39;}
-                    ${l.is_emission ? &#39;&lt;span class=&quot;emission-tag&quot;&gt;Эмиссия&lt;/span&gt;&#39; : &#39;&#39;}
-                &lt;/div&gt;
-                ${!currentUserId
-                    ? `&lt;a href=&quot;login.html&quot; class=&quot;btn btn-secondary&quot; style=&quot;font-size:0.82em;&quot;&gt;Войти&lt;/a&gt;`
-                    : isOwn
-                    ? `&lt;button class=&quot;btn btn-danger&quot; style=&quot;font-size:0.82em;&quot; onclick=&quot;cancelListing(${l.id})&quot;&gt;Снять&lt;/button&gt;`
-                    : `&lt;button class=&quot;btn btn-primary&quot; style=&quot;font-size:0.82em;&quot; onclick=&quot;buyListing(${l.id}, ${l.price})&quot;&gt;Купити&lt;/button&gt;`
-                }
-            &lt;/div&gt;`
-        }).join(&#39;&#39;)
+    const { data: { session } } = await supabaseClient.auth.getSession()
+    if (session) {
+        currentUserId = session.user.id
+        const { data: me } = await supabaseClient
+            .from('users').select('username, public_id, role').eq('id', session.user.id).single()
+        if (me) {
+            userRole = me.role
+            document.getElementById('header-user').innerHTML = `
+                <a href="profile.html?id=${me.public_id}" style="color:#0645ad;">${me.username}</a>
+                &nbsp;
+                <button onclick="logout()" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;">Выйти</button>
+            `
+        }
+        const { data: wallet } = await supabaseClient
+            .from('wallets').select('balance').eq('user_id', currentUserId).single()
+        if (wallet) walletBalance = wallet.balance
+    } else {
+        document.getElementById('header-user').innerHTML = `<a href="login.html" style="font-size:0.85em;">Войти</a>`
     }
 
-    ${((iHolder &amp;&amp; !hasListing) || isOsnov) &amp;&amp; badge.transferable !== false ? `
-    &lt;div class=&quot;sidebar-box&quot; style=&quot;margin-top:16px; border-color: ${isOsnov ? &#39;#c8a850&#39; : &#39;#a2a9b1&#39;}&quot;&gt;
-        &lt;b style=&quot;font-size:0.9em;&quot;&gt;${isOsnov ? &#39;Создать копию (Основательность)&#39; : &#39;Выставити на продажу&#39;}&lt;/b&gt;
-        &lt;div style=&quot;display:flex;gap:8px;margin-top:8px;align-items:center;&quot;&gt;
-            &lt;input type=&quot;number&quot; id=&quot;sell-price-input&quot; placeholder=&quot;Цена в деньгах&quot; min=&quot;0.01&quot; step=&quot;0.01&quot;
-                style=&quot;padding:6px 10px;border:1px solid #a2a9b1;font-family:inherit;font-size:0.9em;flex:1;&quot;&gt;
-            &lt;button class=&quot;btn btn-primary&quot; onclick=&quot;listBadge(${badge.id}, ${isOsnov})&quot;&gt;Выставити&lt;/button&gt;
-        &lt;/div&gt;
-        &lt;div style=&quot;font-size:0.78em;color:#a2a9b1;margin-top:6px;&quot;&gt;
-            ${isOsnov ? &#39;Будет создана новая копия значка.&#39; : &#39;Внимание: значок исчезнет из инвентаря на время продажи.&#39;}
-        &lt;/div&gt;
-    &lt;/div&gt;` : &#39;&#39;}
+    const { data: badge, error } = await supabaseClient
+        .from('badges').select('*').eq('id', badgeId).single()
+    if (error || !badge) { showError('Значок нрт найденол вч реестре'); return }
 
-    &lt;p style=&quot;font-size:0.82em;color:#a2a9b1;margin-top:8px;&quot;&gt;&lt;a href=&quot;market.html&quot;&gt;Открыти рынок →&lt;/a&gt;&lt;/p&gt;
+    const { data: holderRows } = await supabaseClient
+        .from('user_badges').select('user_id, granted_at').eq('badge_id', badgeId)
+        .order('granted_at', { ascending: true })
 
-    &lt;h2 class=&quot;section-title&quot;&gt;Обладатели &lt;span style=&quot;font-size:0.7em;color:#a2a9b1;font-family:sans-serif;&quot;&gt;${holders.length}&lt;/span&gt;&lt;/h2&gt;
+    let holders = []
+    if (holderRows && holderRows.length > 0) {
+        const userIds = holderRows.map(r => r.user_id)
+        const { data: usersData } = await supabaseClient
+            .from('users').select('id, username, public_id, avatar_url, name_color').in('id', userIds)
+        const userMap = {}
+        if (usersData) usersData.forEach(u => { userMap[u.id] = u })
+        holders = holderRows.map(r => ({ granted_at: r.granted_at, users: userMap[r.user_id] ?? null }))
+    }
 
-    ${holders.length === 0
-        ? &#39;&lt;p style=&quot;color:#a2a9b1;font-style:italic;font-size:0.9em;&quot;&gt;Нрт обладателей — значок ещё нрт выданол&lt;/p&gt;&#39;
-        : holders.map(h =&gt; {
-            const u = h.users
-            if (!u) return &#39;&#39;
-            const nameColor = u.name_color ? `color:${u.name_color};` : &#39;&#39;
-            const date = new Date(h.granted_at).toLocaleDateString(&#39;ru-RU&#39;)
-            return `&lt;div class=&quot;sidebar-box&quot; style=&quot;display:flex;align-items:center;gap:12px;padding:8px 12px;margin-bottom:6px;&quot;&gt;
-                &lt;div style=&quot;width:36px;height:36px;border-radius:2px;overflow:hidden;flex-shrink:0;background:#eaecf0;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:1.1em;color:#a2a9b1;&quot;&gt;
-                    ${u.avatar_url
-                        ? `&lt;img src=&quot;${u.avatar_url}&quot; style=&quot;width:36px;height:36px;object-fit:cover;display:block;&quot;&gt;`
-                        : u.username[0].toUpperCase()
+    const { data: listings } = await supabaseClient
+        .from('badge_market').select('id, price, is_emission, seller_id')
+        .eq('badge_id', badgeId).order('price', { ascending: true })
+
+    let sellerMap = {}
+    if (listings && listings.length > 0) {
+        const sellerIds = [...new Set(listings.map(l => l.seller_id))]
+        const { data: sellers } = await supabaseClient
+            .from('users').select('id, username, public_id, avatar_url, name_color').in('id', sellerIds)
+        sellers?.forEach(s => sellerMap[s.id] = s)
+    }
+
+    const iHolder = holderRows?.some(r => r.user_id === currentUserId)
+    const hasListing = listings?.some(l => l.seller_id === currentUserId)
+    const isOsnov = userRole === 'м.с.в. основательность'
+    const rarityLabel = { common: 'Обычный', rare: 'Редкий', legendary: 'Легендарный' }[badge.rarity] ?? ''
+
+    document.title = badge.name + ' — Муринопедия'
+
+    document.getElementById('main-content').innerHTML = `
+        <div class="badge-hero">
+            <img src="${badge.icon_url}" class="badge-icon-big" alt="${badge.name}">
+            <div>
+                <h1 class="badge-title">${badge.name}</h1>
+                ${badge.description ? `<p class="badge-desc">${badge.description}</p>` : ''}
+                <div class="badge-meta">
+                    Добавленол: ${new Date(badge.created_at).toLocaleDateString('ru-RU')} · Выдано: ${holders.length} Людич
+                    ${rarityLabel ? ` · ${rarityLabel}` : ''}
+                    ${badge.max_supply ? ` · Лимит: ${badge.max_supply} шт.` : ''}
+                </div>
+            </div>
+        </div>
+
+        ${badge.how_to_get ? `
+        <div class="how-to-box">
+            <h3>Как получити</h3>
+            ${badge.how_to_get}
+        </div>` : ''}
+
+        <h2 class="section-title">Рынок <span style="font-size:0.7em;color:#a2a9b1;font-family:sans-serif;">${listings?.length ?? 0} лотов</span></h2>
+
+        ${!listings || listings.length === 0
+            ? '<p style="color:#a2a9b1;font-style:italic;font-size:0.9em;">Нрт активных лотов</p>'
+            : listings.map(l => {
+                const s = sellerMap[l.seller_id]
+                const isOwn = currentUserId && l.seller_id === currentUserId
+                const nameColor = s?.name_color ? `color:${s.name_color};` : ''
+                return `<div class="sidebar-box" style="display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:6px;">
+                    <img src="${badge.icon_url}" style="width:40px;height:40px;object-fit:contain;border:1px solid #eaecf0;padding:3px;background:#fff;flex-shrink:0;">
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:bold;font-size:1.05em;">💰 ${Number(l.price).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} денег</div>
+                        ${s ? `<div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+                            ${s.avatar_url
+                                ? `<img src="${s.avatar_url}" style="width:18px;height:18px;border-radius:2px;object-fit:cover;">`
+                                : `<span style="width:18px;height:18px;background:#eaecf0;border-radius:2px;display:inline-flex;align-items:center;justify-content:center;font-size:0.7em;flex-shrink:0;">${s.username[0].toUpperCase()}</span>`
+                            }
+                            <a href="profile.html?id=${s.public_id}" style="font-size:0.82em;${nameColor}">${s.username}</a>
+                        </div>` : ''}
+                        ${l.is_emission ? '<span class="emission-tag">Эмиссия</span>' : ''}
+                    </div>
+                    ${!currentUserId
+                        ? `<a href="login.html" class="btn btn-secondary" style="font-size:0.82em;">Войти</a>`
+                        : isOwn
+                        ? `<button class="btn btn-danger" style="font-size:0.82em;" onclick="cancelListing(${l.id})">Снять</button>`
+                        : `<button class="btn btn-primary" style="font-size:0.82em;" onclick="buyListing(${l.id}, ${l.price})">Купити</button>`
                     }
-                &lt;/div&gt;
-                &lt;a href=&quot;profile.html?id=${u.public_id}&quot; style=&quot;font-size:0.95em;flex:1;${nameColor}&quot;&gt;${u.username}&lt;/a&gt;
-                &lt;span style=&quot;font-size:0.78em;color:#a2a9b1;&quot;&gt;${date}&lt;/span&gt;
-            &lt;/div&gt;`
-        }).join(&#39;&#39;)
-    }
-`
+                </div>`
+            }).join('')
+        }
 
+        ${((iHolder && !hasListing) || isOsnov) && badge.transferable !== false ? `
+        <div class="sidebar-box" style="margin-top:16px; border-color: ${isOsnov ? '#c8a850' : '#a2a9b1'}">
+            <b style="font-size:0.9em;">${isOsnov ? 'Создать копию (Основательность)' : 'Выставити на продажу'}</b>
+            <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+                <input type="number" id="sell-price-input" placeholder="Цена в деньгах" min="0.01" step="0.01"
+                    style="padding:6px 10px;border:1px solid #a2a9b1;font-family:inherit;font-size:0.9em;flex:1;">
+                <button class="btn btn-primary" onclick="listBadge(${badge.id}, ${isOsnov})">Выставити</button>
+            </div>
+            <div style="font-size:0.78em;color:#a2a9b1;margin-top:6px;">
+                ${isOsnov ? 'Будет создана новая копия значка.' : 'Внимание: значок исчезнет из инвентаря на время продажи.'}
+            </div>
+        </div>` : ''}
+
+        <p style="font-size:0.82em;color:#a2a9b1;margin-top:8px;"><a href="market.html">Открыти рынок →</a></p>
+
+        <h2 class="section-title">Обладатели <span style="font-size:0.7em;color:#a2a9b1;font-family:sans-serif;">${holders.length}</span></h2>
+
+        ${holders.length === 0
+            ? '<p style="color:#a2a9b1;font-style:italic;font-size:0.9em;">Нрт обладателей — значок ещё нрт выданол</p>'
+            : holders.map(h => {
+                const u = h.users
+                if (!u) return ''
+                const nameColor = u.name_color ? `color:${u.name_color};` : ''
+                const date = new Date(h.granted_at).toLocaleDateString('ru-RU')
+                return `<div class="sidebar-box" style="display:flex;align-items:center;gap:12px;padding:8px 12px;margin-bottom:6px;">
+                    <div style="width:36px;height:36px;border-radius:2px;overflow:hidden;flex-shrink:0;background:#eaecf0;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:1.1em;color:#a2a9b1;">
+                        ${u.avatar_url
+                            ? `<img src="${u.avatar_url}" style="width:36px;height:36px;object-fit:cover;display:block;">`
+                            : u.username[0].toUpperCase()
+                        }
+                    </div>
+                    <a href="profile.html?id=${u.public_id}" style="font-size:0.95em;flex:1;${nameColor}">${u.username}</a>
+                    <span style="font-size:0.78em;color:#a2a9b1;">${date}</span>
+                </div>`
+            }).join('')
+        }
+    `
 }
 
 async function listBadge(badgeId, isOsnov) {
-const price = parseFloat(document.getElementById('sell-price-input').value)
-if (!price || price <= 0) return alert('Укажи цену')
+    const priceInput = document.getElementById('sell-price-input');
+    const price = parseFloat(priceInput.value);
+    if (!price || price <= 0) return alert('Укажи цену');
 
-if (!isOsnov) {
-    const { data: check } = await supabaseClient.from(&#39;user_badges&#39;).select(&#39;id&#39;).eq(&#39;user_id&#39;, currentUserId).eq(&#39;badge_id&#39;, badgeId).limit(1).single()
-    if (!check) return alert(&#39;У вас нет этого значка&#39;)
+    if (!isOsnov) {
+        const { data: check } = await supabaseClient.from('user_badges').select('id').eq('user_id', currentUserId).eq('badge_id', badgeId).limit(1).single();
+        if (!check) return alert('У вас нет этого значка');
 
-    const { error: delError } = await supabaseClient.from(&#39;user_badges&#39;).delete().eq(&#39;user_id&#39;, currentUserId).eq(&#39;badge_id&#39;, badgeId)
-    if (delError) return alert(&#39;Ошибка изъятия: &#39; + delError.message)
-}
+        const { error: delError } = await supabaseClient.from('user_badges').delete().eq('user_id', currentUserId).eq('badge_id', badgeId);
+        if (delError) return alert('Ошибка изъятия: ' + delError.message);
+    }
 
-const { error } = await supabaseClient.from(&#39;badge_market&#39;).insert({
-    seller_id: currentUserId,
-    badge_id: badgeId,
-    price,
-    is_emission: isOsnov
-})
-
-if (error) {
-    if (!isOsnov) await supabaseClient.from(&#39;user_badges&#39;).insert({ user_id: currentUserId, badge_id: badgeId })
-    alert(&#39;Ошибка: &#39; + error.message)
-    return
-}
-window.location.reload()
-
+    const { error } = await supabaseClient.from('badge_market').insert({
+        seller_id: currentUserId,
+        badge_id: badgeId,
+        price: price,
+        is_emission: isOsnov
+    });
+    
+    if (error) {
+        if (!isOsnov) await supabaseClient.from('user_badges').insert({ user_id: currentUserId, badge_id: badgeId });
+        alert('Ошибка: ' + error.message);
+        return;
+    }
+    window.location.reload();
 }
 
 async function buyListing(listingId, price) {
-if (!confirm(Купить за ${Number(price).toLocaleString(&#39;ru-RU&#39;, { minimumFractionDigits: 2 })} денег?\nТвой баланс: ${Number(walletBalance).toLocaleString(&#39;ru-RU&#39;, { minimumFractionDigits: 2 })} денег)) return
-const { error } = await supabaseClient.rpc('buy_badge', {
-listing_id: listingId,
-buyer_id: currentUserId
-})
-if (error) { alert('Ошибка: ' + error.message); return }
-window.location.reload()
+    const formattedPrice = Number(price).toLocaleString('ru-RU', { minimumFractionDigits: 2 });
+    const formattedBalance = Number(walletBalance).toLocaleString('ru-RU', { minimumFractionDigits: 2 });
+    
+    if (!confirm(`Купить за ${formattedPrice} денег?\nТвой баланс: ${formattedBalance} денег`)) return;
+    
+    const { error } = await supabaseClient.rpc('buy_badge', {
+        listing_id: listingId,
+        buyer_id: currentUserId
+    });
+    
+    if (error) { alert('Ошибка: ' + error.message); return; }
+    window.location.reload();
 }
 
 async function cancelListing(listingId) {
-if (!confirm('Снять лот?')) return
-const { data: listing } = await supabaseClient.from('badge_market').select('badge_id, is_emission').eq('id', listingId).single()
-if (!listing) return
+    if (!confirm('Снять лот?')) return;
+    const { data: listing } = await supabaseClient.from('badge_market').select('badge_id, is_emission').eq('id', listingId).single();
+    if (!listing) return;
 
-const { error: delError } = await supabaseClient.from(&#39;badge_market&#39;).delete().eq(&#39;id&#39;, listingId).eq(&#39;seller_id&#39;, currentUserId)
-if (delError) return alert(&#39;Ошибка: &#39; + delError.message)
+    const { error: delError } = await supabaseClient.from('badge_market').delete().eq('id', listingId).eq('seller_id', currentUserId);
+    if (delError) return alert('Ошибка: ' + delError.message);
 
-if (!listing.is_emission) {
-    await supabaseClient.from(&#39;user_badges&#39;).insert({
-        user_id: currentUserId,
-        badge_id: listing.badge_id
-    })
-}
-window.location.reload()
-
+    if (!listing.is_emission) {
+        await supabaseClient.from('user_badges').insert({
+            user_id: currentUserId,
+            badge_id: listing.badge_id
+        });
+    }
+    window.location.reload();
 }
 
 function showError(msg) {
-document.getElementById('main-content').innerHTML =  &lt;div class=&quot;state-box error&quot;&gt; &lt;div class=&quot;state-box-title&quot;&gt;Смертч-шум&lt;/div&gt; &lt;div&gt;${msg}&lt;/div&gt;<br> &lt;a href=&quot;index.html&quot; class=&quot;btn btn-secondary&quot;&gt;← На главную&lt;/a&gt; &lt;/div&gt;
+    document.getElementById('main-content').innerHTML = `
+        <div class="state-box error">
+            <div class="state-box-title">Смертч-шум</div>
+            <div>${msg}</div><br>
+            <a href="index.html" class="btn btn-secondary">← На главную</a>
+        </div>`;
 }
 
 async function logout() {
-await supabaseClient.auth.signOut()
-window.location.href = 'login.html'
+    await supabaseClient.auth.signOut();
+    window.location.href = 'login.html';
 }
 
-init()
+init();
 </script>
-
 </body>
 </html>
