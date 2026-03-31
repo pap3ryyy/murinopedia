@@ -168,7 +168,7 @@ async function init() {
                 return `<div class="sidebar-box" style="display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:6px;">
                     <img src="${badge.icon_url}" style="width:40px;height:40px;object-fit:contain;border:1px solid #eaecf0;padding:3px;background:#fff;flex-shrink:0;">
                     <div style="flex:1;min-width:0;">
-                        <div style="font-weight:bold;font-size:1.05em;">💰 ${Number(l.price).toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} денег</div>
+                        <div style="font-weight:bold;font-size:1.05em;">💰 ${Number(l.price).toLocaleString('ru-RU')} денег</div>
                         ${s ? `<div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
                             ${s.avatar_url
                                 ? `<img src="${s.avatar_url}" style="width:18px;height:18px;border-radius:2px;object-fit:cover;">`
@@ -192,35 +192,28 @@ async function init() {
         <div class="sidebar-box" style="margin-top:16px; border-color: ${isOsnov ? '#c8a850' : '#a2a9b1'}">
             <b style="font-size:0.9em;">${isOsnov ? 'Создать копию (Основательность)' : 'Выставити на продажу'}</b>
             <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
-                <input type="number" id="sell-price-input" placeholder="Цена в деньгах" min="0.01" step="0.01"
+                <input type="number" id="sell-price-input" placeholder="Цена в деньгах" min="1"
                     style="padding:6px 10px;border:1px solid #a2a9b1;font-family:inherit;font-size:0.9em;flex:1;">
                 <button class="btn btn-primary" onclick="listBadge(${badge.id}, ${isOsnov})">Выставити</button>
             </div>
             <div style="font-size:0.78em;color:#a2a9b1;margin-top:6px;">
-                ${isOsnov ? 'Будет создана новая копия значка.' : 'Внимание: значок исчезнет из инвентаря на время продажи.'}
+                ${isOsnov ? 'Будет создана новая копия.' : 'Значок пропадет из инвентаря до продажи или отмены.'}
             </div>
         </div>` : ''}
-
-        <p style="font-size:0.82em;color:#a2a9b1;margin-top:8px;"><a href="market.html">Открыти рынок →</a></p>
 
         <h2 class="section-title">Обладатели <span style="font-size:0.7em;color:#a2a9b1;font-family:sans-serif;">${holders.length}</span></h2>
 
         ${holders.length === 0
-            ? '<p style="color:#a2a9b1;font-style:italic;font-size:0.9em;">Нрт обладателей — значок ещё нрт выданол</p>'
+            ? '<p style="color:#a2a9b1;font-style:italic;font-size:0.9em;">Нрт обладателей</p>'
             : holders.map(h => {
                 const u = h.users
                 if (!u) return ''
                 const nameColor = u.name_color ? `color:${u.name_color};` : ''
-                const date = new Date(h.granted_at).toLocaleDateString('ru-RU')
                 return `<div class="sidebar-box" style="display:flex;align-items:center;gap:12px;padding:8px 12px;margin-bottom:6px;">
-                    <div style="width:36px;height:36px;border-radius:2px;overflow:hidden;flex-shrink:0;background:#eaecf0;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:1.1em;color:#a2a9b1;">
-                        ${u.avatar_url
-                            ? `<img src="${u.avatar_url}" style="width:36px;height:36px;object-fit:cover;display:block;">`
-                            : u.username[0].toUpperCase()
-                        }
+                    <div style="width:36px;height:36px;border-radius:2px;overflow:hidden;flex-shrink:0;background:#eaecf0;display:flex;align-items:center;justify-content:center;font-size:1.1em;color:#a2a9b1;">
+                        ${u.avatar_url ? `<img src="${u.avatar_url}" style="width:36px;height:36px;object-fit:cover;">` : u.username[0].toUpperCase()}
                     </div>
                     <a href="profile.html?id=${u.public_id}" style="font-size:0.95em;flex:1;${nameColor}">${u.username}</a>
-                    <span style="font-size:0.78em;color:#a2a9b1;">${date}</span>
                 </div>`
             }).join('')
         }
@@ -228,80 +221,59 @@ async function init() {
 }
 
 async function listBadge(badgeId, isOsnov) {
-    const priceInput = document.getElementById('sell-price-input');
-    const price = parseFloat(priceInput.value);
-    if (!price || price <= 0) return alert('Укажи цену');
+    const price = parseFloat(document.getElementById('sell-price-input').value)
+    if (!price || price < 1) return alert('Укажи цену')
 
     if (!isOsnov) {
-        const { data: check } = await supabaseClient.from('user_badges').select('id').eq('user_id', currentUserId).eq('badge_id', badgeId).limit(1).single();
-        if (!check) return alert('У вас нет этого значка');
-
-        const { error: delError } = await supabaseClient.from('user_badges').delete().eq('user_id', currentUserId).eq('badge_id', badgeId);
-        if (delError) return alert('Ошибка изъятия: ' + delError.message);
+        const { error: delError } = await supabaseClient.from('user_badges')
+            .delete().eq('user_id', currentUserId).eq('badge_id', badgeId)
+        
+        if (delError) return alert('Ошибка изъятия значка')
     }
 
     const { error } = await supabaseClient.from('badge_market').insert({
         seller_id: currentUserId,
         badge_id: badgeId,
-        price: price,
+        price,
         is_emission: isOsnov
-    });
+    })
     
     if (error) {
-        if (!isOsnov) await supabaseClient.from('user_badges').insert({ user_id: currentUserId, badge_id: badgeId });
-        alert('Ошибка: ' + error.message);
-        return;
+        if (!isOsnov) await supabaseClient.from('user_badges').insert({ user_id: currentUserId, badge_id: badgeId })
+        alert('Ошибка выставления')
+        return
     }
-    window.location.reload();
+    window.location.reload()
 }
 
 async function buyListing(listingId, price) {
-    const formattedPrice = Number(price).toLocaleString('ru-RU', { minimumFractionDigits: 2 });
-    const formattedBalance = Number(walletBalance).toLocaleString('ru-RU', { minimumFractionDigits: 2 });
-    
-    if (!confirm(`Купить за ${formattedPrice} денег?\nТвой баланс: ${formattedBalance} денег`)) return;
-    
-    const { error } = await supabaseClient.rpc('buy_badge', {
-        listing_id: listingId,
-        buyer_id: currentUserId
-    });
-    
-    if (error) { alert('Ошибка: ' + error.message); return; }
-    window.location.reload();
+    if (!confirm(`Купити за ${Number(price).toLocaleString('ru-RU')}?`)) return
+    const { error } = await supabaseClient.rpc('buy_badge', { listing_id: listingId, buyer_id: currentUserId })
+    if (error) return alert('Ошибка покупки: ' + error.message)
+    window.location.reload()
 }
 
 async function cancelListing(listingId) {
-    if (!confirm('Снять лот?')) return;
-    const { data: listing } = await supabaseClient.from('badge_market').select('badge_id, is_emission').eq('id', listingId).single();
-    if (!listing) return;
+    if (!confirm('Снять лот?')) return
+    const { data: listing } = await supabaseClient.from('badge_market').select('badge_id, is_emission').eq('id', listingId).single()
+    if (!listing) return
 
-    const { error: delError } = await supabaseClient.from('badge_market').delete().eq('id', listingId).eq('seller_id', currentUserId);
-    if (delError) return alert('Ошибка: ' + delError.message);
+    const { error: delError } = await supabaseClient.from('badge_market').delete().eq('id', listingId).eq('seller_id', currentUserId)
+    if (delError) return alert('Ошибка удаления лота')
 
     if (!listing.is_emission) {
-        await supabaseClient.from('user_badges').insert({
-            user_id: currentUserId,
-            badge_id: listing.badge_id
-        });
+        await supabaseClient.from('user_badges').insert({ user_id: currentUserId, badge_id: listing.badge_id })
     }
-    window.location.reload();
+    window.location.reload()
 }
 
 function showError(msg) {
-    document.getElementById('main-content').innerHTML = `
-        <div class="state-box error">
-            <div class="state-box-title">Смертч-шум</div>
-            <div>${msg}</div><br>
-            <a href="index.html" class="btn btn-secondary">← На главную</a>
-        </div>`;
+    document.getElementById('main-content').innerHTML = `<div class="state-box error"><div class="state-box-title">Ошибка</div><div>${msg}</div></div>`
 }
 
-async function logout() {
-    await supabaseClient.auth.signOut();
-    window.location.href = 'login.html';
-}
+async function logout() { await supabaseClient.auth.signOut(); window.location.href = 'login.html' }
 
-init();
+init()
 </script>
 </body>
 </html>
