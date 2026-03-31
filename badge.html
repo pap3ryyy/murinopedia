@@ -2,7 +2,6 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <script src="js/security.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Значок — Муринопедия</title>
     <link rel="icon" type="image/png" href="asset/logo.ico">
@@ -15,20 +14,14 @@
         .badge-meta { font-size:0.8em; color:#a2a9b1; }
         .how-to-box { background:#f0f4ff; border:1px solid #3366cc; border-left:4px solid #3366cc; padding:12px 16px; margin-bottom:20px; font-size:0.92em; }
         .how-to-box h3 { font-family:serif; font-weight:normal; font-size:1.05em; margin:0 0 6px 0; color:#3366cc; }
-        .holders-section h2 { font-family:serif; font-weight:normal; font-size:1.3em; border-bottom:1px solid #a2a9b1; padding-bottom:4px; margin-bottom:14px; }
-        .holders-grid { display:flex; flex-direction:column; gap:8px; }
-        .holder-row { display:flex; align-items:center; gap:12px; padding:8px 12px; border:1px solid #eaecf0; background:#f8f9fa; }
-        .holder-avatar { width:36px; height:36px; border-radius:2px; object-fit:cover; background:#eaecf0; display:flex; align-items:center; justify-content:center; font-family:serif; font-size:1.1em; color:#a2a9b1; flex-shrink:0; overflow:hidden; }
-        .holder-name { font-size:0.95em; }
-        .holder-date { font-size:0.78em; color:#a2a9b1; margin-left:auto; }
-        .market-section h2 { font-family:serif; font-weight:normal; font-size:1.3em; border-bottom:1px solid #a2a9b1; padding-bottom:4px; margin-bottom:14px; margin-top:30px; }
-        .listing-row { display:flex; align-items:center; gap:12px; padding:10px 14px; border:1px solid #eaecf0; background:#f8f9fa; margin-bottom:6px; }
+        .section-title { font-family:serif; font-weight:normal; font-size:1.3em; border-bottom:1px solid #a2a9b1; padding-bottom:4px; margin-bottom:14px; margin-top:30px; }
         .emission-tag { font-size:0.72em; background:#fef6e4; border:1px solid #c8a850; color:#7a6000; padding:1px 6px; }
-        .sell-box { margin-top:16px; padding:14px; border:1px solid #a2a9b1; background:#f8f9fa; }
         .state-box { padding:40px 20px; text-align:center; border:1px solid #a2a9b1; background:#f8f9fa; }
         .state-box-title { font-family:serif; font-size:1.3em; margin-bottom:8px; }
         .state-box.error { border-color:#d33; background:#fee7e6; }
         .state-box.error .state-box-title { color:#d33; }
+        body.dark .badge-icon-big { background:#27272a; border-color:#3f3f46; }
+        body.dark .how-to-box { background:#1e293b; border-color:#3366cc; }
     </style>
 </head>
 <body>
@@ -137,11 +130,9 @@ async function init() {
 
     const iHolder = holderRows?.some(r => r.user_id === currentUserId)
     const hasListing = listings?.some(l => l.seller_id === currentUserId)
+    const rarityLabel = { common: 'Обычный', rare: 'Редкий', legendary: 'Легендарный' }[badge.rarity] ?? ''
 
     document.title = badge.name + ' — Муринопедия'
-    const created = new Date(badge.created_at).toLocaleDateString('ru-RU')
-    const holderCount = holders.length
-    const rarityLabel = { common: 'Обычный', rare: 'Редкий', legendary: 'Легендарный' }[badge.rarity] ?? ''
 
     document.getElementById('main-content').innerHTML = `
         <div class="badge-hero">
@@ -150,7 +141,7 @@ async function init() {
                 <h1 class="badge-title">${badge.name}</h1>
                 ${badge.description ? `<p class="badge-desc">${badge.description}</p>` : ''}
                 <div class="badge-meta">
-                    Добавленол: ${created} · Выдано: ${holderCount} Людич
+                    Добавленол: ${new Date(badge.created_at).toLocaleDateString('ru-RU')} · Выдано: ${holders.length} Людич
                     ${rarityLabel ? ` · ${rarityLabel}` : ''}
                     ${badge.max_supply ? ` · Лимит: ${badge.max_supply} шт.` : ''}
                 </div>
@@ -163,63 +154,61 @@ async function init() {
             ${badge.how_to_get}
         </div>` : ''}
 
-        <div class="market-section">
-            <h2>Рынок <span style="font-size:0.7em;color:#a2a9b1;font-family:sans-serif;">${listings?.length ?? 0} лотов</span></h2>
-            ${!listings || listings.length === 0
-                ? '<p style="color:#a2a9b1;font-style:italic;font-size:0.9em;">Нрт активных лотов</p>'
-                : listings.map(l => {
-                    const s = sellerMap[l.seller_id]
-                    const isOwn = currentUserId && l.seller_id === currentUserId
-                    return `<div class="listing-row">
-                        ${l.is_emission ? '<span class="emission-tag">Эмиссия</span>' : ''}
-                        <span style="flex:1;font-weight:bold;">${Number(l.price).toLocaleString('ru-RU')} денег</span>
-                        ${s ? `<span style="font-size:0.82em;color:#54595d;">Продавец: <a href="profile.html?id=${s.public_id}">${s.username}</a></span>` : ''}
-                        ${!currentUserId
-                            ? `<a href="login.html" class="btn btn-secondary" style="font-size:0.82em;">Войти</a>`
-                            : isOwn
-                            ? `<button class="btn btn-danger" style="font-size:0.82em;" onclick="cancelListing(${l.id})">Снять</button>`
-                            : `<button class="btn btn-primary" style="font-size:0.82em;" onclick="buyListing(${l.id}, ${l.price})">Купити</button>`
-                        }
-                    </div>`
-                }).join('')
-            }
-            ${iHolder && !hasListing && badge.transferable !== false ? `
-            <div class="sell-box">
-                <b style="font-size:0.9em;">Выставити на продажу</b>
-                <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
-                    <input type="number" id="sell-price-input" placeholder="Цена в деньгах" min="1"
-                        style="padding:6px 10px;border:1px solid #a2a9b1;font-family:inherit;font-size:0.9em;flex:1;">
-                    <button class="btn btn-primary" onclick="listBadge(${badge.id})">Выставити</button>
-                </div>
-                <div style="font-size:0.78em;color:#a2a9b1;margin-top:6px;">Комиссия 30% — получишь 70% от цены</div>
-            </div>` : ''}
-            <p style="font-size:0.82em;color:#a2a9b1;margin-top:8px;"><a href="market.html">Открыти рынок →</a></p>
-        </div>
+        <h2 class="section-title">Рынок <span style="font-size:0.7em;color:#a2a9b1;font-family:sans-serif;">${listings?.length ?? 0} лотов</span></h2>
 
-        <div class="holders-section" style="margin-top:30px;">
-            <h2>Обладатели <span style="font-size:0.7em;color:#a2a9b1;font-family:sans-serif;">${holderCount}</span></h2>
-            ${holderCount === 0
-                ? '<p style="color:#a2a9b1;font-style:italic;font-size:0.9em;">Нрт обладателей — значок ещё нрт выданол</p>'
-                : `<div class="holders-grid">
-                    ${holders.map(h => {
-                        const u = h.users
-                        if (!u) return ''
-                        const nameColor = u.name_color ? `color:${u.name_color};` : ''
-                        const date = new Date(h.granted_at).toLocaleDateString('ru-RU')
-                        return `<div class="holder-row">
-                            <div class="holder-avatar">
-                                ${u.avatar_url
-                                    ? `<img src="${u.avatar_url}" style="width:36px;height:36px;object-fit:cover;display:block;">`
-                                    : u.username[0].toUpperCase()
-                                }
-                            </div>
-                            <a href="profile.html?id=${u.public_id}" class="holder-name" style="${nameColor}">${u.username}</a>
-                            <span class="holder-date">${date}</span>
-                        </div>`
-                    }).join('')}
+        ${!listings || listings.length === 0
+            ? '<p style="color:#a2a9b1;font-style:italic;font-size:0.9em;">Нрт активных лотов</p>'
+            : listings.map(l => {
+                const s = sellerMap[l.seller_id]
+                const isOwn = currentUserId && l.seller_id === currentUserId
+                return `<div class="sidebar-box" style="display:flex;align-items:center;gap:12px;padding:10px 14px;margin-bottom:6px;">
+                    ${l.is_emission ? '<span class="emission-tag">Эмиссия</span>' : ''}
+                    <span style="flex:1;font-weight:bold;">${Number(l.price).toLocaleString('ru-RU')} денег</span>
+                    ${s ? `<span style="font-size:0.82em;color:#54595d;">Продавец: <a href="profile.html?id=${s.public_id}">${s.username}</a></span>` : ''}
+                    ${!currentUserId
+                        ? `<a href="login.html" class="btn btn-secondary" style="font-size:0.82em;">Войти</a>`
+                        : isOwn
+                        ? `<button class="btn btn-danger" style="font-size:0.82em;" onclick="cancelListing(${l.id})">Снять</button>`
+                        : `<button class="btn btn-primary" style="font-size:0.82em;" onclick="buyListing(${l.id}, ${l.price})">Купити</button>`
+                    }
                 </div>`
-            }
-        </div>
+            }).join('')
+        }
+
+        ${iHolder && !hasListing && badge.transferable !== false ? `
+        <div class="sidebar-box" style="margin-top:16px;">
+            <b style="font-size:0.9em;">Выставити на продажу</b>
+            <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+                <input type="number" id="sell-price-input" placeholder="Цена в деньгах" min="1"
+                    style="padding:6px 10px;border:1px solid #a2a9b1;font-family:inherit;font-size:0.9em;flex:1;">
+                <button class="btn btn-primary" onclick="listBadge(${badge.id})">Выставити</button>
+            </div>
+            <div style="font-size:0.78em;color:#a2a9b1;margin-top:6px;">Комиссия 30% — получишь 70% от цены</div>
+        </div>` : ''}
+
+        <p style="font-size:0.82em;color:#a2a9b1;margin-top:8px;"><a href="market.html">Открыти рынок →</a></p>
+
+        <h2 class="section-title">Обладатели <span style="font-size:0.7em;color:#a2a9b1;font-family:sans-serif;">${holders.length}</span></h2>
+
+        ${holders.length === 0
+            ? '<p style="color:#a2a9b1;font-style:italic;font-size:0.9em;">Нрт обладателей — значок ещё нрт выданол</p>'
+            : holders.map(h => {
+                const u = h.users
+                if (!u) return ''
+                const nameColor = u.name_color ? `color:${u.name_color};` : ''
+                const date = new Date(h.granted_at).toLocaleDateString('ru-RU')
+                return `<div class="sidebar-box" style="display:flex;align-items:center;gap:12px;padding:8px 12px;margin-bottom:6px;">
+                    <div style="width:36px;height:36px;border-radius:2px;overflow:hidden;flex-shrink:0;background:#eaecf0;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:1.1em;color:#a2a9b1;">
+                        ${u.avatar_url
+                            ? `<img src="${u.avatar_url}" style="width:36px;height:36px;object-fit:cover;display:block;">`
+                            : u.username[0].toUpperCase()
+                        }
+                    </div>
+                    <a href="profile.html?id=${u.public_id}" style="font-size:0.95em;${nameColor}">${u.username}</a>
+                    <span style="font-size:0.78em;color:#a2a9b1;margin-left:auto;">${date}</span>
+                </div>`
+            }).join('')
+        }
     `
 }
 
