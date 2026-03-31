@@ -7,311 +7,80 @@
     <title>Профиль — Муринопедия</title>
     <link rel="stylesheet" href="css/wiki.css">
     <style>
-        .profile-banner {
-            width: 100%;
-            height: 140px;
-            object-fit: fill;
-            display: block;
-            background: #eaecf0;
-            border-bottom: 1px solid #a2a9b1;
-        }
-
-        .profile-banner-placeholder {
-            width: 100%;
-            height: 140px;
-            background: linear-gradient(135deg, #eaecf0 0%, #cee0f2 100%);
-            border-bottom: 1px solid #a2a9b1;
-        }
-
-        .profile-head {
-            display: flex;
-            gap: 16px;
-            align-items: flex-end;
-            padding: 0 0 16px 0;
-            border-bottom: 1px solid #eaecf0;
-            margin-bottom: 16px;
-            margin-top: -32px;
-            position: relative;
-        }
-
-        .profile-avatar-wrap {
-            width: 72px;
-            height: 72px;
-            flex-shrink: 0;
-            border: 3px solid #fff;
-            overflow: hidden;
-            background: #eaecf0;
-            position: relative;
-        }
-
-        .profile-avatar-wrap img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .profile-avatar-initial {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: serif;
-            font-size: 2em;
-            color: #a2a9b1;
-        }
-
-        .profile-username {
-            font-family: serif;
-            font-size: 1.5em;
-            font-weight: normal;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .profile-title {
-            font-size: 0.82em;
-            color: #54595d;
-            margin-top: 2px;
-            font-style: italic;
-        }
-
-        .profile-bio {
-            font-size: 0.9em;
-            color: #54595d;
-            margin-top: 6px;
-            line-height: 1.5;
-        }
-
-        .profile-meta {
-            font-size: 0.8em;
-            color: #a2a9b1;
-            margin-top: 6px;
-        }
-
-        .prev-nicks span {
-            background: #eaecf0;
-            padding: 1px 6px;
-            border-radius: 2px;
-            margin-right: 4px;
-            font-size: 0.8em;
-            color: #54595d;
-        }
-
-        .role-icon-wrap {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .role-icon-wrap .tooltip {
-            display: none;
-            position: absolute;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #202122;
-            color: #fff;
-            font-size: 0.72em;
-            padding: 4px 8px;
-            border-radius: 2px;
-            white-space: nowrap;
-            z-index: 10;
-            pointer-events: none;
-        }
-
-        .role-icon-wrap:hover .tooltip { display: block; }
-
-        /* Edit section */
-        .edit-section {
-            border: 1px solid #a2a9b1;
-            background: #fff;
-            padding: 16px;
-            margin-bottom: 20px;
-        }
-
-        .edit-section h3 {
-            font-family: serif;
-            font-weight: normal;
-            font-size: 1.1em;
-            border-bottom: 1px solid #eaecf0;
-            padding-bottom: 6px;
-            margin: 0 0 14px 0;
-        }
-
-        .edit-tabs {
-            display: flex;
-            border-bottom: 1px solid #a2a9b1;
-            margin-bottom: 14px;
-            flex-wrap: wrap;
-        }
-
-        .edit-tab {
-            padding: 5px 14px;
-            font-size: 0.82em;
-            cursor: pointer;
-            border: 1px solid transparent;
-            border-bottom: none;
-            background: none;
-            color: #54595d;
-            margin-bottom: -1px;
-        }
-
-        .edit-tab.active {
-            background: #fff;
-            border-color: #a2a9b1;
-            color: #202122;
-            font-weight: bold;
-            border-bottom: 1px solid #fff;
-        }
-
-        .edit-tab-content { display: none; }
-        .edit-tab-content.active { display: block; }
-
-        .edit-field { margin-bottom: 12px; }
-
-        .edit-label {
-            font-size: 0.82em;
-            font-weight: bold;
-            color: #54595d;
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .edit-input {
-            width: 100%;
-            padding: 7px 10px;
-            border: 1px solid #a2a9b1;
-            font-size: 0.9em;
-            background: #f8f9fa;
-            color: #202122;
-            outline: none;
-            font-family: sans-serif;
-            box-sizing: border-box;
-        }
-
-        .edit-input:focus { border-color: #3366cc; background: #fff; }
-
-        textarea.edit-input {
-            resize: vertical;
-            min-height: 70px;
-            line-height: 1.5;
-        }
-
-        .edit-hint { font-size: 0.78em; color: #a2a9b1; margin-top: 3px; }
-        .edit-hint.error { color: #d33; }
-        .edit-hint.success { color: #14866d; }
-
-        .upload-btn-wrap {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .color-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .color-swatch {
-            width: 28px;
-            height: 28px;
-            border: 2px solid transparent;
-            cursor: pointer;
-            border-radius: 2px;
-            flex-shrink: 0;
-        }
-
-        .color-swatch:hover, .color-swatch.selected { border-color: #202122; }
-
-        .border-row {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .border-option {
-            width: 44px;
-            height: 44px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.7em;
-            color: #54595d;
-            border: 1px solid #eaecf0;
-            background: #f8f9fa;
-        }
-
-        .border-option:hover, .border-option.selected { border-color: #3366cc; background: #f0f4ff; }
-
-        .border-option .av-demo {
-            width: 32px;
-            height: 32px;
-            background: #cee0f2;
-            font-family: serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1em;
-        }
-
-        .save-bar {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-top: 14px;
-            padding-top: 12px;
-            border-top: 1px solid #eaecf0;
-        }
-
-        .save-status { font-size: 0.82em; }
-        .save-status.error { color: #d33; }
-        .save-status.success { color: #14866d; }
-
-        /* Articles */
-        .articles-list { display: flex; flex-direction: column; gap: 10px; }
-
-        .article-row {
-            border: 1px solid #eaecf0;
-            padding: 10px 12px;
-            background: #f8f9fa;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .article-row-title { font-family: serif; font-size: 1em; color: #0645ad; }
-        .article-row-meta { font-size: 0.78em; color: #a2a9b1; }
-
-        .badge-published { background: #d4f5e9; color: #14866d; border: 1px solid #14866d; font-size: 0.75em; padding: 2px 7px; border-radius: 2px; font-weight: bold; white-space: nowrap; }
-        .badge-pending { background: #fef6e4; color: #c8a850; border: 1px solid #c8a850; font-size: 0.75em; padding: 2px 7px; border-radius: 2px; font-weight: bold; white-space: nowrap; }
-
-        .pinned-article-card {
-            border: 1px solid #c8a850;
-            background: #fef6e4;
-            padding: 12px;
-            margin-bottom: 16px;
-        }
-
-        .pinned-article-card .label {
-            font-size: 0.75em;
-            color: #c8a850;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-bottom: 4px;
-        }
-
-        .state-box { padding: 40px 20px; text-align: center; border: 1px solid #a2a9b1; background: #f8f9fa; }
-        .state-box-title { font-family: serif; font-size: 1.3em; margin-bottom: 8px; }
-        .state-box.error { border-color: #d33; background: #fee7e6; }
-        .state-box.error .state-box-title { color: #d33; }
+        .profile-banner { width:100%; height:140px; object-fit:fill; display:block; background:#eaecf0; border-bottom:1px solid #a2a9b1; }
+        .profile-banner-placeholder { width:100%; height:140px; background:linear-gradient(135deg,#eaecf0 0%,#cee0f2 100%); border-bottom:1px solid #a2a9b1; }
+        .profile-head { display:flex; gap:16px; align-items:flex-end; padding:0 0 16px 0; border-bottom:1px solid #eaecf0; margin-bottom:16px; margin-top:-32px; position:relative; }
+        .profile-avatar-wrap { width:72px; height:72px; flex-shrink:0; border:3px solid #fff; overflow:hidden; background:#eaecf0; position:relative; }
+        .profile-avatar-wrap img { width:100%; height:100%; object-fit:cover; display:block; }
+        .profile-avatar-initial { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-family:serif; font-size:2em; color:#a2a9b1; }
+        .profile-username { font-family:serif; font-size:1.5em; font-weight:normal; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+        .profile-title { font-size:0.82em; color:#54595d; margin-top:2px; font-style:italic; }
+        .profile-bio { font-size:0.9em; color:#54595d; margin-top:6px; line-height:1.5; }
+        .profile-meta { font-size:0.8em; color:#a2a9b1; margin-top:6px; }
+        .prev-nicks span { background:#eaecf0; padding:1px 6px; border-radius:2px; margin-right:4px; font-size:0.8em; color:#54595d; }
+        .role-icon-wrap { position:relative; display:inline-flex; align-items:center; }
+        .role-icon-wrap .tooltip { display:none; position:absolute; bottom:24px; left:50%; transform:translateX(-50%); background:#202122; color:#fff; font-size:0.72em; padding:4px 8px; border-radius:2px; white-space:nowrap; z-index:10; pointer-events:none; }
+        .role-icon-wrap:hover .tooltip { display:block; }
+        .wallet-strip { display:flex; align-items:center; gap:12px; background:#f0f4ff; border:1px solid #3366cc; padding:8px 14px; margin-bottom:16px; flex-wrap:wrap; }
+        .wallet-strip .balance { font-weight:bold; color:#3366cc; font-size:1.05em; }
+        .wallet-strip .tier { font-size:0.78em; padding:2px 8px; border:1px solid #a2a9b1; background:#f8f9fa; color:#54595d; }
+        .wallet-strip .portfolio { font-size:0.82em; color:#54595d; }
+        .edit-section { border:1px solid #a2a9b1; background:#fff; padding:16px; margin-bottom:20px; }
+        .edit-section h3 { font-family:serif; font-weight:normal; font-size:1.1em; border-bottom:1px solid #eaecf0; padding-bottom:6px; margin:0 0 14px 0; }
+        .edit-tabs { display:flex; border-bottom:1px solid #a2a9b1; margin-bottom:14px; flex-wrap:wrap; }
+        .edit-tab { padding:5px 14px; font-size:0.82em; cursor:pointer; border:1px solid transparent; border-bottom:none; background:none; color:#54595d; margin-bottom:-1px; }
+        .edit-tab.active { background:#fff; border-color:#a2a9b1; color:#202122; font-weight:bold; border-bottom:1px solid #fff; }
+        .edit-tab-content { display:none; }
+        .edit-tab-content.active { display:block; }
+        .edit-field { margin-bottom:12px; }
+        .edit-label { font-size:0.82em; font-weight:bold; color:#54595d; display:block; margin-bottom:4px; }
+        .edit-input { width:100%; padding:7px 10px; border:1px solid #a2a9b1; font-size:0.9em; background:#f8f9fa; color:#202122; outline:none; font-family:sans-serif; box-sizing:border-box; }
+        .edit-input:focus { border-color:#3366cc; background:#fff; }
+        textarea.edit-input { resize:vertical; min-height:70px; line-height:1.5; }
+        .edit-hint { font-size:0.78em; color:#a2a9b1; margin-top:3px; }
+        .edit-hint.error { color:#d33; }
+        .edit-hint.success { color:#14866d; }
+        .color-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+        .color-swatch { width:28px; height:28px; border:2px solid transparent; cursor:pointer; border-radius:2px; flex-shrink:0; }
+        .color-swatch:hover, .color-swatch.selected { border-color:#202122; }
+        .border-row { display:flex; gap:8px; flex-wrap:wrap; }
+        .border-option { width:44px; height:44px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:0.7em; color:#54595d; border:1px solid #eaecf0; background:#f8f9fa; }
+        .border-option:hover, .border-option.selected { border-color:#3366cc; background:#f0f4ff; }
+        .border-option .av-demo { width:32px; height:32px; background:#cee0f2; font-family:serif; display:flex; align-items:center; justify-content:center; font-size:1em; }
+        .save-bar { display:flex; gap:10px; align-items:center; margin-top:14px; padding-top:12px; border-top:1px solid #eaecf0; }
+        .save-status { font-size:0.82em; }
+        .save-status.error { color:#d33; }
+        .save-status.success { color:#14866d; }
+        .articles-list { display:flex; flex-direction:column; gap:10px; }
+        .article-row { border:1px solid #eaecf0; padding:10px 12px; background:#f8f9fa; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+        .article-row-title { font-family:serif; font-size:1em; color:#0645ad; }
+        .article-row-meta { font-size:0.78em; color:#a2a9b1; }
+        .badge-published { background:#d4f5e9; color:#14866d; border:1px solid #14866d; font-size:0.75em; padding:2px 7px; border-radius:2px; font-weight:bold; white-space:nowrap; }
+        .badge-pending { background:#fef6e4; color:#c8a850; border:1px solid #c8a850; font-size:0.75em; padding:2px 7px; border-radius:2px; font-weight:bold; white-space:nowrap; }
+        .pinned-article-card { border:1px solid #c8a850; background:#fef6e4; padding:12px; margin-bottom:16px; }
+        .pinned-article-card .label { font-size:0.75em; color:#c8a850; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px; }
+        .state-box { padding:40px 20px; text-align:center; border:1px solid #a2a9b1; background:#f8f9fa; }
+        .state-box-title { font-family:serif; font-size:1.3em; margin-bottom:8px; }
+        .state-box.error { border-color:#d33; background:#fee7e6; }
+        .state-box.error .state-box-title { color:#d33; }
+        .equip-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(60px,1fr)); gap:8px; margin-top:8px; }
+        .equip-item { border:1px solid #eaecf0; padding:6px; background:#f8f9fa; cursor:pointer; text-align:center; position:relative; }
+        .equip-item:hover { border-color:#3366cc; background:#f0f4ff; }
+        .equip-item.equipped { border-color:#14866d; background:#f0fff0; }
+        .equip-item img { width:36px; height:36px; object-fit:contain; display:block; margin:0 auto 2px; }
+        .equip-item .equip-name { font-size:0.65em; color:#54595d; line-height:1.2; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .equip-item .equip-check { position:absolute; top:2px; right:2px; font-size:0.7em; color:#14866d; }
+        .equipped-slots { display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap; }
+        .equipped-slot { width:40px; height:40px; border:1px dashed #a2a9b1; display:flex; align-items:center; justify-content:center; background:#f8f9fa; }
+        .equipped-slot img { width:32px; height:32px; object-fit:contain; }
+        body.dark .wallet-strip { background:#1e293b; border-color:#3366cc; }
+        body.dark .wallet-strip .tier { background:#27272a; border-color:#3f3f46; color:#a1a1aa; }
+        body.dark .edit-section { background:#1c1c1f; border-color:#3f3f46; }
+        body.dark .edit-input { background:#27272a; border-color:#3f3f46; color:#e4e4e7; }
+        body.dark .equip-item { background:#27272a; border-color:#3f3f46; }
+        body.dark .equip-item.equipped { background:#1b2d1b; border-color:#14866d; }
+        body.dark .equipped-slot { background:#27272a; border-color:#3f3f46; }
+        body.dark .article-row { background:#27272a; border-color:#3f3f46; }
     </style>
 </head>
 <body>
@@ -323,7 +92,7 @@
     </div>
     <div style="display:flex;align-items:center;gap:12px;">
         <div class="status-bar">
-            Оперативная обстановка: <span style="color: #d33; font-weight: bold;">СТАБИЛЬНАЯ</span>
+            Оперативная обстановка: <span style="color:#d33;font-weight:bold;">СТАБИЛЬНАЯ</span>
         </div>
         <div id="header-user" style="font-size:0.85em;color:#54595d;"></div>
     </div>
@@ -338,10 +107,11 @@
             <h4>Навигация</h4>
             <p>
                 <a href="index.html">Главная</a><br>
-                <a href="articles.html">Архив Знань</a>
+                <a href="articles.html">Архив Знань</a><br>
+                <a href="market.html">Рынок</a>
             </p>
         </div>
-        <div class="sidebar-box" style="border-color: #d33; background: #fee7e6;">
+        <div class="sidebar-box" style="border-color:#d33;background:#fee7e6;">
             <h4 style="color:#d33;">Напоминание</h4>
             <p>Видл слово «Друг»? Ог — мимикрия Фога. Говори <b>Друн</b>.</p>
         </div>
@@ -360,12 +130,20 @@
 <script src="js/ban_check.js"></script>
 <script src="js/theme.js"></script>
 <script>
+const TIERS = [
+    { min: 0,       max: 500,      label: 'Бедность' },
+    { min: 500,     max: 5000,     label: 'Изи бриджи' },
+    { min: 5000,    max: 50000,    label: 'Начинаем наше лудо приключение' },
+    { min: 50000,   max: 500000,   label: 'Что за бизнес сука' },
+    { min: 500000,  max: Infinity, label: 'Хаха парни прикиньте для него это деньги' },
+]
+function getTier(total) { return TIERS.find(t => total >= t.min && total < t.max) ?? TIERS[0] }
+
 function isSafeUrl(url) {
     if (!url) return false
     return url.startsWith('https://rvykoymrumzgkgbwdefm.supabase.co') ||
            url.startsWith('https://pap3ryyy.github.io/murinopedia/')
 }
-
 function safe(str) {
     if (!str) return ''
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')
@@ -384,8 +162,11 @@ let selectedBorderStyle = ''
 let selectedBg = ''
 let selectedPinnedId = null
 let userArticles = []
+let equippedBadges = []
+let allUserBadges = []
 
 const MSV_ROLES = ['м.с.в.проверкость', 'м.с.в.содрунник', 'м.с.в.основательность']
+const MAX_EQUIPPED = 5
 
 const NAME_COLORS = [
     { value: '', label: 'Обычный', color: '#202122' },
@@ -397,7 +178,6 @@ const NAME_COLORS = [
     { value: '#e67e22', label: 'Оранжевый', color: '#e67e22' },
     { value: '#e91e8c', label: 'Розовый', color: '#e91e8c' },
 ]
-
 const BORDER_STYLES = [
     { value: '', label: 'Нет' },
     { value: '3px solid #3366cc', label: 'Синий' },
@@ -408,16 +188,15 @@ const BORDER_STYLES = [
     { value: '3px solid #202122', label: 'Чёрный' },
     { value: '3px dashed #c8a850', label: 'Пунктир' },
 ]
-
 const BG_OPTIONS = [
-    { value: '', label: 'Белый' },
-    { value: '#f0f4ff', label: 'Голубой' },
-    { value: '#f0fff0', label: 'Зелёный' },
-    { value: '#fef6e4', label: 'Жёлтый' },
-    { value: '#fee7e6', label: 'Красный' },
-    { value: '#f5f0ff', label: 'Фиолет' },
-    { value: '#1a1a2e', label: 'Тёмный' },
-    { value: '#0f3460', label: 'Ночной' },
+    { value: '', label: 'Белый', color: '#fff' },
+    { value: '#f0f4ff', label: 'Голубой', color: '#f0f4ff' },
+    { value: '#f0fff0', label: 'Зелёный', color: '#f0fff0' },
+    { value: '#fef6e4', label: 'Жёлтый', color: '#fef6e4' },
+    { value: '#fee7e6', label: 'Красный', color: '#fee7e6' },
+    { value: '#f5f0ff', label: 'Фиолет', color: '#f5f0ff' },
+    { value: '#1a1a2e', label: 'Тёмный', color: '#1a1a2e' },
+    { value: '#0f3460', label: 'Ночной', color: '#0f3460' },
 ]
 
 function renderHeaderUser(user) {
@@ -428,34 +207,6 @@ function renderHeaderUser(user) {
     `
 }
 
-async function requestUnban(userId, username) {
-    const reason = prompt('Причина запроса на разбан ' + username + ':')
-    if (!reason) return
-    const { data: { session } } = await supabaseClient.auth.getSession()
-    if (!session) return
-
-    const { error } = await supabaseClient.from('unban_requests').insert({
-        user_id: userId,
-        username: username,
-        reason: reason
-    })
-    if (error) { alert('Смертч-шум: ' + error.message); return }
-
-    const { data: founders } = await supabaseClient
-        .from('users').select('id').eq('role', 'м.с.в.основательность')
-    if (founders && founders.length > 0) {
-        await supabaseClient.from('notifications').insert(
-            founders.map(f => ({
-                user_id: f.id,
-                type: 'unban_request',
-                message: 'Запросч на разбан: ' + username + ' — ' + reason,
-                link: 'profile.html?id=' + profileUser.public_id
-            }))
-        )
-    }
-    alert('Запросч отправленол Основательности!')
-}
-
 async function init() {
     const params = new URLSearchParams(window.location.search)
     const profileId = params.get('id')
@@ -463,28 +214,21 @@ async function init() {
     const { data: { session } } = await supabaseClient.auth.getSession()
     if (session) {
         currentUserId = session.user.id
-        const { data: me } = await supabaseClient
-            .from('users').select('*').eq('id', session.user.id).single()
+        const { data: me } = await supabaseClient.from('users').select('*').eq('id', session.user.id).single()
         if (me) {
             currentUser = me
             isMsvUser = MSV_ROLES.includes(me.role)
             await supabaseClient.from('users').update({ last_seen: new Date().toISOString() }).eq('id', session.user.id)
             renderHeaderUser(me)
-        
         }
     } else {
-        document.getElementById('header-user').innerHTML =
-            `<a href="login.html" style="font-size:0.85em;">Войти</a>`
+        document.getElementById('header-user').innerHTML = `<a href="login.html" style="font-size:0.85em;">Войти</a>`
     }
 
     let userQuery = supabaseClient.from('users').select('*')
-    if (profileId) {
-        userQuery = userQuery.eq('public_id', profileId)
-    } else if (currentUserId) {
-        userQuery = userQuery.eq('id', currentUserId)
-    } else {
-        showError('Нрт идентификатора Людич'); return
-    }
+    if (profileId) userQuery = userQuery.eq('public_id', profileId)
+    else if (currentUserId) userQuery = userQuery.eq('id', currentUserId)
+    else { showError('Нрт идентификатора Людич'); return }
 
     const { data: user, error } = await userQuery.single()
     if (error || !user) { showError('Людич нрт найденол вч реестре'); return }
@@ -492,18 +236,11 @@ async function init() {
     profileUser = user
     isOwnProfile = currentUserId === user.id
 
-    // Проверяем значок спонсора
     if (isOwnProfile && !isMsvUser) {
-        const { data: allBadges } = await supabaseClient
-            .from('user_badges')
-            .select('badges(name)')
-            .eq('user_id', user.id)
-        if (allBadges && allBadges.some(ub => ub.badges?.name === 'Спонсорность')) {
-            isMsvUser = true
-        }
+        const { data: allBadges } = await supabaseClient.from('user_badges').select('badges(name)').eq('user_id', user.id)
+        if (allBadges && allBadges.some(ub => ub.badges?.name === 'Спонсорность')) isMsvUser = true
     }
 
-    // Apply profile bg
     if (user.profile_bg) {
         const main = document.querySelector('.container main')
         if (user.profile_bg.startsWith('url(')) {
@@ -512,21 +249,7 @@ async function init() {
             main.style.backgroundRepeat = 'no-repeat'
             main.style.backgroundAttachment = 'local'
             const s = document.createElement('style')
-            s.textContent = [
-                '#main-content .edit-section,',
-                '#main-content .pinned-article-card,',
-                '#main-content .article-row,',
-                '#main-content .profile-head {',
-                '    background: rgba(255,255,255,0.75) !important;',
-                '    backdrop-filter: blur(4px);',
-                '}',
-                '#main-content h2 {',
-                '    background: rgba(255,255,255,0.6);',
-                '    padding: 4px 8px;',
-                '    backdrop-filter: blur(4px);',
-                '}',
-                '#main-content .profile-banner-placeholder { display: none; }'
-            ].join(' ')
+            s.textContent = '#main-content .edit-section, #main-content .pinned-article-card, #main-content .article-row, #main-content .profile-head { background:rgba(255,255,255,0.75)!important; backdrop-filter:blur(4px); } #main-content h2 { background:rgba(255,255,255,0.6); padding:4px 8px; backdrop-filter:blur(4px); } #main-content .profile-banner-placeholder { display:none; }'
             document.head.appendChild(s)
         } else {
             main.style.background = user.profile_bg
@@ -535,27 +258,13 @@ async function init() {
         if (isDark) {
             main.style.color = '#eaecf0'
             const sd = document.createElement('style')
-            sd.textContent = [
-                '#main-content .article-row,',
-                '#main-content .pinned-article-card {',
-                '    background: rgba(255,255,255,0.08) !important;',
-                '    border-color: rgba(255,255,255,0.15) !important;',
-                '}',
-                '#main-content .article-row-title { color: #90b4f5 !important; }',
-                '#main-content .article-row-meta,',
-                '#main-content .profile-meta,',
-                '#main-content .profile-bio,',
-                '#main-content .profile-title { color: #a0aec0 !important; }',
-                '#main-content h2 { border-color: rgba(255,255,255,0.2) !important; color: #eaecf0; }'
-            ].join(' ')
+            sd.textContent = '#main-content .article-row, #main-content .pinned-article-card { background:rgba(255,255,255,0.08)!important; border-color:rgba(255,255,255,0.15)!important; } #main-content .article-row-title { color:#90b4f5!important; } #main-content .article-row-meta, #main-content .profile-meta, #main-content .profile-bio, #main-content .profile-title { color:#a0aec0!important; } #main-content h2 { border-color:rgba(255,255,255,0.2)!important; color:#eaecf0; }'
             document.head.appendChild(sd)
         }
     }
 
     await renderProfile()
 }
-
-
 
 function getOnlineStatus(lastSeen) {
     if (!lastSeen) return null
@@ -572,9 +281,11 @@ function renderOnline(lastSeen) {
     return ''
 }
 
-function renderBadges(userBadges) {
-    if (!userBadges || userBadges.length === 0) return ''
-    return userBadges.map(ub => {
+function renderEquippedBadges(equipped, allBadges) {
+    if (!equipped || equipped.length === 0) return ''
+    return equipped.map(bid => {
+        const ub = allBadges?.find(b => b.badge_id === bid)
+        if (!ub?.badges) return ''
         const b = ub.badges
         return `<a href="badge.html?id=${b.id}" style="text-decoration:none;"><span class="role-icon-wrap">
             <img src="${b.icon_url}" style="width:20px;height:20px;object-fit:contain;cursor:pointer;" alt="${b.name}">
@@ -586,17 +297,16 @@ function renderBadges(userBadges) {
 async function renderProfile() {
     const u = profileUser
 
-    const { data: userBadges } = await supabaseClient
-        .from('user_badges')
-        .select('badge_id, granted_at, badges(id, name, description, icon_url)')
-        .eq('user_id', u.id)
-        .order('granted_at', { ascending: true })
+    const { data: userBadgesData } = await supabaseClient
+        .from('user_badges').select('badge_id, granted_at, badges(id, name, description, icon_url)')
+        .eq('user_id', u.id).order('granted_at', { ascending: true })
+
+    allUserBadges = userBadgesData ?? []
+    equippedBadges = u.equipped_badges ?? []
 
     const { data: articles } = await supabaseClient
         .from('articles').select('id, title, tag, status, created_at')
-        .eq('author', u.username)
-        .order('created_at', { ascending: false })
-
+        .eq('author', u.username).order('created_at', { ascending: false })
     userArticles = articles ?? []
 
     let pinnedArticle = null
@@ -607,12 +317,31 @@ async function renderProfile() {
         pinnedArticle = pa
     }
 
+    let walletHtml = ''
+    const { data: wallet } = await supabaseClient.from('wallets').select('balance').eq('user_id', u.id).single()
+    if (wallet) {
+        let portfolioValue = 0
+        if (allUserBadges.length > 0) {
+            for (const ub of allUserBadges) {
+                const { data: lp } = await supabaseClient.from('badge_prices').select('price')
+                    .eq('badge_id', ub.badge_id).order('sold_at', { ascending: false }).limit(1).single()
+                if (lp) portfolioValue += lp.price
+            }
+        }
+        const total = wallet.balance + portfolioValue
+        const tier = getTier(total)
+        walletHtml = `<div class="wallet-strip">
+            <span class="balance">💰 ${Math.floor(wallet.balance).toLocaleString('ru-RU')} денег</span>
+            <span class="tier">${tier.label}</span>
+            <span class="portfolio">Портфель: ${Math.floor(portfolioValue).toLocaleString('ru-RU')} · Актив: ${Math.floor(total).toLocaleString('ru-RU')}</span>
+        </div>`
+    }
+
     document.title = u.username + ' — Муринопедия'
 
     const isDark = ['#1a1a2e','#0f3460'].includes(u.profile_bg)
     const textColor = isDark ? '#eaecf0' : '#202122'
     const mutedColor = isDark ? '#a0aec0' : '#54595d'
-
     const joined = new Date(u.created_at).toLocaleDateString('ru-RU')
     const prevNicks = (u.previous_usernames ?? []).filter(n => n !== u.username)
     const nameColor = u.name_color || textColor
@@ -624,28 +353,12 @@ async function renderProfile() {
 
     if (isBanned) {
         const isMsvViewer = currentUser && ['м.с.в.содрунник', 'м.с.в.основательность'].includes(currentUser.role)
-        const isFounderViewer = currentUser && currentUser.role === 'м.с.в.основательность'
-
         const banDetails = isMsvViewer ? `
             <table style="width:100%;border-collapse:collapse;font-size:0.88em;margin-top:10px;">
-                <tr style="border-bottom:1px solid #eaecf0;">
-                    <td style="padding:4px 8px;font-weight:bold;color:#54595d;white-space:nowrap;">Кто забанил</td>
-                    <td style="padding:4px 8px;">${safe(u.banned_by)}</td>
-                </tr>
-                <tr style="border-bottom:1px solid #eaecf0;">
-                    <td style="padding:4px 8px;font-weight:bold;color:#54595d;white-space:nowrap;">Причина</td>
-                    <td style="padding:4px 8px;">${safe(u.ban_reason ?? '—')}</td>
-                </tr>
-                <tr>
-                    <td style="padding:4px 8px;font-weight:bold;color:#54595d;white-space:nowrap;">До</td>
-                    <td style="padding:4px 8px;">${u.banned_until ? new Date(u.banned_until).toLocaleString('ru-RU') : 'Навсегда'}</td>
-                </tr>
-            </table>
-            ${isMsvViewer && !isFounderViewer ? `<div style="margin-top:12px;">
-                <button class="btn btn-secondary" onclick="requestUnban('${u.id}', '${safe(u.username)}')">Подати запросч на разбан</button>
-            </div>` : ''}
-        ` : ''
-
+                <tr style="border-bottom:1px solid #eaecf0;"><td style="padding:4px 8px;font-weight:bold;color:#54595d;">Кто забанил</td><td style="padding:4px 8px;">${safe(u.banned_by)}</td></tr>
+                <tr style="border-bottom:1px solid #eaecf0;"><td style="padding:4px 8px;font-weight:bold;color:#54595d;">Причина</td><td style="padding:4px 8px;">${safe(u.ban_reason ?? '—')}</td></tr>
+                <tr><td style="padding:4px 8px;font-weight:bold;color:#54595d;">До</td><td style="padding:4px 8px;">${u.banned_until ? new Date(u.banned_until).toLocaleString('ru-RU') : 'Навсегда'}</td></tr>
+            </table>` : ''
         document.getElementById('main-content').innerHTML = `
         <div class="profile-banner-placeholder" style="background:#fee7e6;border-bottom:2px solid #d33;"></div>
         <div class="profile-head">
@@ -653,17 +366,14 @@ async function renderProfile() {
                 <div class="profile-avatar-initial" style="background:#d33;color:#fff;">${u.username[0].toUpperCase()}</div>
             </div>
             <div style="flex:1;padding-bottom:4px;">
-                <div class="profile-username">
-                    <span style="color:#d33;">${safe(u.username)}</span>
-                </div>
+                <div class="profile-username"><span style="color:#d33;">${safe(u.username)}</span></div>
                 <div class="warning-box" style="margin-top:10px;">
                     <strong>Субьектость забанена М.С.В.</strong><br>
                     Возможно это Фог. Будьте осторожны — контент скрыт вч целях безопасности Людич.
                     ${banDetails}
                 </div>
             </div>
-        </div>
-        `
+        </div>`
         return
     }
 
@@ -672,9 +382,8 @@ async function renderProfile() {
             ? (isSafeUrl(u.banner_url) ? `<img src="${u.banner_url}" class="profile-banner" alt="Баннер">` : `<div class="profile-banner-placeholder"></div>`)
             : `<div class="profile-banner-placeholder"></div>`
         }
-
         <div class="profile-head">
-            <div class="profile-avatar-wrap" style="border: ${borderStyle};">
+            <div class="profile-avatar-wrap" style="border:${borderStyle};">
                 ${isSafeUrl(u.avatar_url)
                     ? `<img src="${u.avatar_url}" alt="${u.username}">`
                     : `<div class="profile-avatar-initial">${u.username[0].toUpperCase()}</div>`
@@ -684,7 +393,7 @@ async function renderProfile() {
                 <div class="profile-username">
                     <span style="color:${nameColor};">${safe(u.username)}</span>
                     ${renderOnline(u.last_seen)}
-                    ${renderBadges(userBadges)}
+                    ${renderEquippedBadges(equippedBadges, allUserBadges)}
                 </div>
                 ${u.title ? `<div class="profile-title" style="color:${mutedColor};">${u.title}</div>` : ''}
                 ${u.bio ? `<div class="profile-bio" style="color:${mutedColor};">${u.bio.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>` : ''}
@@ -694,6 +403,7 @@ async function renderProfile() {
             </div>
         </div>
 
+        ${walletHtml}
         ${isOwnProfile ? renderEditSection() : ''}
 
         ${pinnedArticle ? `
@@ -703,9 +413,7 @@ async function renderProfile() {
             ${pinnedArticle.description ? `<div style="font-size:0.85em;color:#54595d;margin-top:4px;">${pinnedArticle.description}</div>` : ''}
         </div>` : ''}
 
-        <h2 style="font-family:serif;font-weight:normal;font-size:1.3em;border-bottom:1px solid #a2a9b1;padding-bottom:3px;margin-top:20px;">
-            Знань Людич
-        </h2>
+        <h2 style="font-family:serif;font-weight:normal;font-size:1.3em;border-bottom:1px solid #a2a9b1;padding-bottom:3px;margin-top:20px;">Знань Людич</h2>
         ${renderArticlesList(userArticles)}
     `
 
@@ -720,27 +428,25 @@ async function renderProfile() {
         initBorderOptions()
         initBgOptions()
         initPinnedSelect()
+        initEquipGrid()
     }
 }
 
 function renderEditSection() {
-    const canCustomize = isOwnProfile && (isMsvUser || true) // все могут редактировать базовое
-    const canStyle = isOwnProfile && isMsvUser // только МСВ — стили
-
     return `
         <div class="edit-section">
             <h3>Редактировати профиль</h3>
             <div class="edit-tabs">
                 <button class="edit-tab active" onclick="switchEditTab('basic', this)">Основное</button>
                 <button class="edit-tab" onclick="switchEditTab('avatar', this)">Аватар</button>
-                ${canStyle ? `
+                <button class="edit-tab" onclick="switchEditTab('equip', this)">Значки</button>
+                ${isMsvUser ? `
                 <button class="edit-tab" onclick="switchEditTab('banner', this)">Баннер</button>
                 <button class="edit-tab" onclick="switchEditTab('style', this)">Стиль</button>
                 <button class="edit-tab" onclick="switchEditTab('pinned', this)">Закреплённое</button>
                 ` : ''}
             </div>
 
-            <!-- BASIC -->
             <div class="edit-tab-content active" id="etab-basic">
                 <div class="edit-field">
                     <label class="edit-label">Позывной</label>
@@ -750,19 +456,16 @@ function renderEditSection() {
                 <div class="edit-field">
                     <label class="edit-label">Титул</label>
                     <input type="text" class="edit-input" id="title-input" value="${profileUser.title ?? ''}" maxlength="50" placeholder="Основательность Муринопедии...">
-                    <div class="edit-hint">До 50 символов — отображается под ником</div>
                 </div>
                 <div class="edit-field">
                     <label class="edit-label">О себе</label>
                     <textarea class="edit-input" id="bio-input" maxlength="200" placeholder="Расскажи о себе Людич...">${profileUser.bio ?? ''}</textarea>
-                    <div class="edit-hint">Макс. 200 символов</div>
                 </div>
             </div>
 
-            <!-- AVATAR -->
             <div class="edit-tab-content" id="etab-avatar">
                 <div class="edit-field">
-                    <label class="edit-label">Аватарка (PNG, JPG, GIF)</label>
+                    <label class="edit-label">Аватарка</label>
                     <div style="display:flex;gap:12px;align-items:center;">
                         <div id="avatar-preview" style="width:64px;height:64px;overflow:hidden;background:#eaecf0;flex-shrink:0;border:${profileUser.avatar_border || '3px solid #eaecf0'};">
                             ${profileUser.avatar_url
@@ -783,11 +486,19 @@ function renderEditSection() {
                 </div>
             </div>
 
-            <!-- BANNER (MSV only) -->
+            <div class="edit-tab-content" id="etab-equip">
+                <div class="edit-field">
+                    <label class="edit-label">Одетые значки <span style="color:#a2a9b1;font-weight:normal;">(макс. ${MAX_EQUIPPED})</span></label>
+                    <div class="equipped-slots" id="equipped-slots"></div>
+                    <div class="edit-hint" style="margin-bottom:8px;">Нажми на значок чтобы одеть/снять. Одетые показываются у ника.</div>
+                    <div class="equip-grid" id="equip-grid"></div>
+                </div>
+            </div>
+
             ${isMsvUser ? `
             <div class="edit-tab-content" id="etab-banner">
                 <div class="edit-field">
-                    <label class="edit-label">Баннер профиля (PNG, JPG, GIF)</label>
+                    <label class="edit-label">Баннер профиля</label>
                     <div id="banner-preview" style="width:100%;height:80px;overflow:hidden;background:#eaecf0;margin-bottom:8px;">
                         ${profileUser.banner_url
                             ? `<img src="${profileUser.banner_url}" style="width:100%;height:80px;object-fit:cover;display:block;">`
@@ -800,7 +511,6 @@ function renderEditSection() {
                 </div>
             </div>
 
-            <!-- STYLE (MSV only) -->
             <div class="edit-tab-content" id="etab-style">
                 <div class="edit-field">
                     <label class="edit-label">Цвет ника</label>
@@ -818,14 +528,12 @@ function renderEditSection() {
                 </div>
             </div>
 
-            <!-- PINNED (MSV only) -->
             <div class="edit-tab-content" id="etab-pinned">
                 <div class="edit-field">
                     <label class="edit-label">Закреплённое Знань</label>
                     <select class="edit-input" id="pinned-select">
                         <option value="">— Не закреплено —</option>
                     </select>
-                    <div class="edit-hint">Отображается в профиле вверху</div>
                 </div>
             </div>
             ` : ''}
@@ -836,6 +544,64 @@ function renderEditSection() {
             </div>
         </div>
     `
+}
+
+function initEquipGrid() {
+    renderEquipSlots()
+    const grid = document.getElementById('equip-grid')
+    if (!grid) return
+    if (allUserBadges.length === 0) {
+        grid.innerHTML = '<p style="color:#a2a9b1;font-size:0.85em;">Нрт значков</p>'
+        return
+    }
+    grid.innerHTML = allUserBadges.map(ub => {
+        const b = ub.badges
+        if (!b) return ''
+        const isEquipped = equippedBadges.includes(ub.badge_id)
+        return `<div class="equip-item ${isEquipped ? 'equipped' : ''}" id="equip-${b.id}" onclick="toggleEquip(${ub.badge_id})">
+            ${isEquipped ? '<span class="equip-check">✓</span>' : ''}
+            <img src="${b.icon_url}" alt="${b.name}">
+            <div class="equip-name">${b.name}</div>
+        </div>`
+    }).join('')
+}
+
+function renderEquipSlots() {
+    const slots = document.getElementById('equipped-slots')
+    if (!slots) return
+    let html = ''
+    for (let i = 0; i < MAX_EQUIPPED; i++) {
+        const bid = equippedBadges[i]
+        const ub = bid ? allUserBadges.find(u => u.badge_id === bid) : null
+        html += `<div class="equipped-slot">
+            ${ub?.badges ? `<img src="${ub.badges.icon_url}" alt="${ub.badges.name}" title="${ub.badges.name}">` : ''}
+        </div>`
+    }
+    slots.innerHTML = html
+}
+
+function toggleEquip(badgeId) {
+    const idx = equippedBadges.indexOf(badgeId)
+    if (idx >= 0) {
+        equippedBadges.splice(idx, 1)
+    } else {
+        if (equippedBadges.length >= MAX_EQUIPPED) {
+            alert(`Можно одеть максимум ${MAX_EQUIPPED} значков — сначала сними один`)
+            return
+        }
+        equippedBadges.push(badgeId)
+    }
+    const item = document.getElementById('equip-' + badgeId)
+    if (item) {
+        item.classList.toggle('equipped', equippedBadges.includes(badgeId))
+        const check = item.querySelector('.equip-check')
+        if (equippedBadges.includes(badgeId)) {
+            if (!check) item.insertAdjacentHTML('afterbegin', '<span class="equip-check">✓</span>')
+        } else {
+            if (check) check.remove()
+        }
+    }
+    renderEquipSlots()
 }
 
 function switchEditTab(name, btn) {
@@ -852,11 +618,9 @@ function initColorSwatches() {
     container.innerHTML = NAME_COLORS.map(c => `
         <div class="color-swatch ${selectedNameColor === c.value ? 'selected' : ''}"
              style="background:${c.color || '#f8f9fa'};border:2px solid ${selectedNameColor === c.value ? '#202122' : '#a2a9b1'};"
-             title="${c.label}"
-             onclick="selectNameColor('${c.value}', this)">
+             title="${c.label}" onclick="selectNameColor('${c.value}', this)">
             <span style="font-size:0.6em;color:${c.value ? '#fff' : '#202122'};text-shadow:0 0 2px rgba(0,0,0,0.5);pointer-events:none;">А</span>
-        </div>
-    `).join('')
+        </div>`).join('')
 }
 
 function selectNameColor(value, el) {
@@ -870,11 +634,9 @@ function initBorderOptions() {
     if (!container) return
     container.innerHTML = BORDER_STYLES.map(b => `
         <div class="border-option ${selectedBorderStyle === b.value ? 'selected' : ''}"
-             title="${b.label}"
-             onclick="selectBorder('${b.value}', this)">
+             title="${b.label}" onclick="selectBorder('${b.value}', this)">
             <div class="av-demo" style="${b.value ? 'border:' + b.value + ';' : 'border:3px solid #eaecf0;'}">А</div>
-        </div>
-    `).join('')
+        </div>`).join('')
 }
 
 function selectBorder(value, el) {
@@ -891,11 +653,9 @@ function initBgOptions() {
     container.innerHTML = BG_OPTIONS.map(b => `
         <div class="color-swatch ${selectedBg === b.value ? 'selected' : ''}"
              style="background:${b.color || '#fff'};border:2px solid ${selectedBg === b.value ? '#202122' : '#a2a9b1'};display:flex;align-items:center;justify-content:center;"
-             title="${b.label}"
-             onclick="selectBg('${b.value}', this)">
-            <span style="font-size:0.55em;color:${['#1a1a2e','#0f3460'].includes(b.color) ? '#fff' : '#202122'};pointer-events:none;text-shadow:0 0 2px rgba(255,255,255,0.5);">${b.label.substring(0,3)}</span>
-        </div>
-    `).join('')
+             title="${b.label}" onclick="selectBg('${b.value}', this)">
+            <span style="font-size:0.55em;color:${['#1a1a2e','#0f3460'].includes(b.color) ? '#fff' : '#202122'};pointer-events:none;">${b.label.substring(0,3)}</span>
+        </div>`).join('')
 }
 
 function selectBg(value, el) {
@@ -923,22 +683,13 @@ async function uploadImage(type, input) {
     const hintId = type + '-hint'
     const hint = document.getElementById(hintId)
     if (hint) { hint.className = 'edit-hint'; hint.textContent = 'Загружати...' }
-
     const ext = file.name.split('.').pop()
     const folder = type === 'avatar' ? 'avatars' : 'banners'
     const fileName = folder + '/' + currentUserId + '_' + Date.now() + '.' + ext
-
-    const { error } = await supabaseClient.storage
-        .from('images').upload(fileName, file, { upsert: true })
-
-    if (error) {
-        if (hint) { hint.className = 'edit-hint error'; hint.textContent = 'Смертч-шум: ' + error.message }
-        return
-    }
-
+    const { error } = await supabaseClient.storage.from('images').upload(fileName, file, { upsert: true })
+    if (error) { if (hint) { hint.className = 'edit-hint error'; hint.textContent = 'Смертч-шум: ' + error.message } return }
     const { data: urlData } = supabaseClient.storage.from('images').getPublicUrl(fileName)
     const url = urlData.publicUrl + '?t=' + Date.now()
-
     if (type === 'avatar') {
         selectedAvatarUrl = url
         const preview = document.getElementById('avatar-preview')
@@ -948,7 +699,6 @@ async function uploadImage(type, input) {
         const preview = document.getElementById('banner-preview')
         if (preview) preview.innerHTML = `<img src="${url}" style="width:100%;height:80px;object-fit:cover;display:block;">`
     }
-
     if (hint) { hint.className = 'edit-hint success'; hint.textContent = 'Загруженол ✓' }
 }
 
@@ -956,13 +706,9 @@ async function checkNewUsername() {
     const val = document.getElementById('username-input').value.trim()
     const hint = document.getElementById('username-hint')
     clearTimeout(nicknameTimer)
-
-    if (val === profileUser.username) {
-        hint.className = 'edit-hint'; hint.textContent = 'Старый позывной сохранится вч истории'; return
-    }
+    if (val === profileUser.username) { hint.className = 'edit-hint'; hint.textContent = 'Старый позывной сохранится вч истории'; return }
     if (val.length < 3) { hint.className = 'edit-hint error'; hint.textContent = 'Минимум 3 символа'; return }
     if (!/^[a-zA-Zа-яА-ЯёЁ0-9_]+$/.test(val)) { hint.className = 'edit-hint error'; hint.textContent = 'Недопустимые символы'; return }
-
     hint.className = 'edit-hint'; hint.textContent = 'Проверка...'
     nicknameTimer = setTimeout(async () => {
         const { data } = await supabaseClient.from('users').select('username').eq('username', val).single()
@@ -976,24 +722,15 @@ async function uploadBgGif(input) {
     if (!file) return
     const hint = document.getElementById('bg-gif-hint')
     hint.style.color = '#54595d'; hint.textContent = 'Загружати...'
-
     const ext = file.name.split('.').pop()
     const fileName = 'backgrounds/' + currentUserId + '_' + Date.now() + '.' + ext
-
-    const { error } = await supabaseClient.storage
-        .from('images').upload(fileName, file, { upsert: true })
-
+    const { error } = await supabaseClient.storage.from('images').upload(fileName, file, { upsert: true })
     if (error) { hint.style.color = '#d33'; hint.textContent = 'Смертч-шум: ' + error.message; return }
-
     const { data: urlData } = supabaseClient.storage.from('images').getPublicUrl(fileName)
     const url = urlData.publicUrl + '?t=' + Date.now()
     selectedBg = 'url(' + url + ')'
-
-    document.getElementById('bg-gif-preview').innerHTML =
-        '<img src="' + url + '" style="max-height:60px;max-width:200px;object-fit:cover;border:1px solid #a2a9b1;">'
+    document.getElementById('bg-gif-preview').innerHTML = '<img src="' + url + '" style="max-height:60px;max-width:200px;object-fit:cover;border:1px solid #a2a9b1;">'
     hint.style.color = '#14866d'; hint.textContent = 'Загруженол ✓'
-
-    // Deselect color swatches
     document.querySelectorAll('#bg-options .color-swatch').forEach(s => s.classList.remove('selected'))
 }
 
@@ -1004,7 +741,6 @@ async function saveProfile() {
     const title = document.getElementById('title-input')?.value.trim()
     const pinnedSel = document.getElementById('pinned-select')
     const pinnedId = pinnedSel ? (pinnedSel.value || null) : selectedPinnedId
-
     msg.className = 'save-status'; msg.textContent = 'Сохраняти...'
 
     const updates = {
@@ -1015,7 +751,8 @@ async function saveProfile() {
         name_color: selectedNameColor || null,
         avatar_border: selectedBorderStyle || null,
         profile_bg: selectedBg || null,
-        pinned_article_id: pinnedId || null
+        pinned_article_id: pinnedId || null,
+        equipped_badges: equippedBadges
     }
 
     if (newUsername && newUsername !== profileUser.username) {
@@ -1031,7 +768,6 @@ async function saveProfile() {
 
     const { error } = await supabaseClient.from('users').update(updates).eq('id', currentUserId)
     if (error) { msg.className = 'save-status error'; msg.textContent = 'Смертч-шум: ' + error.message; return }
-
     msg.className = 'save-status success'; msg.textContent = 'Сохраненол ✓'
     setTimeout(() => window.location.reload(), 700)
 }
@@ -1048,8 +784,7 @@ function renderArticlesList(articles) {
                 <span class="${a.status === 'published' ? 'badge-published' : 'badge-pending'}">
                     ${a.status === 'published' ? 'Опубликовано' : 'На проверке'}
                 </span>
-            </div>
-        `).join('')}
+            </div>`).join('')}
     </div>`
 }
 
@@ -1064,12 +799,10 @@ function showError(msg) {
             <div class="state-box-title">Смертч-шум</div>
             <div>${msg}</div><br>
             <a href="index.html" class="btn btn-secondary">← На главную</a>
-        </div>
-    `
+        </div>`
 }
 
 init()
 </script>
-
 </body>
 </html>
