@@ -83,6 +83,7 @@ let currentUserId = null
 let currentRole = null
 let walletBalance = 0
 let priceChart = null
+let myAvailableToSell = 0
 
 async function init() {
     const params = new URLSearchParams(window.location.search)
@@ -148,7 +149,7 @@ async function init() {
     const myCopiesTotal = holderRows?.filter(r => r.user_id === currentUserId).length || 0
     const myListedCount = listings?.filter(l => l.seller_id === currentUserId && !l.is_emission)
         .reduce((sum, l) => sum + (l.amount || 1), 0) || 0
-    const myAvailableToSell = myCopiesTotal - myListedCount
+    myAvailableToSell = myCopiesTotal - myListedCount
 
     const isFounder = currentRole === 'м.с.в.основательность'
     const rarityLabel = { common: 'Обычный', rare: 'Редкий', legendary: 'Легендарный' }[badge.rarity] ?? ''
@@ -326,6 +327,7 @@ async function createEmission(badgeId) {
         seller_id: currentUserId,
         badge_id: badgeId,
         price,
+        amount: 1,
         is_emission: true
     }))
 
@@ -340,14 +342,17 @@ async function listBadge(badgeId) {
     
     if (!price || price < 1) return alert('Укажи цену')
     if (!amount || amount < 1) return alert('Укажи количество')
+    if (amount > myAvailableToSell) return alert(`У тебя нет столько копий! Доступно: ${myAvailableToSell}`)
 
-    const { error } = await supabaseClient.from('badge_market').insert({
+    const newListings = Array.from({ length: amount }, () => ({
         seller_id: currentUserId,
         badge_id: badgeId,
-        price,
-        amount: amount,
+        price: price,
+        amount: 1,
         is_emission: false
-    })
+    }))
+
+    const { error } = await supabaseClient.from('badge_market').insert(newListings)
     if (error) { alert('Ошибка: ' + error.message); return }
     window.location.reload()
 }
