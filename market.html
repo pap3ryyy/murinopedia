@@ -180,7 +180,7 @@ async function loadWallet(userId) {
     const tier = getTier(total)
 
     document.getElementById('wallet-bar').style.display = 'block'
-    document.getElementById('wallet-balance').textContent = Math.floor(wallet.balance).toLocaleString('ru-RU')
+    document.getElementById('wallet-balance').textContent = wallet.balance.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     document.getElementById('tier-badge').textContent = tier.label
 }
 
