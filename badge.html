@@ -1,314 +1,514 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Рынок — Муринопедия</title>
-    <link rel="icon" type="image/png" href="asset/logo.ico">
-    <link rel="stylesheet" href="css/wiki.css">
-    <style>
-        .market-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:14px; margin-top:16px; }
-        .market-card { border:1px solid #a2a9b1; background:#f8f9fa; padding:16px; display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; text-decoration:none; color:inherit; }
-        .market-card:hover { border-color:#3366cc; background:#f0f4ff; text-decoration:none; }
-        .market-icon { width:56px; height:56px; object-fit:contain; border:1px solid #eaecf0; padding:4px; background:#fff; }
-        .market-name { font-family:serif; font-size:1em; font-weight:bold; color:#202122; }
-        .market-rarity { font-size:0.72em; text-transform:uppercase; letter-spacing:0.04em; color:#a2a9b1; }
-        .market-rarity.rare { color:#3366cc; }
-        .market-rarity.legendary { color:#c8a850; }
-        .market-price { font-size:1.05em; font-weight:bold; color:#202122; }
-        .market-lots { font-size:0.78em; color:#54595d; }
-        .emission-tag { font-size:0.7em; background:#fef6e4; border:1px solid #c8a850; color:#7a6000; padding:1px 6px; }
-        .wallet-bar { background:#f0f4ff; border:1px solid #3366cc; padding:8px 14px; font-size:0.9em; display:flex; align-items:center; gap:16px; margin-bottom:20px; }
-        .wallet-balance { font-weight:bold; color:#3366cc; font-size:1.1em; }
-        .tier-badge { font-size:0.78em; padding:2px 8px; border:1px solid #a2a9b1; background:#f8f9fa; color:#54595d; }
-        .state-box { padding:40px 20px; text-align:center; border:1px solid #a2a9b1; background:#f8f9fa; }
-        .state-box-title { font-family:serif; font-size:1.3em; margin-bottom:8px; }
-        .tabs { display:flex; gap:0; border-bottom:1px solid #a2a9b1; margin-bottom:20px; }
-        .tab { padding:8px 16px; cursor:pointer; font-size:0.9em; border:1px solid transparent; border-bottom:none; background:none; color:#54595d; }
-        .tab.active { border-color:#a2a9b1; border-bottom-color:#fff; background:#fff; color:#202122; margin-bottom:-1px; }
+ <!DOCTYPE html>
 
-        body.dark .wallet-bar { background:#1e293b; border-color:#3366cc; }
-        body.dark .market-card { background:#27272a; border-color:#3f3f46; }
-        body.dark .market-card:hover { background:#1e293b; border-color:#3366cc; }
-        body.dark .market-icon { background:#1c1c1f; border-color:#3f3f46; }
-        body.dark .market-name { color:#e4e4e7; }
-        body.dark .market-price { color:#e4e4e7; }
-        body.dark .tab.active { background:#1c1c1f; border-color:#3f3f46; border-bottom-color:#1c1c1f; }
-        body.dark .state-box { background:#27272a; border-color:#3f3f46; }
-        body.dark .tier-badge { background:#27272a; border-color:#3f3f46; color:#a1a1aa; }
-    </style>
+<html lang="ru">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Значок — Муринопедия</title>
+
+    <link rel="icon" type="image/png" href="asset/logo.ico">
+
+    <link rel="stylesheet" href="css/wiki.css">
+
+    <style>
+
+        .badge-hero { display:flex; gap:20px; align-items:center; padding:20px 0; border-bottom:1px solid #a2a9b1; margin-bottom:20px; }
+
+        .badge-icon-big { width:80px; height:80px; object-fit:contain; flex-shrink:0; border:1px solid #eaecf0; padding:6px; background:#f8f9fa; }
+
+        .badge-title { font-family:serif; font-size:1.8em; font-weight:normal; margin:0 0 6px 0; }
+
+        .badge-desc { color:#54595d; font-size:0.95em; margin:0 0 8px 0; }
+
+        .badge-meta { font-size:0.8em; color:#a2a9b1; }
+
+        .how-to-box { background:#f0f4ff; border:1px solid #3366cc; border-left:4px solid #3366cc; padding:12px 16px; margin-bottom:20px; font-size:0.92em; }
+
+        .how-to-box h3 { font-family:serif; font-weight:normal; font-size:1.05em; margin:0 0 6px 0; color:#3366cc; }
+
+        .section-title { font-family:serif; font-weight:normal; font-size:1.3em; border-bottom:1px solid #a2a9b1; padding-bottom:4px; margin-bottom:14px; margin-top:30px; }
+
+        .emission-tag { font-size:0.72em; background:#fef6e4; border:1px solid #c8a850; color:#7a6000; padding:1px 6px; display:inline-block; margin-top:4px; }
+
+        .state-box { padding:40px 20px; text-align:center; border:1px solid #a2a9b1; background:#f8f9fa; }
+
+        .state-box-title { font-family:serif; font-size:1.3em; margin-bottom:8px; }
+
+        .state-box.error { border-color:#d33; background:#fee7e6; }
+
+        .state-box.error .state-box-title { color:#d33; }
+
+        body.dark .badge-icon-big { background:#27272a; border-color:#3f3f46; }
+
+        body.dark .how-to-box { background:#1e293b; border-color:#3366cc; }
+
+    </style>
+
 </head>
+
 <body>
 
+
 <header>
-    <div class="logo-area">
-        <img src="asset/logo.png" alt="М.С.В." class="logo-img">
-        <a href="index.html" class="logo-text">Муринопедия</a>
-    </div>
-    <div style="display:flex;align-items:center;gap:12px;">
-        <div class="status-bar">
-            Оперативная обстановка: <span style="color:#d33;font-weight:bold;">СТАБИЛЬНАЯ</span>
-        </div>
-        <div id="header-user" style="font-size:0.85em;color:#54595d;"></div>
-    </div>
+
+    <div class="logo-area">
+
+        <img src="asset/logo.png" alt="М.С.В." class="logo-img">
+
+        <a href="index.html" class="logo-text">Муринопедия</a>
+
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;">
+
+        <div class="status-bar">
+
+            Оперативная обстановка: <span style="color:#d33;font-weight:bold;">СТАБИЛЬНАЯ</span>
+
+        </div>
+
+        <div id="header-user" style="font-size:0.85em;color:#54595d;"></div>
+
+    </div>
+
 </header>
 
+
 <div class="container">
-    <main>
-        <h1>Рынок Значков</h1>
 
-        <div id="wallet-bar" style="display:none;">
-            <div class="wallet-bar">
-                <span>Баланс: <span class="wallet-balance" id="wallet-balance">0</span> денег</span>
-                <span class="tier-badge" id="tier-badge">—</span>
-            </div>
-        </div>
+    <main id="main-content">
 
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('market', this)">Все значки</button>
-            <button class="tab" onclick="switchTab('history', this)">История сделок</button>
-        </div>
+        <p style="color:#54595d;">Загружати...</p>
 
-        <div id="tab-market">
-            <div id="market-wrap">
-                <div class="state-box"><div class="state-box-title">Загружати...</div></div>
-            </div>
-        </div>
+    </main>
 
-        <div id="tab-history" style="display:none;">
-            <div id="history-wrap">
-                <div class="state-box"><div class="state-box-title">Загружати...</div></div>
-            </div>
-        </div>
-    </main>
+    <aside>
 
-    <aside>
-        <div class="sidebar-box">
-            <h4>Навигация</h4>
-            <p>
-                <a href="index.html">Главная</a><br>
-                <a href="badges.html">Все значки</a><br>
-                <a href="articles.html">Архив Знань</a>
-            </p>
-        </div>
-        <div class="sidebar-box">
-            <h4>Тиры богатства</h4>
-            <p style="font-size:0.82em;color:#54595d;line-height:1.8;">
-                <span style="color:#a2a9b1;">● Бедность</span> — 0–500<br>
-                <span style="color:#54595d;">● Изи бриджи</span> — 500–5к<br>
-                <span style="color:#3366cc;">● Лудо приключение</span> — 5к–50к<br>
-                <span style="color:#c8a850;">● Что за бизнес сука</span> — 50к–500к<br>
-                <span style="color:#d33;">● Для него это деньги</span> — 500к+
-            </p>
-        </div>
-        <div class="sidebar-box" style="border-color:#d33;background:#fee7e6;">
-            <h4 style="color:#d33;">Правила рынка</h4>
-            <p style="font-size:0.82em;">Комиссия 30% с каждой сделки. Управляй лотами на странице значка.</p>
-        </div>
-    </aside>
+        <div class="sidebar-box">
+
+            <h4>Навигация</h4>
+
+            <p>
+
+                <a href="index.html">Главная</a><br>
+
+                <a href="badges.html">Все значки</a><br>
+
+                <a href="market.html">Рынок</a>
+
+            </p>
+
+        </div>
+
+        <div class="sidebar-box" style="border-color:#d33;background:#fee7e6;">
+
+            <h4 style="color:#d33;">Напоминание</h4>
+
+            Видл слово «Друг»? Ог — мимикрия Фога. Говори <b>Друн</b>.
+
+        </div>
+
+    </aside>
+
 </div>
 
+
 <footer>
-    Муринопедия — 2026 год.<br>
-    Ч илу доной, пока естч светл. Мурино стояти, Фог дрожати.
+
+    Муринопедия — 2026 год.<br>
+
+    Ч илу доной, пока естч светл. Мурино стояти, Фог дрожати.
+
 </footer>
 
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script src="js/config.js"></script>
+
 <script src="js/maintenance.js"></script>
+
 <script src="js/alert.js"></script>
+
 <script src="js/ban_check.js"></script>
+
 <script src="js/theme.js"></script>
+
 <script>
-const TIERS = [
-    { min: 0,       max: 500,      label: 'Бедность' },
-    { min: 500,     max: 5000,     label: 'Изи бриджи' },
-    { min: 5000,    max: 50000,    label: 'Начинаем наше лудо приключение' },
-    { min: 50000,   max: 500000,   label: 'Что за бизнес сука' },
-    { min: 500000,  max: Infinity, label: 'Хаха парни прикиньте для него это деньги' },
-]
 
-function getTier(total) {
-    return TIERS.find(t => total >= t.min && total < t.max) ?? TIERS[0]
-}
+let currentUserId = null
 
-let currentUser = null
+let walletBalance = 0
+
 
 async function init() {
-    const { data: { session } } = await supabaseClient.auth.getSession()
 
-    if (session) {
-        const { data: me } = await supabaseClient
-            .from('users').select('id, username, public_id').eq('id', session.user.id).single()
-        if (me) {
-            currentUser = me
-            document.getElementById('header-user').innerHTML = `
-                <a href="profile.html?id=${me.public_id}" style="color:#0645ad;">${me.username}</a>
-                &nbsp;
-                <button onclick="logout()" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;">Выйти</button>
-            `
-            await loadWallet(me.id)
-        }
-    } else {
-        document.getElementById('header-user').innerHTML = `<a href="login.html" style="font-size:0.85em;">Войти</a>`
-    }
+    const params = new URLSearchParams(window.location.search)
 
-    await loadMarket()
+    const badgeId = params.get('id')
+
+    if (!badgeId) { showError('Нрт идентификатора значка'); return }
+
+
+    const { data: { session } } = await supabaseClient.auth.getSession()
+
+    if (session) {
+
+        currentUserId = session.user.id
+
+        const { data: me } = await supabaseClient
+
+            .from('users').select('username, public_id, role').eq('id', session.user.id).single()
+
+        if (me) {
+
+            document.getElementById('header-user').innerHTML = `
+
+                <a href="profile.html?id=${me.public_id}" style="color:#0645ad;">${me.username}</a>
+
+                &nbsp;
+
+                <button onclick="logout()" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;">Выйти</button>
+
+            `
+
+        }
+
+        const { data: wallet } = await supabaseClient
+
+            .from('wallets').select('balance').eq('user_id', currentUserId).single()
+
+        if (wallet) walletBalance = wallet.balance
+
+    } else {
+
+        document.getElementById('header-user').innerHTML = `<a href="login.html" style="font-size:0.85em;">Войти</a>`
+
+    }
+
+
+    const { data: badge, error } = await supabaseClient
+
+        .from('badges').select('*').eq('id', badgeId).single()
+
+    if (error || !badge) { showError('Значок нрт найденол вч реестре'); return }
+
+
+    const { data: holderRows } = await supabaseClient
+
+        .from('user_badges').select('user_id, granted_at').eq('badge_id', badgeId)
+
+        .order('granted_at', { ascending: true })
+
+
+    let holders = []
+
+    if (holderRows && holderRows.length > 0) {
+
+        const userIds = holderRows.map(r => r.user_id)
+
+        const { data: usersData } = await supabaseClient
+
+            .from('users').select('id, username, public_id, avatar_url, name_color').in('id', userIds)
+
+        const userMap = {}
+
+        if (usersData) usersData.forEach(u => { userMap[u.id] = u })
+
+        holders = holderRows.map(r => ({ granted_at: r.granted_at, users: userMap[r.user_id] ?? null }))
+
+    }
+
+
+    const { data: listings } = await supabaseClient
+
+        .from('badge_market').select('id, price, is_emission, seller_id')
+
+        .eq('badge_id', badgeId).order('price', { ascending: true })
+
+
+    let sellerMap = {}
+
+    if (listings && listings.length > 0) {
+
+        const sellerIds = [...new Set(listings.map(l => l.seller_id))]
+
+        const { data: sellers } = await supabaseClient
+
+            .from('users').select('id, username, public_id, avatar_url, name_color').in('id', sellerIds)
+
+        sellers?.forEach(s => sellerMap[s.id] = s)
+
+    }
+
+
+    const iHolder = holderRows?.some(r => r.user_id === currentUserId)
+
+    const hasListing = listings?.some(l => l.seller_id === currentUserId)
+
+    const rarityLabel = { common: 'Обычный', rare: 'Редкий', legendary: 'Легендарный' }[badge.rarity] ?? ''
+
+
+    document.title = badge.name + ' — Муринопедия'
+
+
+    document.getElementById('main-content').innerHTML = `
+
+        <div class="badge-hero">
+
+            <img src="${badge.icon_url}" class="badge-icon-big" alt="${badge.name}">
+
+            <div>
+
+                <h1 class="badge-title">${badge.name}</h1>
+
+                ${badge.description ? `<p class="badge-desc">${badge.description}</p>` : ''}
+
+                <div class="badge-meta">
+
+                    Добавленол: ${new Date(badge.created_at).toLocaleDateString('ru-RU')} · Выдано: ${holders.length} Людич
+
+                    ${rarityLabel ? ` · ${rarityLabel}` : ''}
+
+                    ${badge.max_supply ? ` · Лимит: ${badge.max_supply} шт.` : ''}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        ${badge.how_to_get ? `
+
+        <div class="how-to-box">
+
+            <h3>Как получити</h3>
+
+            ${badge.how_to_get}
+
+        </div>` : ''}
+
+
+        <h2 class="section-title">Рынок <span style="font-size:0.7em;color:#a2a9b1;font-family:sans-serif;">${listings?.length ?? 0} лотов</span></h2>
+
+
+        ${!listings || listings.length === 0
+
+            ? '<p style="color:#a2a9b1;font-style:italic;font-size:0.9em;">Нрт активных лотов</p>'
+
+            : listings.map(l => {
+
+                const s = sellerMap[l.seller_id]
+
+                const isOwn = currentUserId && l.seller_id === currentUserId
+
+                const nameColor = s?.name_color ? `color:${s.name_color};` : ''
+
+                return `<div class="sidebar-box" style="display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:6px;">
+
+                    <img src="${badge.icon_url}" style="width:40px;height:40px;object-fit:contain;border:1px solid #eaecf0;padding:3px;background:#fff;flex-shrink:0;">
+
+                    <div style="flex:1;min-width:0;">
+
+                        <div style="font-weight:bold;font-size:1.05em;">💰 ${Number(l.price).toLocaleString('ru-RU')} денег</div>
+
+                        ${s ? `<div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+
+                            ${s.avatar_url
+
+                                ? `<img src="${s.avatar_url}" style="width:18px;height:18px;border-radius:2px;object-fit:cover;">`
+
+                                : `<span style="width:18px;height:18px;background:#eaecf0;border-radius:2px;display:inline-flex;align-items:center;justify-content:center;font-size:0.7em;flex-shrink:0;">${s.username[0].toUpperCase()}</span>`
+
+                            }
+
+                            <a href="profile.html?id=${s.public_id}" style="font-size:0.82em;${nameColor}">${s.username}</a>
+
+                        </div>` : ''}
+
+                        ${l.is_emission ? '<span class="emission-tag">Эмиссия</span>' : ''}
+
+                    </div>
+
+                    ${!currentUserId
+
+                        ? `<a href="login.html" class="btn btn-secondary" style="font-size:0.82em;">Войти</a>`
+
+                        : isOwn
+
+                        ? `<button class="btn btn-danger" style="font-size:0.82em;" onclick="cancelListing(${l.id})">Снять</button>`
+
+                        : `<button class="btn btn-primary" style="font-size:0.82em;" onclick="buyListing(${l.id}, ${l.price})">Купити</button>`
+
+                    }
+
+                </div>`
+
+            }).join('')
+
+        }
+
+
+        ${iHolder && !hasListing && badge.transferable !== false ? `
+
+        <div class="sidebar-box" style="margin-top:16px;">
+
+            <b style="font-size:0.9em;">Выставити на продажу</b>
+
+            <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+
+                <input type="number" id="sell-price-input" placeholder="Цена в деньгах" min="1"
+
+                    style="padding:6px 10px;border:1px solid #a2a9b1;font-family:inherit;font-size:0.9em;flex:1;">
+
+                <button class="btn btn-primary" onclick="listBadge(${badge.id})">Выставити</button>
+
+            </div>
+
+            <div style="font-size:0.78em;color:#a2a9b1;margin-top:6px;">Комиссия 30% — получишь 70% от цены</div>
+
+        </div>` : ''}
+
+
+        <p style="font-size:0.82em;color:#a2a9b1;margin-top:8px;"><a href="market.html">Открыти рынок →</a></p>
+
+
+        <h2 class="section-title">Обладатели <span style="font-size:0.7em;color:#a2a9b1;font-family:sans-serif;">${holders.length}</span></h2>
+
+
+        ${holders.length === 0
+
+            ? '<p style="color:#a2a9b1;font-style:italic;font-size:0.9em;">Нрт обладателей — значок ещё нрт выданол</p>'
+
+            : holders.map(h => {
+
+                const u = h.users
+
+                if (!u) return ''
+
+                const nameColor = u.name_color ? `color:${u.name_color};` : ''
+
+                const date = new Date(h.granted_at).toLocaleDateString('ru-RU')
+
+                return `<div class="sidebar-box" style="display:flex;align-items:center;gap:12px;padding:8px 12px;margin-bottom:6px;">
+
+                    <div style="width:36px;height:36px;border-radius:2px;overflow:hidden;flex-shrink:0;background:#eaecf0;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:1.1em;color:#a2a9b1;">
+
+                        ${u.avatar_url
+
+                            ? `<img src="${u.avatar_url}" style="width:36px;height:36px;object-fit:cover;display:block;">`
+
+                            : u.username[0].toUpperCase()
+
+                        }
+
+                    </div>
+
+                    <a href="profile.html?id=${u.public_id}" style="font-size:0.95em;flex:1;${nameColor}">${u.username}</a>
+
+                    <span style="font-size:0.78em;color:#a2a9b1;">${date}</span>
+
+                </div>`
+
+            }).join('')
+
+        }
+
+    `
+
 }
 
-async function loadWallet(userId) {
-    const { data: wallet } = await supabaseClient
-        .from('wallets').select('balance').eq('user_id', userId).single()
-    if (!wallet) return
 
-    const { data: userBadges } = await supabaseClient
-        .from('user_badges').select('badge_id').eq('user_id', userId)
+async function listBadge(badgeId) {
 
-    let portfolioValue = 0
-    if (userBadges && userBadges.length > 0) {
-        for (const ub of userBadges) {
-            const { data: lastPrice } = await supabaseClient
-                .from('badge_prices').select('price')
-                .eq('badge_id', ub.badge_id)
-                .order('sold_at', { ascending: false })
-                .limit(1).single()
-            if (lastPrice) portfolioValue += lastPrice.price
-        }
-    }
+    const price = parseFloat(document.getElementById('sell-price-input').value)
 
-    const total = wallet.balance + portfolioValue
-    const tier = getTier(total)
+    if (!price || price < 1) return alert('Укажи цену')
 
-    document.getElementById('wallet-bar').style.display = 'block'
-    document.getElementById('wallet-balance').textContent = Math.floor(wallet.balance).toLocaleString('ru-RU')
-    document.getElementById('tier-badge').textContent = tier.label
+    const { error } = await supabaseClient.from('badge_market').insert({
+
+        seller_id: currentUserId,
+
+        badge_id: badgeId,
+
+        price,
+
+        is_emission: false
+
+    })
+
+    if (error) { alert('Ошибка: ' + error.message); return }
+
+    window.location.reload()
+
 }
 
-async function loadMarket() {
-    const { data: badges } = await supabaseClient
-        .from('badges')
-        .select('id, name, icon_url, rarity, transferable')
-        .neq('transferable', false)
 
-    if (!badges || badges.length === 0) {
-        document.getElementById('market-wrap').innerHTML = `
-            <div class="state-box"><div class="state-box-title">Значки не найдены</div></div>`
-        return
-    }
+async function buyListing(listingId, price) {
 
-    const { data: listings } = await supabaseClient
-        .from('badge_market').select('price, is_emission, badge_id')
+    if (!confirm(`Купить за ${Number(price).toLocaleString('ru-RU')} денег?\nТвой баланс: ${Math.floor(walletBalance).toLocaleString('ru-RU')} денег`)) return
 
-    const badgeLots = {}
-    listings?.forEach(l => {
-        if (!badgeLots[l.badge_id]) badgeLots[l.badge_id] = []
-        badgeLots[l.badge_id].push(l)
-    })
+    const { error } = await supabaseClient.rpc('buy_badge', {
 
-    document.getElementById('market-wrap').innerHTML = `
-        <div class="market-grid">
-            ${badges.map(b => {
-                const lots = badgeLots[b.id] ?? []
-                const minPrice = lots.length > 0 ? Math.min(...lots.map(l => l.price)) : null
-                const hasEmission = lots.some(l => l.is_emission)
-                const rarityLabel = { common: 'Обычный', rare: 'Редкий', legendary: 'Легендарный' }[b.rarity] ?? b.rarity
-                
-                return `<a href="badge.html?id=${b.id}" class="market-card">
-                    <img src="${b.icon_url}" class="market-icon" alt="${b.name}">
-                    ${hasEmission ? '<span class="emission-tag">Эмиссия</span>' : ''}
-                    <div class="market-name">${b.name}</div>
-                    <div class="market-rarity ${b.rarity}">${rarityLabel}</div>
-                    ${minPrice !== null
-                        ? `<div class="market-price">💰 от ${Number(minPrice).toLocaleString('ru-RU')} денег</div>
-                           <div class="market-lots">${lots.length} ${lots.length === 1 ? 'лот' : lots.length < 5 ? 'лота' : 'лотов'}</div>`
-                        : `<div class="market-lots" style="color:#a2a9b1;">Нет лотов</div>`
-                    }
-                </a>`
-            }).join('')}
-        </div>`
+        listing_id: listingId,
+
+        buyer_id: currentUserId
+
+    })
+
+    if (error) { alert('Ошибка: ' + error.message); return }
+
+    window.location.reload()
+
 }
 
-async function loadHistory() {
-    const { data: prices } = await supabaseClient
-        .from('badge_prices').select('badge_id, price, sold_at, buyer_id, seller_id')
-        .order('sold_at', { ascending: false }).limit(50)
 
-    if (!prices || prices.length === 0) {
-        document.getElementById('history-wrap').innerHTML = `
-            <div class="state-box"><div class="state-box-title">Нрт сделок</div></div>`
-        return
-    }
+async function cancelListing(listingId) {
 
-    const badgeIds = [...new Set(prices.map(p => p.badge_id))]
-    const userIds = [...new Set([
-        ...prices.map(p => p.buyer_id),
-        ...prices.map(p => p.seller_id)
-    ].filter(Boolean))]
+    if (!confirm('Снять лот?')) return
 
-    const { data: badges } = await supabaseClient
-        .from('badges').select('id, name, icon_url').in('id', badgeIds)
-    const { data: users } = await supabaseClient
-        .from('users').select('id, username, public_id, name_color, avatar_url').in('id', userIds)
+    const { error } = await supabaseClient.from('badge_market').delete()
 
-    const badgeMap = {}
-    const userMap = {}
-    badges?.forEach(b => badgeMap[b.id] = b)
-    users?.forEach(u => userMap[u.id] = u)
+        .eq('id', listingId).eq('seller_id', currentUserId)
 
-    document.getElementById('history-wrap').innerHTML = prices.map(p => {
-        const b = badgeMap[p.badge_id]
-        const buyer = userMap[p.buyer_id]
-        const seller = userMap[p.seller_id]
-        if (!b) return ''
+    if (error) { alert('Ошибка: ' + error.message); return }
 
-        const date = new Date(p.sold_at)
-        const dateStr = date.toLocaleDateString('ru-RU')
-        const timeStr = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+    window.location.reload()
 
-        const userHtml = (u) => u ? `
-            <span style="display:inline-flex;align-items:center;gap:4px;">
-                ${u.avatar_url
-                    ? `<img src="${u.avatar_url}" style="width:16px;height:16px;border-radius:2px;object-fit:cover;">`
-                    : `<span style="width:16px;height:16px;background:#eaecf0;border-radius:2px;display:inline-flex;align-items:center;justify-content:center;font-size:0.65em;">${u.username[0].toUpperCase()}</span>`
-                }
-                <a href="profile.html?id=${u.public_id}" style="${u.name_color ? `color:${u.name_color};` : ''}">${u.username}</a>
-            </span>` : '<span style="color:#a2a9b1;">—</span>'
-
-        return `<div class="sidebar-box" style="display:flex;align-items:center;gap:12px;padding:10px 14px;margin-bottom:6px;">
-            <a href="badge.html?id=${b.id}">
-                <img src="${b.icon_url}" style="width:36px;height:36px;object-fit:contain;border:1px solid #eaecf0;padding:3px;background:#fff;flex-shrink:0;">
-            </a>
-            <div style="flex:1;min-width:0;">
-                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                    <a href="badge.html?id=${b.id}" style="font-weight:bold;font-size:0.95em;">${b.name}</a>
-                    <span style="font-weight:bold;color:#3366cc;">💰 ${Number(p.price).toLocaleString('ru-RU')} денег</span>
-                </div>
-                <div style="font-size:0.82em;color:#54595d;margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                    ${userHtml(seller)} → ${userHtml(buyer)}
-                </div>
-            </div>
-            <div style="text-align:right;flex-shrink:0;">
-                <div style="font-size:0.82em;color:#54595d;">${dateStr}</div>
-                <div style="font-size:0.78em;color:#a2a9b1;">${timeStr}</div>
-            </div>
-        </div>`
-    }).join('')
 }
 
-function switchTab(tab, btn) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
-    btn.classList.add('active')
-    document.getElementById('tab-market').style.display = tab === 'market' ? 'block' : 'none'
-    document.getElementById('tab-history').style.display = tab === 'history' ? 'block' : 'none'
-    if (tab === 'history') loadHistory()
+
+function showError(msg) {
+
+    document.getElementById('main-content').innerHTML = `
+
+        <div class="state-box error">
+
+            <div class="state-box-title">Смертч-шум</div>
+
+            <div>${msg}</div><br>
+
+            <a href="index.html" class="btn btn-secondary">← На главную</a>
+
+        </div>`
+
 }
+
 
 async function logout() {
-    await supabaseClient.auth.signOut()
-    window.location.href = 'login.html'
+
+    await supabaseClient.auth.signOut()
+
+    window.location.href = 'login.html'
+
 }
 
+
 init()
-</script>
-</body>
-</html>
+
+</script> 
