@@ -29,6 +29,7 @@
         body.dark .how-to-box { background:#1e293b; border-color:#3366cc; }
         body.dark .founder-box { background:#2d2510; border-color:#c8a850; }
         body.dark .price-chart-wrap { background:#27272a; border-color:#3f3f46; }
+        .holder-count { background:#3366cc; color:#fff; font-size:0.75em; padding:1px 5px; border-radius:10px; margin-left:6px; font-weight:bold; }
     </style>
 </head>
 <body>
@@ -118,7 +119,7 @@ async function init() {
 
     let holders = []
     if (holderRows && holderRows.length > 0) {
-        const userIds = holderRows.map(r => r.user_id)
+        const userIds = [...new Set(holderRows.map(r => r.user_id))]
         const { data: usersData } = await supabaseClient
             .from('users').select('id, username, public_id, avatar_url, name_color').in('id', userIds)
         const userMap = {}
@@ -148,6 +149,16 @@ async function init() {
     const hasListing = listings?.some(l => l.seller_id === currentUserId && !l.is_emission)
     const isFounder = currentRole === 'м.с.в.основательность'
     const rarityLabel = { common: 'Обычный', rare: 'Редкий', legendary: 'Легендарный' }[badge.rarity] ?? ''
+
+    const groupedHolders = {}
+    holders.forEach(h => {
+        if (!h.users) return
+        const uid = h.users.id
+        if (!groupedHolders[uid]) {
+            groupedHolders[uid] = { info: h.users, count: 0, first_date: h.granted_at }
+        }
+        groupedHolders[uid].count++
+    })
 
     document.title = badge.name + ' — Муринопедия'
 
@@ -244,11 +255,10 @@ async function init() {
 
         ${holders.length === 0
             ? '<p style="color:#a2a9b1;font-style:italic;font-size:0.9em;">Нрт обладателей — значок ещё нрт выданол</p>'
-            : holders.map(h => {
-                const u = h.users
-                if (!u) return ''
+            : Object.values(groupedHolders).map(h => {
+                const u = h.info
                 const nameColor = u.name_color ? `color:${u.name_color};` : ''
-                const date = new Date(h.granted_at).toLocaleDateString('ru-RU')
+                const date = new Date(h.first_date).toLocaleDateString('ru-RU')
                 return `<div class="sidebar-box" style="display:flex;align-items:center;gap:12px;padding:8px 12px;margin-bottom:6px;">
                     <div style="width:36px;height:36px;border-radius:2px;overflow:hidden;flex-shrink:0;background:#eaecf0;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:1.1em;color:#a2a9b1;">
                         ${u.avatar_url
@@ -256,7 +266,10 @@ async function init() {
                             : u.username[0].toUpperCase()
                         }
                     </div>
-                    <a href="profile.html?id=${u.public_id}" style="font-size:0.95em;flex:1;${nameColor}">${u.username}</a>
+                    <div style="flex:1;min-width:0;">
+                        <a href="profile.html?id=${u.public_id}" style="font-size:0.95em;${nameColor}">${u.username}</a>
+                        ${h.count > 1 ? `<span class="holder-count">x${h.count}</span>` : ''}
+                    </div>
                     <span style="font-size:0.78em;color:#a2a9b1;">${date}</span>
                 </div>`
             }).join('')
