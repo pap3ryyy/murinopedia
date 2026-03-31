@@ -10,7 +10,6 @@
         .market-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:14px; margin-top:16px; }
         .market-card { border:1px solid #a2a9b1; background:#f8f9fa; padding:16px; display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; text-decoration:none; color:inherit; }
         .market-card:hover { border-color:#3366cc; background:#f0f4ff; text-decoration:none; }
-        .market-card.no-lots { opacity:0.6; }
         .market-icon { width:56px; height:56px; object-fit:contain; border:1px solid #eaecf0; padding:4px; background:#fff; }
         .market-name { font-family:serif; font-size:1em; font-weight:bold; color:#202122; }
         .market-rarity { font-size:0.72em; text-transform:uppercase; letter-spacing:0.04em; color:#a2a9b1; }
@@ -27,8 +26,6 @@
         .tabs { display:flex; gap:0; border-bottom:1px solid #a2a9b1; margin-bottom:20px; }
         .tab { padding:8px 16px; cursor:pointer; font-size:0.9em; border:1px solid transparent; border-bottom:none; background:none; color:#54595d; }
         .tab.active { border-color:#a2a9b1; border-bottom-color:#fff; background:#fff; color:#202122; margin-bottom:-1px; }
-        .history-row { display:flex; align-items:center; gap:10px; padding:10px 14px; margin-bottom:6px; }
-        .history-avatar { width:28px; height:28px; border-radius:2px; object-fit:cover; background:#eaecf0; display:flex; align-items:center; justify-content:center; font-size:0.8em; color:#a2a9b1; flex-shrink:0; overflow:hidden; }
 
         body.dark .wallet-bar { background:#1e293b; border-color:#3366cc; }
         body.dark .market-card { background:#27272a; border-color:#3f3f46; }
@@ -68,7 +65,7 @@
         </div>
 
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('market', this)">Все значки</button>
+            <button class="tab active" onclick="switchTab('market', this)">Все лоты</button>
             <button class="tab" onclick="switchTab('history', this)">История сделок</button>
         </div>
 
@@ -188,57 +185,61 @@ async function loadWallet(userId) {
 }
 
 async function loadMarket() {
-    const { data: allBadges } = await supabaseClient
-        .from('badges').select('id, name, icon_url, rarity')
-        .order('id', { ascending: false })
-
     const { data: listings } = await supabaseClient
         .from('badge_market').select('id, price, is_emission, badge_id')
+        .order('created_at', { ascending: false })
 
-    const lotMap = {}
-    listings?.forEach(l => {
-        if (!lotMap[l.badge_id]) lotMap[l.badge_id] = []
-        lotMap[l.badge_id].push(l)
-    })
-
-    if (!allBadges || allBadges.length === 0) {
+    if (!listings || listings.length === 0) {
         document.getElementById('market-wrap').innerHTML = `
             <div class="state-box">
-                <div class="state-box-title">Нрт значков</div>
+                <div class="state-box-title">Рынок пустой</div>
+                <div style="color:#54595d;font-size:0.9em;">Нрт лотов — выставляй значки на <a href="badges.html">странице значка</a></div>
             </div>`
         return
     }
 
-    const sorted = [...allBadges].sort((a, b) => {
-        const aLots = lotMap[a.id]?.length ?? 0
-        const bLots = lotMap[b.id]?.length ?? 0
-        return bLots - aLots
+    const badgeIds = [...new Set(listings.map(l => l.badge_id))]
+    const { data: badges } = await supabaseClient
+        .from('badges').select('id, name, icon_url, rarity, transferable').in('id', badgeIds)
+
+    const badgeMap = {}
+    badges?.filter(b => b.transferable !== false).forEach(b => badgeMap[b.id] = b)
+
+    const badgeLots = {}
+    listings.forEach(l => {
+        if (!badgeMap[l.badge_id]) return
+        if (!badgeLots[l.badge_id]) badgeLots[l.badge_id] = []
+        badgeLots[l.badge_id].push(l)
     })
 
-    const totalLots = listings?.length ?? 0
-    const withLots = Object.keys(lotMap).length
+    const uniqueBadges = Object.keys(badgeLots)
+
+    if (uniqueBadges.length === 0) {
+        document.getElementById('market-wrap').innerHTML = `
+            <div class="state-box">
+                <div class="state-box-title">Рынок пустой</div>
+                <div style="color:#54595d;font-size:0.9em;">Нрт лотов — выставляй значки на <a href="badges.html">странице значка</a></div>
+            </div>`
+        return
+    }
 
     document.getElementById('market-wrap').innerHTML = `
-        <p style="font-size:0.85em;color:#54595d;margin-bottom:12px;">
-            Лотов на рынке: <b>${totalLots}</b> · Значков с лотами: <b>${withLots}</b> · Всего значков: <b>${allBadges.length}</b>
-        </p>
+        <p style="font-size:0.85em;color:#54595d;margin-bottom:12px;">Лотов: <b>${listings.length}</b> · Значков: <b>${uniqueBadges.length}</b></p>
         <div class="market-grid">
-            ${sorted.map(b => {
-                const lots = lotMap[b.id] ?? []
-                const hasLots = lots.length > 0
-                const minPrice = hasLots ? Math.min(...lots.map(l => l.price)) : null
+            ${uniqueBadges.map(bid => {
+                const b = badgeMap[bid]
+                if (!b) return ''
+                const lots = badgeLots[bid]
+                const minPrice = Math.min(...lots.map(l => l.price))
                 const hasEmission = lots.some(l => l.is_emission)
                 const rarityLabel = { common: 'Обычный', rare: 'Редкий', legendary: 'Легендарный' }[b.rarity] ?? b.rarity
-                return `<a href="badge.html?id=${b.id}" class="market-card${hasLots ? '' : ' no-lots'}">
+                return `<a href="badge.html?id=${b.id}" class="market-card">
                     <img src="${b.icon_url}" class="market-icon" alt="${b.name}">
                     ${hasEmission ? '<span class="emission-tag">Эмиссия</span>' : ''}
                     <div class="market-name">${b.name}</div>
                     <div class="market-rarity ${b.rarity}">${rarityLabel}</div>
-                    ${hasLots
-                        ? `<div class="market-price">💰 от ${Number(minPrice).toLocaleString('ru-RU')}</div>
-                           <div class="market-lots">${lots.length} ${lots.length === 1 ? 'лот' : lots.length < 5 ? 'лота' : 'лотов'}</div>`
-                        : `<div class="market-lots" style="color:#a2a9b1;">Нрт лотов</div>`
-                    }
+                    <div class="market-price">💰 от ${Number(minPrice).toLocaleString('ru-RU')} денег</div>
+                    <div class="market-lots">${lots.length} ${lots.length === 1 ? 'лот' : lots.length < 5 ? 'лота' : 'лотов'}</div>
                 </a>`
             }).join('')}
         </div>`
@@ -257,54 +258,50 @@ async function loadHistory() {
 
     const badgeIds = [...new Set(prices.map(p => p.badge_id))]
     const userIds = [...new Set([
-        ...prices.filter(p => p.buyer_id).map(p => p.buyer_id),
-        ...prices.filter(p => p.seller_id).map(p => p.seller_id)
-    ])]
+        ...prices.map(p => p.buyer_id),
+        ...prices.map(p => p.seller_id)
+    ].filter(Boolean))]
 
     const { data: badges } = await supabaseClient
         .from('badges').select('id, name, icon_url').in('id', badgeIds)
     const { data: users } = await supabaseClient
-        .from('users').select('id, username, public_id, avatar_url, name_color').in('id', userIds)
+        .from('users').select('id, username, public_id, name_color, avatar_url').in('id', userIds)
 
     const badgeMap = {}
     const userMap = {}
     badges?.forEach(b => badgeMap[b.id] = b)
     users?.forEach(u => userMap[u.id] = u)
 
-    function avatar(u) {
-        if (!u) return `<div class="history-avatar">?</div>`
-        return `<div class="history-avatar">
-            ${u.avatar_url
-                ? `<img src="${u.avatar_url}" style="width:28px;height:28px;object-fit:cover;display:block;">`
-                : u.username[0].toUpperCase()
-            }
-        </div>`
-    }
-
-    function userName(u) {
-        if (!u) return '<span style="color:#a2a9b1;">неизвестно</span>'
-        const color = u.name_color ? `color:${u.name_color};` : ''
-        return `<a href="profile.html?id=${u.public_id}" style="font-size:0.85em;${color}">${u.username}</a>`
-    }
-
     document.getElementById('history-wrap').innerHTML = prices.map(p => {
         const b = badgeMap[p.badge_id]
-        const buyer = p.buyer_id ? userMap[p.buyer_id] : null
-        const seller = p.seller_id ? userMap[p.seller_id] : null
+        const buyer = userMap[p.buyer_id]
+        const seller = userMap[p.seller_id]
         if (!b) return ''
 
         const date = new Date(p.sold_at)
         const dateStr = date.toLocaleDateString('ru-RU')
         const timeStr = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
 
-        return `<div class="sidebar-box history-row">
-            <img src="${b.icon_url}" style="width:36px;height:36px;object-fit:contain;border:1px solid #eaecf0;padding:3px;background:#fff;flex-shrink:0;">
+        const userHtml = (u) => u ? `
+            <span style="display:inline-flex;align-items:center;gap:4px;">
+                ${u.avatar_url
+                    ? `<img src="${u.avatar_url}" style="width:16px;height:16px;border-radius:2px;object-fit:cover;">`
+                    : `<span style="width:16px;height:16px;background:#eaecf0;border-radius:2px;display:inline-flex;align-items:center;justify-content:center;font-size:0.65em;">${u.username[0].toUpperCase()}</span>`
+                }
+                <a href="profile.html?id=${u.public_id}" style="${u.name_color ? `color:${u.name_color};` : ''}">${u.username}</a>
+            </span>` : '<span style="color:#a2a9b1;">—</span>'
+
+        return `<div class="sidebar-box" style="display:flex;align-items:center;gap:12px;padding:10px 14px;margin-bottom:6px;">
+            <a href="badge.html?id=${b.id}">
+                <img src="${b.icon_url}" style="width:36px;height:36px;object-fit:contain;border:1px solid #eaecf0;padding:3px;background:#fff;flex-shrink:0;">
+            </a>
             <div style="flex:1;min-width:0;">
-                <div style="font-weight:bold;"><a href="badge.html?id=${b.id}">${b.name}</a> — 💰 ${Number(p.price).toLocaleString('ru-RU')} денег</div>
-                <div style="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap;">
-                    ${avatar(seller)} ${userName(seller)}
-                    <span style="color:#a2a9b1;font-size:0.82em;">→</span>
-                    ${avatar(buyer)} ${userName(buyer)}
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                    <a href="badge.html?id=${b.id}" style="font-weight:bold;font-size:0.95em;">${b.name}</a>
+                    <span style="font-weight:bold;color:#3366cc;">💰 ${Number(p.price).toLocaleString('ru-RU')} денег</span>
+                </div>
+                <div style="font-size:0.82em;color:#54595d;margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                    ${userHtml(seller)} → ${userHtml(buyer)}
                 </div>
             </div>
             <div style="text-align:right;flex-shrink:0;">
