@@ -128,7 +128,7 @@ async function init() {
     }
 
     const { data: listings } = await supabaseClient
-        .from('badge_market').select('id, price, is_emission, seller_id')
+        .from('badge_market').select('id, price, is_emission, seller_id, amount')
         .eq('badge_id', badgeId).order('price', { ascending: true })
 
     let sellerMap = {}
@@ -145,8 +145,11 @@ async function init() {
         .order('sold_at', { ascending: true })
         .limit(30)
 
-    const iHolder = holderRows?.some(r => r.user_id === currentUserId)
-    const hasListing = listings?.some(l => l.seller_id === currentUserId && !l.is_emission)
+    const myCopiesTotal = holderRows?.filter(r => r.user_id === currentUserId).length || 0
+    const myListedCount = listings?.filter(l => l.seller_id === currentUserId && !l.is_emission)
+        .reduce((sum, l) => sum + (l.amount || 1), 0) || 0
+    const myAvailableToSell = myCopiesTotal - myListedCount
+
     const isFounder = currentRole === 'м.с.в.основательность'
     const rarityLabel = { common: 'Обычный', rare: 'Редкий', legendary: 'Легендарный' }[badge.rarity] ?? ''
 
@@ -193,7 +196,7 @@ async function init() {
                 return `<div class="sidebar-box" style="display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:6px;">
                     <img src="${badge.icon_url}" style="width:40px;height:40px;object-fit:contain;border:1px solid #eaecf0;padding:3px;background:#fff;flex-shrink:0;">
                     <div style="flex:1;min-width:0;">
-                        <div style="font-weight:bold;font-size:1.05em;">💰 ${Number(l.price).toLocaleString('ru-RU')} денег</div>
+                        <div style="font-weight:bold;font-size:1.05em;">💰 ${Number(l.price).toLocaleString('ru-RU')} денег ${l.amount > 1 ? `<span style="color:#a2a9b1;font-weight:normal;">(x${l.amount})</span>` : ''}</div>
                         ${s ? `<div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
                             ${s.avatar_url
                                 ? `<img src="${s.avatar_url}" style="width:18px;height:18px;border-radius:2px;object-fit:cover;">`
@@ -213,11 +216,13 @@ async function init() {
             }).join('')
         }
 
-        ${iHolder && !hasListing && badge.transferable !== false ? `
+        ${myAvailableToSell > 0 && badge.transferable !== false ? `
         <div class="sidebar-box" style="margin-top:16px;">
-            <b style="font-size:0.9em;">Выставити на продажу</b>
+            <b style="font-size:0.9em;">Выставити на продажу (Доступно: ${myAvailableToSell})</b>
             <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
-                <input type="number" id="sell-price-input" placeholder="Цена в деньгах" min="1"
+                <input type="number" id="sell-price-input" placeholder="Цена за шт." min="1"
+                    style="padding:6px 10px;border:1px solid #a2a9b1;font-family:inherit;font-size:0.9em;flex:2;">
+                <input type="number" id="sell-amount-input" value="1" min="1" max="${myAvailableToSell}"
                     style="padding:6px 10px;border:1px solid #a2a9b1;font-family:inherit;font-size:0.9em;flex:1;">
                 <button class="btn btn-primary" onclick="listBadge(${badge.id})">Выставити</button>
             </div>
@@ -331,11 +336,16 @@ async function createEmission(badgeId) {
 
 async function listBadge(badgeId) {
     const price = parseFloat(document.getElementById('sell-price-input').value)
+    const amount = parseInt(document.getElementById('sell-amount-input').value)
+    
     if (!price || price < 1) return alert('Укажи цену')
+    if (!amount || amount < 1) return alert('Укажи количество')
+
     const { error } = await supabaseClient.from('badge_market').insert({
         seller_id: currentUserId,
         badge_id: badgeId,
         price,
+        amount: amount,
         is_emission: false
     })
     if (error) { alert('Ошибка: ' + error.message); return }
