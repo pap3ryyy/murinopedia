@@ -65,7 +65,7 @@
         </div>
 
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('market', this)">Все лоты</button>
+            <button class="tab active" onclick="switchTab('market', this)">Все значки</button>
             <button class="tab" onclick="switchTab('history', this)">История сделок</button>
         </div>
 
@@ -91,16 +91,6 @@
                 <a href="articles.html">Архив Знаний</a>
             </p>
         </div>
-        <div class="sidebar-box">
-            <h4>Тиры богатства</h4>
-            <p style="font-size:0.82em;color:#54595d;line-height:1.8;">
-                <span style="color:#a2a9b1;">● Бедность</span> — 0–500<br>
-                <span style="color:#54595d;">● Изи бриджи</span> — 500–5к<br>
-                <span style="color:#3366cc;">● Лудо приключение</span> — 5к–50к<br>
-                <span style="color:#c8a850;">● Что за бизнес сука</span> — 50к–500к<br>
-                <span style="color:#d33;">● Для него это деньги</span> — 500к+
-            </p>
-        </div>
         <div class="sidebar-box" style="border-color:#d33;background:#fee7e6;">
             <h4 style="color:#d33;">Правила рынка</h4>
             <p style="font-size:0.82em;">Комиссия 30% с каждой сделки. Управляй лотами на странице значка.</p>
@@ -109,8 +99,7 @@
 </div>
 
 <footer>
-    Муринопедия — 2026 год.<br>
-    Чили доной, пока есть свет. Мурино стоит, Фог дрожит.
+    Муринопедия — 2026 год.
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -123,9 +112,9 @@
 const TIERS = [
     { min: 0,       max: 500,      label: 'Бедность' },
     { min: 500,     max: 5000,     label: 'Изи бриджи' },
-    { min: 5000,    max: 50000,    label: 'Начинаем наше лудо приключение' },
+    { min: 5000,    max: 50000,    label: 'Лудо приключение' },
     { min: 50000,   max: 500000,   label: 'Что за бизнес сука' },
-    { min: 500000,  max: Infinity, label: 'Хаха парни прикиньте для него это деньги' },
+    { min: 500000,  max: Infinity, label: 'Для него это деньги' },
 ]
 
 function getTier(total) {
@@ -155,19 +144,13 @@ async function init() {
 }
 
 async function loadWallet(userId) {
-    const { data: wallet } = await supabaseClient
-        .from('wallets').select('balance').eq('user_id', userId).single()
+    const { data: wallet } = await supabaseClient.from('wallets').select('balance').eq('user_id', userId).single()
     if (!wallet) return
-    const { data: userBadges } = await supabaseClient
-        .from('user_badges').select('badge_id').eq('user_id', userId)
+    const { data: userBadges } = await supabaseClient.from('user_badges').select('badge_id').eq('user_id', userId)
     let portfolioValue = 0
-    if (userBadges && userBadges.length > 0) {
+    if (userBadges?.length > 0) {
         for (const ub of userBadges) {
-            const { data: lastPrice } = await supabaseClient
-                .from('badge_prices').select('price')
-                .eq('badge_id', ub.badge_id)
-                .order('sold_at', { ascending: false })
-                .limit(1).single()
+            const { data: lastPrice } = await supabaseClient.from('badge_prices').select('price').eq('badge_id', ub.badge_id).order('sold_at', { ascending: false }).limit(1).single()
             if (lastPrice) portfolioValue += lastPrice.price
         }
     }
@@ -179,95 +162,73 @@ async function loadWallet(userId) {
 }
 
 async function loadMarket() {
-    const { data: listings } = await supabaseClient
-        .from('badge_market').select('id, price, is_emission, badge_id')
-    if (!listings || listings.length === 0) {
-        document.getElementById('market-wrap').innerHTML = `
-            <div class="state-box">
-                <div class="state-box-title">Рынок пустой</div>
-                <div style="color:#54595d;font-size:0.9em;">Нет лотов — выставляй значки на <a href="badges.html">странице значка</a></div>
-            </div>`
+    const { data: badges } = await supabaseClient
+        .from('badges')
+        .select('id, name, icon_url, rarity, transferable')
+        .neq('transferable', false)
+
+    if (!badges || badges.length === 0) {
+        document.getElementById('market-wrap').innerHTML = `<div class="state-box"><div class="state-box-title">Значков не найдено</div></div>`
         return
     }
-    const badgeIds = [...new Set(listings.map(l => l.badge_id))]
-    const { data: badges } = await supabaseClient
-        .from('badges').select('id, name, icon_url, rarity, transferable').in('id', badgeIds)
-    const badgeMap = {}
-    badges?.filter(b => b.transferable !== false).forEach(b => badgeMap[b.id] = b)
+
+    const { data: listings } = await supabaseClient
+        .from('badge_market')
+        .select('price, is_emission, badge_id')
+
     const badgeLots = {}
-    listings.forEach(l => {
-        if (!badgeMap[l.badge_id]) return
+    listings?.forEach(l => {
         if (!badgeLots[l.badge_id]) badgeLots[l.badge_id] = []
         badgeLots[l.badge_id].push(l)
     })
-    const uniqueBadges = Object.keys(badgeLots)
-    if (uniqueBadges.length === 0) {
-        document.getElementById('market-wrap').innerHTML = `<div class="state-box"><div class="state-box-title">Рынок пустой</div></div>`
-        return
-    }
+
     document.getElementById('market-wrap').innerHTML = `
-        <p style="font-size:0.85em;color:#54595d;margin-bottom:12px;">Лотов: <b>${listings.length}</b> · Значков: <b>${uniqueBadges.length}</b></p>
         <div class="market-grid">
-            ${uniqueBadges.map(bid => {
-                const b = badgeMap[bid]
-                const lots = badgeLots[bid]
-                const minPrice = Math.min(...lots.map(l => l.price))
+            ${badges.map(b => {
+                const lots = badgeLots[b.id] || []
+                const minPrice = lots.length > 0 ? Math.min(...lots.map(l => l.price)) : null
                 const hasEmission = lots.some(l => l.is_emission)
                 const rarityLabel = { common: 'Обычный', rare: 'Редкий', legendary: 'Легендарный' }[b.rarity] ?? b.rarity
-                return `<a href="badge.html?id=${b.id}" class="market-card">
+                
+                return `
+                <a href="badge.html?id=${b.id}" class="market-card">
                     <img src="${b.icon_url}" class="market-icon" alt="${b.name}">
                     ${hasEmission ? '<span class="emission-tag">Эмиссия</span>' : ''}
                     <div class="market-name">${b.name}</div>
                     <div class="market-rarity ${b.rarity}">${rarityLabel}</div>
-                    <div class="market-price">💰 от ${Number(minPrice).toLocaleString('ru-RU')} денег</div>
-                    <div class="market-lots">${lots.length} ${lots.length === 1 ? 'лот' : lots.length < 5 ? 'лота' : 'лотов'}</div>
+                    ${minPrice !== null 
+                        ? `<div class="market-price">💰 от ${Number(minPrice).toLocaleString('ru-RU')} денег</div>
+                           <div class="market-lots">${lots.length} лотов</div>`
+                        : `<div class="market-lots" style="color:#a2a9b1;">Нет лотов</div>`
+                    }
                 </a>`
             }).join('')}
         </div>`
 }
 
 async function loadHistory() {
-    const { data: prices } = await supabaseClient
-        .from('badge_prices').select('badge_id, price, sold_at, buyer_id, seller_id')
-        .order('sold_at', { ascending: false }).limit(50)
+    const { data: prices } = await supabaseClient.from('badge_prices').select('badge_id, price, sold_at, buyer_id, seller_id').order('sold_at', { ascending: false }).limit(50)
     if (!prices || prices.length === 0) {
         document.getElementById('history-wrap').innerHTML = `<div class="state-box"><div class="state-box-title">Нет сделок</div></div>`
         return
     }
     const badgeIds = [...new Set(prices.map(p => p.badge_id))]
-    const userIds = [...new Set([...prices.map(p => p.buyer_id), ...prices.map(p => p.seller_id)].filter(Boolean))]
     const { data: badges } = await supabaseClient.from('badges').select('id, name, icon_url').in('id', badgeIds)
-    const { data: users } = await supabaseClient.from('users').select('id, username, public_id, name_color, avatar_url').in('id', userIds)
     const badgeMap = {}
-    const userMap = {}
     badges?.forEach(b => badgeMap[b.id] = b)
-    users?.forEach(u => userMap[u.id] = u)
+
     document.getElementById('history-wrap').innerHTML = prices.map(p => {
         const b = badgeMap[p.badge_id]
-        const buyer = userMap[p.buyer_id]
-        const seller = userMap[p.seller_id]
         if (!b) return ''
-        const date = new Date(p.sold_at)
-        const dateStr = date.toLocaleDateString('ru-RU')
-        const timeStr = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
-        const userHtml = (u) => u ? `
-            <span style="display:inline-flex;align-items:center;gap:4px;">
-                ${u.avatar_url ? `<img src="${u.avatar_url}" style="width:16px;height:16px;border-radius:2px;object-fit:cover;">` : `<span style="width:16px;height:16px;background:#eaecf0;border-radius:2px;display:inline-flex;align-items:center;justify-content:center;font-size:0.65em;">${u.username[0].toUpperCase()}</span>`}
-                <a href="profile.html?id=${u.public_id}" style="${u.name_color ? `color:${u.name_color};` : ''}">${u.username}</a>
-            </span>` : '<span style="color:#a2a9b1;">—</span>'
-        return `<div class="sidebar-box" style="display:flex;align-items:center;gap:12px;padding:10px 14px;margin-bottom:6px;">
-            <a href="badge.html?id=${b.id}"><img src="${b.icon_url}" style="width:36px;height:36px;object-fit:contain;border:1px solid #eaecf0;padding:3px;background:#fff;flex-shrink:0;"></a>
-            <div style="flex:1;min-width:0;">
-                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                    <a href="badge.html?id=${b.id}" style="font-weight:bold;font-size:0.95em;">${b.name}</a>
-                    <span style="font-weight:bold;color:#3366cc;">💰 ${Number(p.price).toLocaleString('ru-RU')} денег</span>
-                </div>
-                <div style="font-size:0.82em;color:#54595d;margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${userHtml(seller)} → ${userHtml(buyer)}</div>
+        const date = new Date(p.sold_at).toLocaleDateString('ru-RU')
+        return `
+        <div class="sidebar-box" style="display:flex;align-items:center;gap:12px;padding:10px;">
+            <img src="${b.icon_url}" style="width:32px;height:32px;object-fit:contain;">
+            <div style="flex:1;">
+                <div style="font-weight:bold;font-size:0.9em;">${b.name}</div>
+                <div style="color:#3366cc;font-size:0.85em;">💰 ${Number(p.price).toLocaleString('ru-RU')}</div>
             </div>
-            <div style="text-align:right;flex-shrink:0;">
-                <div style="font-size:0.82em;color:#54595d;">${dateStr}</div>
-                <div style="font-size:0.78em;color:#a2a9b1;">${timeStr}</div>
-            </div>
+            <div style="font-size:0.75em;color:#a2a9b1;">${date}</div>
         </div>`
     }).join('')
 }
