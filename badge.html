@@ -15,7 +15,7 @@
         .how-to-box { background:#f0f4ff; border:1px solid #3366cc; border-left:4px solid #3366cc; padding:12px 16px; margin-bottom:20px; font-size:0.92em; }
         .how-to-box h3 { font-family:serif; font-weight:normal; font-size:1.05em; margin:0 0 6px 0; color:#3366cc; }
         .section-title { font-family:serif; font-weight:normal; font-size:1.3em; border-bottom:1px solid #a2a9b1; padding-bottom:4px; margin-bottom:14px; margin-top:30px; }
-        .emission-tag { font-size:0.72em; background:#fef6e4; border:1px solid #c8a850; color:#7a6000; padding:1px 6px; }
+        .emission-tag { font-size:0.72em; background:#fef6e4; border:1px solid #c8a850; color:#7a6000; padding:1px 6px; display:inline-block; margin-top:4px; }
         .state-box { padding:40px 20px; text-align:center; border:1px solid #a2a9b1; background:#f8f9fa; }
         .state-box-title { font-family:serif; font-size:1.3em; margin-bottom:8px; }
         .state-box.error { border-color:#d33; background:#fee7e6; }
@@ -124,7 +124,7 @@ async function init() {
     if (listings && listings.length > 0) {
         const sellerIds = [...new Set(listings.map(l => l.seller_id))]
         const { data: sellers } = await supabaseClient
-            .from('users').select('id, username, public_id').in('id', sellerIds)
+            .from('users').select('id, username, public_id, avatar_url, name_color').in('id', sellerIds)
         sellers?.forEach(s => sellerMap[s.id] = s)
     }
 
@@ -161,10 +161,20 @@ async function init() {
             : listings.map(l => {
                 const s = sellerMap[l.seller_id]
                 const isOwn = currentUserId && l.seller_id === currentUserId
-                return `<div class="sidebar-box" style="display:flex;align-items:center;gap:12px;padding:10px 14px;margin-bottom:6px;">
-                    ${l.is_emission ? '<span class="emission-tag">Эмиссия</span>' : ''}
-                    <span style="flex:1;font-weight:bold;">${Number(l.price).toLocaleString('ru-RU')} денег</span>
-                    ${s ? `<span style="font-size:0.82em;color:#54595d;">Продавец: <a href="profile.html?id=${s.public_id}">${s.username}</a></span>` : ''}
+                const nameColor = s?.name_color ? `color:${s.name_color};` : ''
+                return `<div class="sidebar-box" style="display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:6px;">
+                    <img src="${badge.icon_url}" style="width:40px;height:40px;object-fit:contain;border:1px solid #eaecf0;padding:3px;background:#fff;flex-shrink:0;">
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:bold;font-size:1.05em;">💰 ${Number(l.price).toLocaleString('ru-RU')} денег</div>
+                        ${s ? `<div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+                            ${s.avatar_url
+                                ? `<img src="${s.avatar_url}" style="width:18px;height:18px;border-radius:2px;object-fit:cover;">`
+                                : `<span style="width:18px;height:18px;background:#eaecf0;border-radius:2px;display:inline-flex;align-items:center;justify-content:center;font-size:0.7em;flex-shrink:0;">${s.username[0].toUpperCase()}</span>`
+                            }
+                            <a href="profile.html?id=${s.public_id}" style="font-size:0.82em;${nameColor}">${s.username}</a>
+                        </div>` : ''}
+                        ${l.is_emission ? '<span class="emission-tag">Эмиссия</span>' : ''}
+                    </div>
                     ${!currentUserId
                         ? `<a href="login.html" class="btn btn-secondary" style="font-size:0.82em;">Войти</a>`
                         : isOwn
@@ -204,8 +214,8 @@ async function init() {
                             : u.username[0].toUpperCase()
                         }
                     </div>
-                    <a href="profile.html?id=${u.public_id}" style="font-size:0.95em;${nameColor}">${u.username}</a>
-                    <span style="font-size:0.78em;color:#a2a9b1;margin-left:auto;">${date}</span>
+                    <a href="profile.html?id=${u.public_id}" style="font-size:0.95em;flex:1;${nameColor}">${u.username}</a>
+                    <span style="font-size:0.78em;color:#a2a9b1;">${date}</span>
                 </div>`
             }).join('')
         }
