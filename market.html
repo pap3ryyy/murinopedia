@@ -185,18 +185,46 @@ async function loadWallet(userId) {
 }
 
 async function loadMarket() {
-    const { data: listings } = await supabaseClient
-        .from('badge_market').select('id, price, is_emission, badge_id')
-        .order('created_at', { ascending: false })
+    const { data: badges } = await supabaseClient
+        .from('badges').select('id, name, icon_url, rarity, transferable')
+        .neq('transferable', false)
 
-    if (!listings || listings.length === 0) {
+    if (!badges || badges.length === 0) {
         document.getElementById('market-wrap').innerHTML = `
-            <div class="state-box">
-                <div class="state-box-title">Рынок пустой</div>
-                <div style="color:#54595d;font-size:0.9em;">Нрт лотов — выставляй значки на <a href="badges.html">странице значка</a></div>
-            </div>`
+            <div class="state-box"><div class="state-box-title">Нрт значков</div></div>`
         return
     }
+
+    const { data: listings } = await supabaseClient
+        .from('badge_market').select('id, price, is_emission, badge_id')
+
+    const badgeLots = {}
+    listings?.forEach(l => {
+        if (!badgeLots[l.badge_id]) badgeLots[l.badge_id] = []
+        badgeLots[l.badge_id].push(l)
+    })
+
+    document.getElementById('market-wrap').innerHTML = `
+        <div class="market-grid">
+            ${badges.map(b => {
+                const lots = badgeLots[b.id] ?? []
+                const minPrice = lots.length > 0 ? Math.min(...lots.map(l => l.price)) : null
+                const hasEmission = lots.some(l => l.is_emission)
+                const rarityLabel = { common: 'Обычный', rare: 'Редкий', legendary: 'Легендарный' }[b.rarity] ?? b.rarity
+                return `<a href="badge.html?id=${b.id}" class="market-card">
+                    <img src="${b.icon_url}" class="market-icon" alt="${b.name}">
+                    ${hasEmission ? '<span class="emission-tag">Эмиссия</span>' : ''}
+                    <div class="market-name">${b.name}</div>
+                    <div class="market-rarity ${b.rarity}">${rarityLabel}</div>
+                    ${minPrice !== null
+                        ? `<div class="market-price">💰 от ${Number(minPrice).toLocaleString('ru-RU')} денег</div>
+                           <div class="market-lots">${lots.length} ${lots.length === 1 ? 'лот' : lots.length < 5 ? 'лота' : 'лотов'}</div>`
+                        : `<div class="market-lots" style="color:#a2a9b1;">Нрт лотов</div>`
+                    }
+                </a>`
+            }).join('')}
+        </div>`
+}
 
     const badgeIds = [...new Set(listings.map(l => l.badge_id))]
     const { data: badges } = await supabaseClient
