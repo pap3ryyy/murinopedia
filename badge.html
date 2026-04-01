@@ -145,6 +145,14 @@ async function init() {
         .eq('badge_id', badgeId)
         .order('sold_at', { ascending: true })
         .limit(30)
+    let priceChangeHtml = ''
+if (priceHistory && priceHistory.length >= 2) {
+    const first = priceHistory[0].price
+    const last = priceHistory[priceHistory.length - 1].price
+    const change = ((last - first) / first * 100).toFixed(1)
+    const isUp = last >= first
+    priceChangeHtml = `<span style="font-size:0.82em;font-weight:bold;color:${isUp ? '#14866d' : '#d33'};margin-left:8px;">${isUp ? '▲' : '▼'} ${isUp ? '+' : ''}${change}%</span>`
+}
 
     const myCopiesTotal = holderRows?.filter(r => r.user_id === currentUserId).length || 0
     const myListedCount = listings?.filter(l => l.seller_id === currentUserId && !l.is_emission)
@@ -186,7 +194,7 @@ async function init() {
             ${badge.how_to_get}
         </div>` : ''}
 
-        <h2 class="section-title">Рынок <span style="font-size:0.7em;color:#a2a9b1;font-family:sans-serif;">${listings?.length ?? 0} лотов</span></h2>
+        <h2 class="section-title">Рынок <span style="font-size:0.7em;color:#a2a9b1;font-family:sans-serif;">${listings?.length ?? 0} лотов</span>${priceChangeHtml}</h2>
 
         ${!listings || listings.length === 0
             ? '<p style="color:#a2a9b1;font-style:italic;font-size:0.9em;">Нрт активных лотов</p>'
