@@ -1,6 +1,7 @@
 (async function () {
     const MSV_ROLES = ['м.с.в.основательность', 'м.с.в.содрунник', 'м.с.в.проверкость']
 
+    /*
     await new Promise(resolve => {
         if (typeof supabaseClient !== 'undefined') return resolve()
         const i = setInterval(() => {
@@ -18,6 +19,13 @@
         const { data: user } = await supabaseClient
             .from('users').select('role').eq('id', session.user.id).single()
         if (user && MSV_ROLES.includes(user.role)) return
+    }
+    */
+
+    const data = {
+        value: 'true',
+        mode: 'maintenance',
+        reason: 'Сайт закрыт на техобслуживания'
     }
 
     const mode = data.mode ?? 'maintenance'
