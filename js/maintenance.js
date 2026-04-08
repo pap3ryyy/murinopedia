@@ -33,8 +33,9 @@
 
     const isWelldone = mode === 'welldone'
 
-    document.open()
-    document.write(`<!DOCTYPE html>
+    const render = () => {
+        document.open()
+        document.write(`<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -43,8 +44,8 @@
     <link rel="icon" type="image/png" href="asset/logo.ico">
     <link rel="stylesheet" href="css/wiki.css">
     <style>
-        body { display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; }
-        .box { border:1px solid #a2a9b1; padding:48px 40px; max-width:480px; width:100%; text-align:center; }
+        body { display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; background:#fff !important; }
+        .box { border:1px solid #a2a9b1; padding:48px 40px; max-width:480px; width:100%; text-align:center; background:#fff; }
         .box h1 { font-family:serif; font-size:1.6em; margin:0 0 24px 0; ${isWelldone ? 'color:#d33;' : ''} }
         .box img { width:220px; height:220px; object-fit:contain; display:block; margin:0 auto 24px auto; }
         .box p { font-size:0.95em; color:#54595d; margin:0 0 10px 0; line-height:1.6; }
@@ -65,5 +66,9 @@
     </div>
 </body>
 </html>`)
-    document.close()
+        document.close()
+    }
+
+    if (document.readyState === 'complete') render()
+    else window.addEventListener('load', render)
 })()
