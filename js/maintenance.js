@@ -1,8 +1,8 @@
 (async function () {
     const data = {
         value: 'true',
-        mode: 'maintenance',
-        reason: 'Сайт закрыт на техобслуживания'
+        mode: 'welldone',
+        reason: 'Сайт закрыт, всем спасибо за то что были участниками проекта.'
     };
 
     const mode = data.mode ?? 'maintenance';
