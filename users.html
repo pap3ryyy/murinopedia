@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Муринопедия - Итоги участников</title>
+<link rel="stylesheet" href="css/wiki.css">
+<style>
+.search-wrap {
+    margin: 18px 0 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+.search-wrap input {
+    border: 1px solid #a2a9b1;
+    padding: 5px 9px;
+    font-size: 0.95em;
+    outline: none;
+    background: #f8f9fa;
+    color: #202122;
+    width: 260px;
+}
+.search-wrap input:focus { border-color: #3366cc; background: #fff; }
+.sort-wrap { display: flex; align-items: center; gap: 6px; font-size: 0.9em; }
+.sort-wrap label { color: #54595d; }
+.sort-wrap select {
+    border: 1px solid #a2a9b1;
+    padding: 4px 8px;
+    font-size: 0.9em;
+    background: #f8f9fa;
+    color: #202122;
+    cursor: pointer;
+}
+.search-hint { font-size: 0.82em; color: #54595d; margin: 4px 0 14px 0; }
+#no-results { display: none; color: #54595d; font-size: 0.95em; margin-top: 12px; }
+.users-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 14px;
+}
+.user-card { border: 1px solid #a2a9b1; background: #f8f9fa; }
+.user-card-header {
+    background: #eaecf0;
+    border-bottom: 1px solid #a2a9b1;
+    padding: 6px 10px;
+    font-family: serif;
+    font-size: 1.05em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.card-founder .user-card-header { background: #cee0f2; border-bottom-color: #3366cc; }
+.card-admin   .user-card-header { background: #dce6f5; border-bottom-color: #7a9bcf; }
+.card-sponsor { border-color: #14866d; }
+.card-sponsor .user-card-header { border-bottom-color: #14866d; }
+.card-founder.card-sponsor { border-color: #14866d; }
+.card-founder.card-sponsor .user-card-header { background: #cee0f2; border-bottom-color: #3366cc; }
+.card-admin.card-sponsor { border-color: #14866d; }
+.card-admin.card-sponsor .user-card-header { background: #dce6f5; border-bottom-color: #7a9bcf; }
+.banned-tag {
+    font-size: 0.72em;
+    background: #d33;
+    color: #fff;
+    padding: 1px 6px;
+    font-family: sans-serif;
+    font-weight: normal;
+    letter-spacing: 0.03em;
+}
+.user-table { width: 100%; border-collapse: collapse; font-size: 0.88em; }
+.user-table td { padding: 4px 10px; vertical-align: top; border-top: 1px solid #eaecf0; }
+.user-table td:first-child { font-weight: bold; color: #54595d; white-space: nowrap; width: 42%; }
+.legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 0.85em;
+    margin-bottom: 18px;
+    color: #54595d;
+}
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-swatch { width: 14px; height: 14px; border: 1px solid #a2a9b1; flex-shrink: 0; }
+.swatch-founder { background: #cee0f2; border-color: #3366cc; }
+.swatch-admin   { background: #dce6f5; border-color: #7a9bcf; }
+.swatch-sponsor { background: #f8f9fa; border: 2px solid #14866d; }
+.stats-box {
+    background: #f8f9fa;
+    border: 1px solid #a2a9b1;
+    border-left: 5px solid #3366cc;
+    padding: 12px 15px;
+    margin-bottom: 22px;
+    font-size: 0.95em;
+}
+.stats-box table { border-collapse: collapse; }
+.stats-box td { padding: 2px 16px 2px 0; }
+.stats-box td:first-child { color: #54595d; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">
+    <span class="logo-text">Муринопедия</span>
+  </div>
+  <span style="font-size:0.85em;color:#54595d;">архив закрыт</span>
+</header>
+
+<div class="container" style="display:block;max-width:1100px;">
+<main>
+
+<h1>Итоги участников</h1>
+<div class="article-meta">Архивировано после закрытия проекта - апрель 2026</div>
+
+<div class="notice-box">
+  Муринопедия окончательно закрыта. Мы благодарны каждому друну, который был с нами это время. Ниже - финальное состояние всех профилей на момент закрытия.
+</div>
+
+<div class="stats-box">
+  <table>
+    <tr><td>Всего участников</td><td>46</td></tr>
+    <tr><td>Хотя бы раз были онлайн</td><td>30</td></tr>
+    <tr><td>Написали знания</td><td>10</td></tr>
+    <tr><td>Загрузили треки</td><td>3</td></tr>
+    <tr><td>Получили значки</td><td>14</td></tr>
+  </table>
+</div>
+
+<h2>Участники</h2>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-swatch swatch-founder"></div> Основатель</div>
+  <div class="legend-item"><div class="legend-swatch swatch-admin"></div> М.С.В. содрунник</div>
+  <div class="legend-item"><div class="legend-swatch swatch-sponsor"></div> Спонсор</div>
+</div>
+
+<div class="search-wrap">
+  <input type="text" id="search" placeholder="Найти участника..." autocomplete="off">
+  <div class="sort-wrap">
+    <label for="sort">Сортировка:</label>
+    <select id="sort">
+      <option value="old">сначала старые</option>
+      <option value="new">сначала новые</option>
+    </select>
+  </div>
+</div>
+<div class="search-hint">Поиск по имени или любому полю профиля</div>
+<div id="no-results">Участник не найден.</div>
+
+<div class="users-grid" id="users-grid">
+<div class="user-card card-founder card-sponsor" data-name="pap3ryyy" data-ts="1768374816000">
+  <div class="user-card-header">pap3ryyy</div>
+  <table class="user-table"><tr><td>Роль</td><td>м.с.в.основательность</td></tr><tr><td>Титул</td><td>МСВ основательность</td></tr><tr><td>О себе</td><td>о май чад</td></tr><tr><td>Регистрация</td><td>14.01.2026</td></tr><tr><td>Последний визит</td><td>05.04.2026</td></tr><tr><td>Значки</td><td>М.С.В, Редкий ник, Богатость, Мэлстро, pap3ryyy, Спонсорность, ИзиБриджи, ИзиБриджи</td></tr><tr><td>Баланс</td><td>49999985938 денег</td></tr><tr><td>Заработано</td><td>448 денег</td></tr><tr><td>Потрачено</td><td>14510 денег</td></tr><tr><td>Знаний написано</td><td>3</td></tr><tr><td>Треков загружено</td><td>1</td></tr></table>
+</div>
+<div class="user-card card-admin" data-name="кiлiбiк_off" data-ts="1772536444172">
+  <div class="user-card-header">кiлiбiк_off</div>
+  <table class="user-table"><tr><td>Роль</td><td>м.с.в.содрунник</td></tr><tr><td>Титул</td><td>Сотрудность М.С.В.</td></tr><tr><td>Регистрация</td><td>03.03.2026</td></tr><tr><td>Последний визит</td><td>14.03.2026</td></tr><tr><td>Значки</td><td>М.С.В, Редкий ник</td></tr></table>
+</div>
+<div class="user-card card-sponsor" data-name="mellstroy" data-ts="1772536802147">
+  <div class="user-card-header">mellstroy</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Титул</td><td>Багач😎</td></tr><tr><td>О себе</td><td>ч богатыч. .--. --- ... -- --- - .-. ..  .--. .-. --- ..-. .. .-.. -..-  .- .-. - ..- .-. .-  ..  .--. . .-. . .-- . -.. ..  .- --.. -... ..- -.- ..-  -- --- .-. --.. .</td></tr><tr><td>Регистрация</td><td>03.03.2026</td></tr><tr><td>Последний визит</td><td>01.04.2026</td></tr><tr><td>Значки</td><td>ИзиБриджи, Спонсорность, ARG, Друн Основательности, Богатость, Редкий ник, M.C.b</td></tr><tr><td>Баланс</td><td>44 денег</td></tr><tr><td>Потрачено</td><td>6 денег</td></tr><tr><td>Знаний написано</td><td>1</td></tr><tr><td>Треков загружено</td><td>8</td></tr></table>
+</div>
+<div class="user-card" data-name="mellstroy" data-ts="1772539771407">
+  <div class="user-card-header">Mellstroy</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>03.03.2026</td></tr><tr><td>Последний визит</td><td>08.03.2026</td></tr><tr><td>Значки</td><td>Редкий ник</td></tr><tr><td>Знаний написано</td><td>1</td></tr></table>
+</div>
+<div class="user-card" data-name="artur" data-ts="1772542035356">
+  <div class="user-card-header">Artur</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>О себе</td><td>Hi! 👋 -- -.-- --. .-.. .-  -- .- Ņ  -.. .-. .- ..- -..  .-.-.-</td></tr><tr><td>Регистрация</td><td>03.03.2026</td></tr><tr><td>Значки</td><td>Редкий ник, ARG</td></tr><tr><td>Знаний написано</td><td>1</td></tr></table>
+</div>
+<div class="user-card" data-name="msv" data-ts="1772543288610">
+  <div class="user-card-header">msv</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>О себе</td><td>М.С.В. (М.С.В. следит...)</td></tr><tr><td>Регистрация</td><td>03.03.2026</td></tr><tr><td>Значки</td><td>Редкий ник, ARG</td></tr></table>
+</div>
+<div class="user-card" data-name="glavstroy" data-ts="1772544493870">
+  <div class="user-card-header">Glavstroy</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>03.03.2026</td></tr><tr><td>Значки</td><td>Редкий ник</td></tr></table>
+</div>
+<div class="user-card card-admin card-sponsor" data-name="фриз" data-ts="1772563105099">
+  <div class="user-card-header">фриз</div>
+  <table class="user-table"><tr><td>Роль</td><td>м.с.в.содрунник</td></tr><tr><td>Титул</td><td>Сотруднность МСВ</td></tr><tr><td>Регистрация</td><td>03.03.2026</td></tr><tr><td>Последний визит</td><td>01.04.2026</td></tr><tr><td>Значки</td><td>М.С.В, Спонсорность, Редкий ник, Друн Основательности, Мэлстро</td></tr><tr><td>Баланс</td><td>5606 денег</td></tr><tr><td>Заработано</td><td>5607 денег</td></tr><tr><td>Потрачено</td><td>51 денег</td></tr><tr><td>Знаний написано</td><td>3</td></tr><tr><td>Треков загружено</td><td>1</td></tr></table>
+</div>
+<div class="user-card" data-name="epstein" data-ts="1772563569651">
+  <div class="user-card-header">Epstein</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>О себе</td><td>Привеь, мкня звоут Джеффри.</td></tr><tr><td>Регистрация</td><td>03.03.2026</td></tr><tr><td>Значки</td><td>Редкий ник</td></tr></table>
+</div>
+<div class="user-card" data-name="мытя" data-ts="1772605096040">
+  <div class="user-card-header">мытя</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>О себе</td><td>моя родиность мытищи</td></tr><tr><td>Регистрация</td><td>04.03.2026</td></tr><tr><td>Значки</td><td>Редкий ник</td></tr></table>
+</div>
+<div class="user-card" data-name="магя" data-ts="1772633152875">
+  <div class="user-card-header">Магя</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>04.03.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="_kalvicheg_" data-ts="1772697680659">
+  <div class="user-card-header">_Kalvicheg_</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>05.03.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="bremrhka" data-ts="1772708007537">
+  <div class="user-card-header">bremrhka</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Титул</td><td>Еслость тв говоришость „Друг“, тв предательность.</td></tr><tr><td>Регистрация</td><td>05.03.2026</td></tr><tr><td>Последний визит</td><td>08.03.2026</td></tr><tr><td>Знаний написано</td><td>1</td></tr></table>
+</div>
+<div class="user-card" data-name="korobka920" data-ts="1772716022691">
+  <div class="user-card-header">Korobka920</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>05.03.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="друн" data-ts="1772731893374">
+  <div class="user-card-header">Друн</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>05.03.2026</td></tr><tr><td>Значки</td><td>Редкий ник</td></tr></table>
+</div>
+<div class="user-card" data-name="koniaoo" data-ts="1772733804907">
+  <div class="user-card-header">koniaoo</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>05.03.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="другнедрун" data-ts="1772785153229">
+  <div class="user-card-header">ДругНеДрун</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>О себе</td><td>Я Друг (мур. Ч Друн)</td></tr><tr><td>Регистрация</td><td>06.03.2026</td></tr><tr><td>Последний визит</td><td>02.04.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="владыка_вейдер" data-ts="1772791478565">
+  <div class="user-card-header">Владыка_Вейдер</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>06.03.2026</td></tr><tr><td>Последний визит</td><td>05.04.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="fog (хороший)" data-ts="1773002527609">
+  <div class="user-card-header">Fog (хороший)</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Титул</td><td>The Fog is coming😂😂😂🤞</td></tr><tr><td>Регистрация</td><td>08.03.2026</td></tr><tr><td>Последний визит</td><td>09.03.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="дмитрч" data-ts="1773093323830">
+  <div class="user-card-header">Дмитрч</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>09.03.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="персик" data-ts="1773238310436">
+  <div class="user-card-header">Персик</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>11.03.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="дод" data-ts="1773264903639">
+  <div class="user-card-header">Дод</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>11.03.2026</td></tr><tr><td>Последний визит</td><td>13.03.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="cleve" data-ts="1773408104554">
+  <div class="user-card-header">Cleve</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>13.03.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="fogdrun67" data-ts="1773413462907">
+  <div class="user-card-header">fogdrun67</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>13.03.2026</td></tr></table>
+</div>
+<div class="user-card card-sponsor" data-name="klaustyy" data-ts="1773437802118">
+  <div class="user-card-header">Klaustyy</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>О себе</td><td>сисесть жопость ананасость пивость водкость унитазость ч ебаный пидорасость</td></tr><tr><td>Регистрация</td><td>13.03.2026</td></tr><tr><td>Последний визит</td><td>02.04.2026</td></tr><tr><td>Значки</td><td>Богатость, Друн Основательности, Редкий ник, М.С.В, Спонсорность, ИзиБриджи, Мэлстро, M.C.b, M.C.b</td></tr><tr><td>Баланс</td><td>14886767 денег</td></tr><tr><td>Потрачено</td><td>2 денег</td></tr></table>
+</div>
+<div class="user-card" data-name="друност" data-ts="1773480498210">
+  <div class="user-card-header">Друност</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>14.03.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="shapzel" data-ts="1773490060072">
+  <div class="user-card-header">shapzel</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>14.03.2026</td></tr><tr><td>Последний визит</td><td>27.03.2026</td></tr><tr><td>Знаний написано</td><td>1</td></tr></table>
+</div>
+<div class="user-card card-sponsor" data-name="сливп" data-ts="1773498108780">
+  <div class="user-card-header">сливп</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Титул</td><td>обитательност</td></tr><tr><td>О себе</td><td>@wiselmm tg</td></tr><tr><td>Регистрация</td><td>14.03.2026</td></tr><tr><td>Последний визит</td><td>14.03.2026</td></tr><tr><td>Значки</td><td>Спонсорность</td></tr><tr><td>Знаний написано</td><td>2</td></tr></table>
+</div>
+<div class="user-card" data-name="fogost" data-ts="1773518642601">
+  <div class="user-card-header">Fogost</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>14.03.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="элджей" data-ts="1773564384162">
+  <div class="user-card-header">элджей</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>15.03.2026</td></tr></table>
+</div>
+<div class="user-card card-sponsor" data-name="saretrar" data-ts="1773576820259">
+  <div class="user-card-header">SareTrar</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Титул</td><td>хз кто</td></tr><tr><td>О себе</td><td>СареКалл</td></tr><tr><td>Регистрация</td><td>15.03.2026</td></tr><tr><td>Последний визит</td><td>20.03.2026</td></tr><tr><td>Значки</td><td>Вкусность, Спонсорность, Друн Основательности</td></tr><tr><td>Треков загружено</td><td>3</td></tr></table>
+</div>
+<div class="user-card" data-name="омайгад" data-ts="1773580665218">
+  <div class="user-card-header">Омайгад</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Титул</td><td>Биснесменность</td></tr><tr><td>О себе</td><td>ч жительность Мытищи, телеграмность:@kumosk</td></tr><tr><td>Регистрация</td><td>15.03.2026</td></tr><tr><td>Последний визит</td><td>20.03.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="frisk" data-ts="1773605286577">
+  <div class="user-card-header">Frisk</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>15.03.2026</td></tr><tr><td>Последний визит</td><td>16.03.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="кракен40" data-ts="1773606371226">
+  <div class="user-card-header">Кракен40</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>15.03.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="l1mba" data-ts="1773771354058">
+  <div class="user-card-header">l1mba</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>17.03.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="nein_goosler" data-ts="1773940000709">
+  <div class="user-card-header">Nein_Goosler</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>19.03.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="салфетка5" data-ts="1774382814562">
+  <div class="user-card-header">салфетка5</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>24.03.2026</td></tr><tr><td>Последний визит</td><td>24.03.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="mellon" data-ts="1774431518718">
+  <div class="user-card-header">mellon</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>25.03.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="меллстройность" data-ts="1774553534709">
+  <div class="user-card-header">меллстройность</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>26.03.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="dzhamshuttt" data-ts="1774602919586">
+  <div class="user-card-header">dzhamshuttt</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>27.03.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="dzhamshut" data-ts="1774627218701">
+  <div class="user-card-header">Dzhamshut</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Титул</td><td>Всевышность по знаньамость о друнах</td></tr><tr><td>О себе</td><td>Крутой людич</td></tr><tr><td>Регистрация</td><td>27.03.2026</td></tr><tr><td>Последний визит</td><td>05.04.2026</td></tr><tr><td>Баланс</td><td>45 денег</td></tr><tr><td>Потрачено</td><td>5 денег</td></tr><tr><td>Знаний написано</td><td>2</td></tr></table>
+</div>
+<div class="user-card" data-name="кокосность" data-ts="1775050322673">
+  <div class="user-card-header">Кокосность</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Титул</td><td>Гражданость</td></tr><tr><td>О себе</td><td>Привеи, меность зовут Кокосность, я живость в Мытищи, хороший человекость, есть собакость и двость котостость. Будость рад с вамость общатьсость</td></tr><tr><td>Регистрация</td><td>01.04.2026</td></tr><tr><td>Последний визит</td><td>05.04.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="anton_chigurh" data-ts="1775116908297">
+  <div class="user-card-header">anton_chigurh</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Титул</td><td>Антон чегур</td></tr><tr><td>О себе</td><td>не кого не убивал🤑🤑🤑</td></tr><tr><td>Регистрация</td><td>02.04.2026</td></tr><tr><td>Последний визит</td><td>04.04.2026</td></tr><tr><td>Баланс</td><td>45 денег</td></tr><tr><td>Потрачено</td><td>5 денег</td></tr><tr><td>Знаний написано</td><td>1</td></tr></table>
+</div>
+<div class="user-card" data-name="друн" data-ts="1775239838558">
+  <div class="user-card-header">друн</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Титул</td><td>Друность</td></tr><tr><td>О себе</td><td>---.  -... -.-- .--  .-- . --.. -.. . ---.</td></tr><tr><td>Регистрация</td><td>03.04.2026</td></tr><tr><td>Последний визит</td><td>04.04.2026</td></tr><tr><td>Баланс</td><td>45 денег</td></tr><tr><td>Потрачено</td><td>5 денег</td></tr></table>
+</div>
+<div class="user-card" data-name="мегалюльность" data-ts="1775396209250">
+  <div class="user-card-header">мегалюльность</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>05.04.2026</td></tr></table>
+</div>
+<div class="user-card" data-name="br0gd" data-ts="1775415896297">
+  <div class="user-card-header">br0gd</div>
+  <table class="user-table"><tr><td>Роль</td><td>людич</td></tr><tr><td>Регистрация</td><td>05.04.2026</td></tr><tr><td>Последний визит</td><td>05.04.2026</td></tr><tr><td>Баланс</td><td>45 денег</td></tr><tr><td>Потрачено</td><td>5 денег</td></tr></table>
+</div></div>
+
+</main>
+</div>
+
+<footer>Муринопедия - 2026. Архив создан после закрытия проекта.</footer>
+
+<script>
+const input = document.getElementById('search');
+const sortSelect = document.getElementById('sort');
+const grid = document.getElementById('users-grid');
+const noResults = document.getElementById('no-results');
+
+function getCards() {
+  return Array.from(grid.querySelectorAll('.user-card'));
+}
+
+function applyFilter() {
+  const q = input.value.trim().toLowerCase();
+  const cards = getCards();
+  let found = 0;
+  cards.forEach(function(card) {
+    const match = !q || card.textContent.toLowerCase().includes(q);
+    card.style.display = match ? '' : 'none';
+    if (match) found++;
+  });
+  noResults.style.display = (q && found === 0) ? 'block' : 'none';
+}
+
+function applySort() {
+  const cards = getCards();
+  const dir = sortSelect.value === 'new' ? -1 : 1;
+  cards.sort(function(a, b) {
+    return dir * (parseInt(a.dataset.ts) - parseInt(b.dataset.ts));
+  });
+  cards.forEach(function(c) { grid.appendChild(c); });
+  applyFilter();
+}
+
+input.addEventListener('input', applyFilter);
+sortSelect.addEventListener('change', applySort);
+</script>
+
+</body>
+</html>
