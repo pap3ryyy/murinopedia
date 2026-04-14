@@ -2,7 +2,7 @@
     const data = {
         value: 'true',
         mode: '???',
-        reason: 'Сайтость в разработке...'
+        reason: ''
     };
 
     const mode = data.mode ?? 'maintenance';
@@ -87,6 +87,7 @@
             pointer-events: none;
             font-family: monospace;
             cursor: pointer;
+            z-index: 9999;
         }
         .secret-hint.visible {
             opacity: 1;
@@ -97,46 +98,48 @@
 <body>
     <div class="box">
         <h1>${isWelldone ? 'Конец Дона' : (isSecret ? 'Дон в разработке..' : 'Дон ограничен')}</h1>
-        <img src="asset/${isWelldone ? 'pizda' : 'blya'}.gif" alt="">
+        <img src="asset/${isWelldone ? 'pizda' : (isSecret ? 'murino-cd-don.vercel.app' : 'blya')}.gif" alt="">
         <p>${isWelldone
             ? 'Муринопедия окончательно закрыта. Сайт доживает последние дни — пока ещё естч светл.'
             : (isSecret 
-                ? 'Ч илу доной, пока естч светл.'
+                ? 'Сайтость в разработке.'
                 : 'Сайтость закрыта на тех обслуживанность, оставайтесь в донах.')
         }</p>
         ${reason && !isSecret ? `<div class="reason-box"><b>Причина:</b> ${reason}</div>` : ''}
-        <div class="footer-note">
+        <div class="footer-note" id="footerNote">
             Муринопедия — 2026. Ч илу 
-            <span class="don-clickable" id="donTrigger">дон</span>ой, пока естч светл.
+            <span class="don-clickable">дон</span>ой, пока естч светл.
         </div>
     </div>
     ${isSecret ? `
     <div class="secret-hint" id="secretHint">скачай гифку</div>
     <script>
         (function() {
-            const donTrigger = document.getElementById('donTrigger');
+            const donTriggers = document.querySelectorAll('.don-clickable');
             const secretHint = document.getElementById('secretHint');
             let clickCount = 0;
             let timeout = null;
             
-            donTrigger.addEventListener('click', function(e) {
-                e.stopPropagation();
-                clickCount++;
-                
-                if (clickCount === 1) {
-                    secretHint.classList.add('visible');
-                    timeout = setTimeout(function() {
+            donTriggers.forEach(function(trigger) {
+                trigger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    clickCount++;
+                    
+                    if (clickCount === 1) {
+                        secretHint.classList.add('visible');
+                        timeout = setTimeout(function() {
+                            secretHint.classList.remove('visible');
+                            clickCount = 0;
+                        }, 3000);
+                    }
+                    
+                    if (clickCount === 3) {
+                        clearTimeout(timeout);
                         secretHint.classList.remove('visible');
+                        window.open('https://github.com/pap3ryyy/murinoCDDon/blob/main/murino-cd-don.vercel.app.gif', '_blank');
                         clickCount = 0;
-                    }, 3000);
-                }
-                
-                if (clickCount === 3) {
-                    clearTimeout(timeout);
-                    secretHint.classList.remove('visible');
-                    window.open('https://github.com/pap3ryyy/murinoCDDon/blob/main/murino-cd-don.vercel.app.gif', '_blank');
-                    clickCount = 0;
-                }
+                    }
+                });
             });
             
             secretHint.addEventListener('click', function() {
