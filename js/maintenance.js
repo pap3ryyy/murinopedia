@@ -70,7 +70,7 @@
             font-size: 0.78em; 
             color: #a2a9b1; 
         }
-        .don-clickable {
+        .don-word {
             cursor: pointer;
             color: inherit;
             text-decoration: none;
@@ -88,16 +88,26 @@
             font-family: monospace;
             cursor: pointer;
             z-index: 9999;
+            background: rgba(255,255,255,0.8);
+            padding: 4px 8px;
+            border-radius: 2px;
         }
         .secret-hint.visible {
             opacity: 1;
             pointer-events: auto;
         }
+        .secret-hint a {
+            color: #a2a9b1;
+            text-decoration: none;
+        }
+        .secret-hint a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <div class="box">
-        <h1>${isWelldone ? 'Конец Дона' : (isSecret ? 'Дон в разработке..' : 'Дон ограничен')}</h1>
+        <h1>${isWelldone ? 'Конец Дона' : (isSecret ? '<span class="don-word">Дон</span> в разработке..' : 'Дон ограничен')}</h1>
         <img src="asset/${isWelldone ? 'pizda' : (isSecret ? 'murino-cd-don.vercel.app' : 'blya')}.gif" alt="">
         <p>${isWelldone
             ? 'Муринопедия окончательно закрыта. Сайт доживает последние дни — пока ещё естч светл.'
@@ -108,20 +118,22 @@
         ${reason && !isSecret ? `<div class="reason-box"><b>Причина:</b> ${reason}</div>` : ''}
         <div class="footer-note" id="footerNote">
             Муринопедия — 2026. Ч илу 
-            <span class="don-clickable">дон</span>ой, пока естч светл.
+            <span class="don-word">дон</span>ой, пока естч светл.
         </div>
     </div>
     ${isSecret ? `
-    <div class="secret-hint" id="secretHint">скачай гифку</div>
+    <div class="secret-hint" id="secretHint">
+        <a href="https://github.com/pap3ryyy/murinoCDDon/raw/main/murino-cd-don.vercel.app.gif" target="_blank">скачай гифку</a>
+    </div>
     <script>
         (function() {
-            const donTriggers = document.querySelectorAll('.don-clickable');
+            const donWords = document.querySelectorAll('.don-word');
             const secretHint = document.getElementById('secretHint');
             let clickCount = 0;
             let timeout = null;
             
-            donTriggers.forEach(function(trigger) {
-                trigger.addEventListener('click', function(e) {
+            donWords.forEach(function(word) {
+                word.addEventListener('click', function(e) {
                     e.stopPropagation();
                     clickCount++;
                     
@@ -130,20 +142,16 @@
                         timeout = setTimeout(function() {
                             secretHint.classList.remove('visible');
                             clickCount = 0;
-                        }, 3000);
+                        }, 5000);
                     }
                     
-                    if (clickCount === 3) {
+                    if (clickCount >= 3) {
                         clearTimeout(timeout);
                         secretHint.classList.remove('visible');
-                        window.open('https://github.com/pap3ryyy/murinoCDDon/blob/main/murino-cd-don.vercel.app.gif', '_blank');
+                        window.open('https://github.com/pap3ryyy/murinoCDDon/raw/main/murino-cd-don.vercel.app.gif', '_blank');
                         clickCount = 0;
                     }
                 });
-            });
-            
-            secretHint.addEventListener('click', function() {
-                window.open('https://github.com/pap3ryyy/murinoCDDon/blob/main/murino-cd-don.vercel.app.gif', '_blank');
             });
         })();
     </script>
