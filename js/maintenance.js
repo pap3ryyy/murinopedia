@@ -84,21 +84,21 @@
             color: #a2a9b1;
             opacity: 0;
             transition: opacity 0.3s;
-            pointer-events: none;
             font-family: monospace;
-            cursor: pointer;
             z-index: 9999;
-            background: rgba(255,255,255,0.8);
-            padding: 4px 8px;
-            border-radius: 2px;
+            background: rgba(255,255,255,0.9);
+            padding: 6px 10px;
+            border: 1px solid #e0e0e0;
+            pointer-events: none;
         }
         .secret-hint.visible {
             opacity: 1;
             pointer-events: auto;
         }
         .secret-hint a {
-            color: #a2a9b1;
+            color: #0645ad;
             text-decoration: none;
+            pointer-events: auto;
         }
         .secret-hint a:hover {
             text-decoration: underline;
@@ -123,35 +123,26 @@
     </div>
     ${isSecret ? `
     <div class="secret-hint" id="secretHint">
-        <a href="https://github.com/pap3ryyy/murinoCDDon/raw/main/murino-cd-don.vercel.app.gif" target="_blank">скачай гифку</a>
+        скачай или посмотри на <a href="https://github.com/pap3ryyy/murinoCDDon/raw/main/murino-cd-don.vercel.app.gif" target="_blank">ссылку гифки</a>
     </div>
     <script>
         (function() {
             const donWords = document.querySelectorAll('.don-word');
             const secretHint = document.getElementById('secretHint');
-            let clickCount = 0;
-            let timeout = null;
             
             donWords.forEach(function(word) {
                 word.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    clickCount++;
-                    
-                    if (clickCount === 1) {
-                        secretHint.classList.add('visible');
-                        timeout = setTimeout(function() {
-                            secretHint.classList.remove('visible');
-                            clickCount = 0;
-                        }, 5000);
-                    }
-                    
-                    if (clickCount >= 3) {
-                        clearTimeout(timeout);
-                        secretHint.classList.remove('visible');
-                        window.open('https://github.com/pap3ryyy/murinoCDDon/raw/main/murino-cd-don.vercel.app.gif', '_blank');
-                        clickCount = 0;
-                    }
+                    secretHint.classList.add('visible');
                 });
+            });
+            
+            document.addEventListener('click', function() {
+                secretHint.classList.remove('visible');
+            });
+            
+            secretHint.addEventListener('click', function(e) {
+                e.stopPropagation();
             });
         })();
     </script>
