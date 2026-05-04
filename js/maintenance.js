@@ -1,4 +1,4 @@
-(async function () {
+/* (async function () {
     const data = {
         value: 'false',
         mode: '',
