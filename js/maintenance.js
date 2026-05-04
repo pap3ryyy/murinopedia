@@ -1,6 +1,6 @@
 (async function () {
     const data = {
-        value: 'true',
+        value: 'false',
         mode: '???',
         reason: ''
     };
