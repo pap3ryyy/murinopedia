@@ -1,7 +1,7 @@
 (async function () {
     const data = {
         value: 'false',
-        mode: 'null',
+        mode: '',
         reason: ''
     };
 
