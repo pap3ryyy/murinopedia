@@ -27,8 +27,29 @@ Site URL: https://ваш-сайт.vercel.app (или ваш GitHub Pages)
 
 Redirect URLs: добавьте этот же адрес и его же с /** (например, https://ваш-сайт.vercel.app/**)
 
-Без финальной замены авторизация не заработает — вы просто не сможете войти.
+---
 
+### 3.5. Включите вход через Google
+
+Муринопедия входит только через Google. Настройка займёт 5 минут.
+
+1. Зайди в [Google Cloud Console](https://console.cloud.google.com/), создай проект (или выбери существующий).
+2. В боковом меню **APIs & Services** → **Credentials** → **Create Credentials** → **OAuth client ID**.
+   - Тип приложения: **Web application**.
+   - Поле **Authorized redirect URIs** пока оставь пустым, мы вернёмся.
+   - Жми **Create**.
+3. Скопируй **Client ID** и **Client Secret**.
+4. Иди в Supabase → **Authentication** → **Providers** → **Google**.
+   - Вставь Client ID и Client Secret.
+   - Включи тумблер **Enabled**.
+   - Supabase покажет **Callback URL** (прямо под полями). Скопируй его.
+5. Вернись в Google Cloud Console, открой созданного клиента, в поле **Authorized redirect URIs** вставь скопированный Callback URL. Сохрани.
+6. Вернись в Supabase и нажми **Save**.
+
+Готово. Кнопка «Войти через Google» заработает.
+
+> **Капча Turnstile**  
+> В `login.html` стоит тестовый ключ `0x4AAAAAACns9RV8iJQrS8E5` — он пропускает всех. Этого достаточно для запуска. Замени на свой из [Cloudflare Dashboard](https://dash.cloudflare.com/), только если захочешь защититься от ботов.
 
 ---
 
