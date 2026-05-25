@@ -1,8 +1,8 @@
-/* (async function () {
+(async function () {
     const data = {
-        value: 'false',
-        mode: '',
-        reason: ''
+        value: 'true',
+        mode: 'maintenance',
+        reason: 'Муринопедия закрыта на техническую переработку, ожидайте открытие в июне'
     };
 
     const mode = data.mode ?? 'maintenance';
