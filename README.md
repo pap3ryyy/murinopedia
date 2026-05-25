@@ -49,6 +49,14 @@
   <a href="https://murinopedia.pages.dev">
     <img src="https://img.shields.io/badge/ЗЕРКАЛО-Cloudflare-f6821f?style=for-the-badge&logo=cloudflare" alt="Зеркало">
   </a>
+  &nbsp;
+  <a href="https://t.me/pap3rysklad">
+    <img src="https://img.shields.io/badge/ТЕЛЕГРАМ-Канал-26A5E4?style=for-the-badge&logo=telegram" alt="Телеграм">
+  </a>
+  &nbsp;
+  <a href="#">
+    <img src="https://img.shields.io/badge/ДИСКОРД-В_разработке-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Дискорд в разработке">
+  </a>
 </p>
 
 ---
