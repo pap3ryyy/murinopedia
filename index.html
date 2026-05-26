@@ -34,6 +34,8 @@
         .notif-empty { padding: 20px; text-align: center; color: #a2a9b1; font-size: 0.85em; }
         .mark-all-btn { background: none; border: none; color: #3366cc; font-size: 0.78em; cursor: pointer; padding: 0; }
         .mark-all-btn:hover { text-decoration: underline; }
+        .update-log-entry { margin-bottom: 6px; border-bottom: 1px solid #eaecf0; padding-bottom: 4px; }
+        .update-log-entry:last-child { border-bottom: none; }
     </style>
 </head>
 <body>
@@ -181,6 +183,11 @@
             Гранч: <span style="color: green;">АКТИВЕН</span>
         </div>
 
+        <div class="sidebar-box" id="update-log">
+            <h4>Журнал обновлений</h4>
+            <p style="color:#a2a9b1;font-size:0.85em;">Загружати сводку М.С.В...</p>
+        </div>
+
         <div class="sidebar-box" id="archive-stats">
             <h4>Статистика</h4>
             <p style="color:#a2a9b1;font-size:0.85em;">Загружати...</p>
@@ -209,6 +216,7 @@
 <script src="js/alert.js"></script>
 <script src="js/ban_check.js"></script>
 <script src="js/theme.js"></script>
+<script src="js/update_popup.js"></script>
 <script>
 async function init() {
     const dbOk = await checkDb()
@@ -255,6 +263,7 @@ async function init() {
     }
 
     await loadStats()
+    await loadUpdateLog()
 }
 
 async function checkDb() {
@@ -296,6 +305,35 @@ async function loadStats() {
             <a href="articles.html">Открыти Архив →</a>
         </p>
     `
+}
+
+async function loadUpdateLog() {
+    const container = document.getElementById('update-log')
+    if (!container) return
+
+    const { data: updates } = await supabaseClient
+        .from('update_logs')
+        .select('version, title, created_at')
+        .order('created_at', { ascending: false })
+        .limit(5)
+
+    if (!updates || updates.length === 0) {
+        container.innerHTML = '<h4>Журнал обновлений</h4><p style="color:#a2a9b1;font-size:0.85em;">Нрт записей — Архив молчит</p>'
+        return
+    }
+
+    let html = '<h4>Журнал обновлений</h4><div style="font-size:0.82em;line-height:1.6;">'
+    updates.forEach(u => {
+        const date = new Date(u.created_at).toLocaleDateString('ru-RU')
+        html += `<div class="update-log-entry">
+            <span style="color:#54595d;">[${date}]</span>
+            <span style="font-weight:bold;color:#202122;"> v${u.version}</span> —
+            <span style="color:#54595d;">${u.title.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>
+        </div>`
+    })
+    html += `<a href="changelog.html" style="font-size:0.8em;">→ Полный журнал М.С.В.</a></div>`
+
+    container.innerHTML = html
 }
 
 async function logout() {
