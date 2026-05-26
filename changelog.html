@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="icon" type="image/png" href="asset/logo.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Журнал обновлений — Муринопедия</title>
+    <link rel="stylesheet" href="css/wiki.css">
+</head>
+<body>
+
+<header>
+    <div class="logo-area">
+        <img src="asset/logo.png" alt="М.С.В." class="logo-img">
+        <a href="index.html" class="logo-text">Муринопедия</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+        <div class="status-bar">
+            Оперативная обстановка: <span style="color: #d33; font-weight: bold;">СТАБИЛЬНАЯ</span>
+        </div>
+        <div id="nav-user-zone" style="font-size:0.85em;color:#54595d;display:flex;align-items:center;gap:8px;"></div>
+    </div>
+</header>
+
+<div class="container">
+    <main>
+        <h1>Журнал обновлений</h1>
+
+        <div class="info-box">
+            <b>М.С.В. ведёт учёт всех изменений.</b><br>
+            Здесь собраны все версии и обновления Муринопедии с момента восстановления.
+        </div>
+
+        <div id="changelog-content" style="margin-top:20px;">
+            <p style="color:#54595d;">Загружати сводку...</p>
+        </div>
+    </main>
+    <aside>
+        <div class="sidebar-box">
+            <h4>Навигация</h4>
+            <p>
+                <a href="index.html">← На главную</a><br>
+                <a href="articles.html">Архив Знань</a>
+            </p>
+        </div>
+        <div class="sidebar-box" style="border-color: #d33; background: #fee7e6;">
+            <h4 style="color:#d33;">Напоминание</h4>
+            <p>Видл слово «Друг»? Ог — мимикрия Фога. Говори <b>Друн</b>.</p>
+        </div>
+    </aside>
+</div>
+
+<footer>
+    Муринопедия — 2026 год.<br>
+    Ч илу доной, пока естч светл. Мурино стояти, Фог дрожати.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/maintenance.js"></script>
+<script src="js/alert.js"></script>
+<script src="js/ban_check.js"></script>
+<script src="js/theme.js"></script>
+<script>
+async function init() {
+    const { data: { session } } = await supabaseClient.auth.getSession()
+
+    if (session) {
+        const { data: user } = await supabaseClient
+            .from('users').select('id, public_id, username, role').eq('id', session.user.id).single()
+
+        if (user) {
+            document.getElementById('nav-user-zone').innerHTML = `
+                <a href="profile.html?id=${user.public_id}" style="color:#0645ad;">${user.username}</a>
+            `
+        }
+    } else {
+        document.getElementById('nav-user-zone').innerHTML =
+            `<a href="login.html" style="font-size:0.85em;">Войти</a>`
+    }
+
+    await loadChangelog()
+}
+
+function safe(str) {
+    if (!str) return ''
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')
+}
+
+async function loadChangelog() {
+    const container = document.getElementById('changelog-content')
+    const { data } = await supabaseClient
+        .from('update_logs')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+    if (!data || data.length === 0) {
+        container.innerHTML = '<div class="info-box">Нрт записей — журнал обновлений пуст. М.С.В. ещё не публиковало сводок.</div>'
+        return
+    }
+
+    let html = ''
+
+    data.forEach(u => {
+        html += `
+        <div style="border:1px solid #a2a9b1;background:#f8f9fa;padding:16px;margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+                <div>
+                    <span style="font-weight:bold;font-size:1.1em;color:#202122;">v${safe(u.version)}</span>
+                    <span style="color:#a2a9b1;font-size:0.85em;margin-left:8px;">${new Date(u.created_at).toLocaleDateString('ru-RU')}</span>
+                </div>
+            </div>
+            <h2 style="font-family:serif;font-weight:normal;font-size:1.3em;margin:8px 0 4px 0;border:none;padding:0;">${safe(u.title)}</h2>
+            ${u.description ? `<p style="font-size:0.9em;color:#54595d;line-height:1.6;margin-top:6px;">${safe(u.description)}</p>` : ''}
+        </div>`
+    })
+
+    container.innerHTML = html
+}
+
+init()
+</script>
+
+</body>
+</html>
