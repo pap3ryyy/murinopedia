@@ -43,7 +43,6 @@
         .access-denied h2 { font-family: serif; font-weight: normal; color: #d33; }
         .admin-user-bar { font-size: 0.82em; color: #54595d; display: flex; gap: 10px; align-items: center; }
 
-        /* Badges */
         .badges-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 24px; }
         .badge-card { border: 1px solid #a2a9b1; background: #f8f9fa; padding: 12px; display: flex; gap: 10px; align-items: flex-start; }
         .badge-icon { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; }
@@ -70,6 +69,9 @@
         .user-select-item:hover { background: #f0f4ff; }
         .user-select-item.selected { background: #cee0f2; }
         .user-has-badge { color: #a2a9b1; font-size: 0.78em; }
+
+        .update-log-entry { border: 1px solid #a2a9b1; background: #f8f9fa; padding: 12px; margin-bottom: 10px; }
+        .update-log-entry .meta { font-size: 0.8em; color: #54595d; }
     </style>
 </head>
 <body>
@@ -113,7 +115,6 @@
     </aside>
 </div>
 
-<!-- Modal для выдачи значка -->
 <div class="grant-modal" id="grant-modal">
     <div class="grant-modal-box">
         <h3 id="grant-modal-title">Выдати значок</h3>
@@ -184,13 +185,15 @@ function renderAdmin() {
             <button class="admin-tab" onclick="switchTab('stats', this)">Статистика</button>
             <button class="admin-tab" onclick="switchTab('users', this)">Людич</button>
             <button class="admin-tab" onclick="switchTab('fm', this)">Мурино FM</button>
-                        ${isFounder ? `<button class="admin-tab" onclick="switchTab('unban', this)">Запросы разбана</button>` : ''}
+            <button class="admin-tab" onclick="switchTab('updates', this)">Обновления</button>
+            ${isFounder ? `<button class="admin-tab" onclick="switchTab('unban', this)">Запросы разбана</button>` : ''}
         </div>
         <div class="admin-tab-content active" id="tab-pending"><div id="pending-list"><p style="color:#54595d;">Загружати...</p></div></div>
         <div class="admin-tab-content" id="tab-badges"><div id="badges-content"><p style="color:#54595d;">Загружати...</p></div></div>
         <div class="admin-tab-content" id="tab-stats"><div id="stats-content"><p style="color:#54595d;">Загружати...</p></div></div>
         <div class="admin-tab-content" id="tab-users"><div id="users-content"><p style="color:#54595d;">Загружати...</p></div></div>
         <div class="admin-tab-content" id="tab-fm"><div id="fm-content"><p style="color:#54595d;">Загружати...</p></div></div>
+        <div class="admin-tab-content" id="tab-updates"><div id="updates-content"><p style="color:#54595d;">Загружати...</p></div></div>
         ${isFounder ? '<div class="admin-tab-content" id="tab-unban"><div id="unban-content"><p style="color:#54595d;">Загружати...</p></div></div>' : ''}
     `
     loadPending()
@@ -206,6 +209,7 @@ function switchTab(name, btn) {
     if (name === 'badges') loadBadges()
     if (name === 'unban') loadUnbanRequests()
     if (name === 'fm') loadFmPending()
+    if (name === 'updates') loadUpdates()
 }
 
 function safe(str) {
@@ -728,7 +732,6 @@ async function logout() {
     window.location.href = 'login.html'
 }
 
-init()
 async function loadFmPending() {
     const el = document.getElementById('fm-content')
     el.innerHTML = '<p style="color:#54595d;">Загружати...</p>'
@@ -821,6 +824,89 @@ async function deleteFmTrack(id) {
     loadFmPending()
 }
 
+async function loadUpdates() {
+    const container = document.getElementById('updates-content')
+    const { data } = await supabaseClient.from('update_logs').select('*').order('created_at', { ascending: false })
+
+    let html = `<div class="create-badge-form">
+        <h3>Добавити запись в журнал</h3>
+        <div class="form-field">
+            <label class="form-label">Версия</label>
+            <input type="text" class="form-input" id="update-version" placeholder="2.0">
+        </div>
+        <div class="form-field">
+            <label class="form-label">Заголовок</label>
+            <input type="text" class="form-input" id="update-title" placeholder="Возвращение Муринопедии">
+        </div>
+        <div class="form-field">
+            <label class="form-label">Описание</label>
+            <textarea class="form-input" id="update-desc" rows="3" placeholder="Что изменилось..."></textarea>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:4px;">
+            <button class="btn btn-primary" onclick="addUpdateLog()">Добавити</button>
+            <span style="font-size:0.82em;color:#54595d;" id="update-add-status"></span>
+        </div>
+    </div>`
+
+    html += `<h3 style="font-family:serif;font-weight:normal;font-size:1.1em;border-bottom:1px solid #eaecf0;padding-bottom:4px;margin-bottom:12px;">Все записи</h3>`
+
+    if (!data || data.length === 0) {
+        html += '<div class="empty-state">Нрт записей — журнал пуст</div>'
+    } else {
+        data.forEach(u => {
+            html += `<div class="update-log-entry">
+                <div style="font-weight:bold;">v${safe(u.version)} — ${safe(u.title)}</div>
+                ${u.description ? `<div style="font-size:0.88em;color:#54595d;margin-top:4px;">${safe(u.description)}</div>` : ''}
+                <div class="meta" style="margin-top:6px;">${new Date(u.created_at).toLocaleDateString('ru-RU')} · <button class="btn-remove" style="font-size:0.75em;" onclick="deleteUpdateLog(${u.id})">Удалити</button></div>
+            </div>`
+        })
+    }
+
+    container.innerHTML = html
+}
+
+async function addUpdateLog() {
+    const version = document.getElementById('update-version').value.trim()
+    const title = document.getElementById('update-title').value.trim()
+    const desc = document.getElementById('update-desc').value.trim()
+    const status = document.getElementById('update-add-status')
+
+    if (!version || !title) {
+        status.style.color = '#d33'
+        status.textContent = 'Нрт версии или заголовка'
+        return
+    }
+
+    status.style.color = '#54595d'
+    status.textContent = 'Добавляем...'
+
+    const { error } = await supabaseClient.from('update_logs').insert({
+        version,
+        title,
+        description: desc || null
+    })
+
+    if (error) {
+        status.style.color = '#d33'
+        status.textContent = 'Смертч-шум: ' + error.message
+        return
+    }
+
+    status.style.color = '#14866d'
+    status.textContent = 'Добавлено ✓'
+    document.getElementById('update-version').value = ''
+    document.getElementById('update-title').value = ''
+    document.getElementById('update-desc').value = ''
+    loadUpdates()
+}
+
+async function deleteUpdateLog(id) {
+    if (!confirm('Удалити запись из журнала?')) return
+    await supabaseClient.from('update_logs').delete().eq('id', id)
+    loadUpdates()
+}
+
+init()
 </script>
 </body>
 </html>
