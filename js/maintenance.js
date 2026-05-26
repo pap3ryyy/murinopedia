@@ -1,4 +1,4 @@
-(async function () {
+/**(async function () {
     const data = {
         value: 'true',
         mode: 'maintenance',
