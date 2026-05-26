@@ -203,7 +203,6 @@
 <script src="js/alert.js"></script>
 <script src="js/ban_check.js"></script>
 <script src="js/theme.js"></script>
-<script src="js/player.js"></script>
 <script>
 const params      = new URLSearchParams(location.search)
 const trackId     = parseInt(params.get('id'))
@@ -292,7 +291,6 @@ async function recordPlay() {
     if (el) el.textContent = newCount
 }
 
-/* ── RENDER ── */
 function renderPage() {
     document.getElementById('main-content').innerHTML = `
         <div class="player-block">
@@ -348,15 +346,15 @@ function renderPage() {
     setupMedia()
 }
 
-
 function setupMedia() {
     if (isVideo) {
         mediaEl = document.getElementById('media-el')
-        mediaEl.volume = 0.8
     } else {
-        MurinoFM.play(track)
-        mediaEl = MurinoFM.getAudio()
+        mediaEl = document.createElement('audio')
+        mediaEl.src = track.file_url
+        mediaEl.preload = 'auto'
     }
+    mediaEl.volume = 0.8
 
     mediaEl.addEventListener('loadedmetadata', () => {
         document.getElementById('time-dur').textContent = fmt(mediaEl.duration)
@@ -383,31 +381,20 @@ function setupMedia() {
         if (isRepeat) {
             mediaEl.currentTime = 0
             mediaEl.play()
+        } else {
+            isPlaying = false
+            document.getElementById('btn-play').textContent = '▶'
+            if (!isVideo) stopViz()
         }
     })
-
-    if (!isVideo && !mediaEl.paused) {
-        isPlaying = true
-        document.getElementById('btn-play').textContent = '⏸'
-        setupViz()
-        startViz()
-    }
 }
 
 function togglePlay() {
     if (!mediaEl) return
     if (isPlaying) {
         mediaEl.pause()
-        if (!isVideo) {
-            const fmpBtn = document.getElementById('fmp-play')
-            if (fmpBtn) fmpBtn.textContent = '▶'
-        }
     } else {
         mediaEl.play().catch(e => console.warn('play:', e))
-        if (!isVideo) {
-            const fmpBtn = document.getElementById('fmp-play')
-            if (fmpBtn) fmpBtn.textContent = '⏸'
-        }
     }
 }
 
