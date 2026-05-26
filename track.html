@@ -353,13 +353,8 @@ function setupMedia() {
         mediaEl = document.createElement('audio')
         mediaEl.src = track.file_url
         mediaEl.preload = 'auto'
-        mediaEl.crossOrigin = 'anonymous'
     }
     mediaEl.volume = 0.8
-
-    if (!isVideo) {
-        setupViz()
-    }
 
     mediaEl.addEventListener('loadedmetadata', () => {
         document.getElementById('time-dur').textContent = fmt(mediaEl.duration)
@@ -375,12 +370,10 @@ function setupMedia() {
     mediaEl.addEventListener('play', () => {
         isPlaying = true
         document.getElementById('btn-play').textContent = '⏸'
-        if (!isVideo) startViz()
     })
     mediaEl.addEventListener('pause', () => {
         isPlaying = false
         document.getElementById('btn-play').textContent = '▶'
-        if (!isVideo) stopViz()
     })
     mediaEl.addEventListener('ended', () => {
         if (isRepeat) {
@@ -389,7 +382,6 @@ function setupMedia() {
         } else {
             isPlaying = false
             document.getElementById('btn-play').textContent = '▶'
-            if (!isVideo) stopViz()
         }
     })
 }
@@ -433,53 +425,11 @@ function onTimeUpdate() {
 }
 
 function setupViz() {
-    if (audioCtx) return
-    try {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-        const src = audioCtx.createMediaElementSource(mediaEl)
-        analyser  = audioCtx.createAnalyser()
-        analyser.fftSize = 256
-        src.connect(analyser)
-        analyser.connect(audioCtx.destination)
-    } catch(e) {
-        audioCtx = null
-        analyser = null
-    }
+    return
 }
 
-function startViz() {
-    if (!analyser) { setupViz(); if (!analyser) return }
-    if (animFrame) return
-    const canvas = document.getElementById('viz-canvas')
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    const buf = new Uint8Array(analyser.frequencyBinCount)
-    function draw() {
-        animFrame = requestAnimationFrame(draw)
-        analyser.getByteFrequencyData(buf)
-        const W = canvas.width = canvas.offsetWidth
-        const H = canvas.height = 140
-        ctx.fillStyle = '#0d0d14'
-        ctx.fillRect(0, 0, W, H)
-        const bw = W / buf.length * 2.5
-        for (let i = 0; i < buf.length; i++) {
-            const h   = (buf[i] / 255) * H
-            const hue = 220 + (buf[i] / 255) * 60
-            ctx.fillStyle = `hsl(${hue},80%,${40 + (buf[i]/255)*30}%)`
-            ctx.fillRect(i * (bw + 1), H - h, bw, h)
-        }
-    }
-    draw()
-}
-
-function stopViz() {
-    if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null }
-    const canvas = document.getElementById('viz-canvas')
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    ctx.fillStyle = '#0d0d14'
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
-}
+function startViz() {}
+function stopViz() {}
 
 function drawWaveform() {
     const canvas = document.getElementById('wf-canvas')
