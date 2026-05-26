@@ -353,8 +353,13 @@ function setupMedia() {
         mediaEl = document.createElement('audio')
         mediaEl.src = track.file_url
         mediaEl.preload = 'auto'
+        mediaEl.crossOrigin = 'anonymous'
     }
     mediaEl.volume = 0.8
+
+    if (!isVideo) {
+        setupViz()
+    }
 
     mediaEl.addEventListener('loadedmetadata', () => {
         document.getElementById('time-dur').textContent = fmt(mediaEl.duration)
@@ -436,7 +441,10 @@ function setupViz() {
         analyser.fftSize = 256
         src.connect(analyser)
         analyser.connect(audioCtx.destination)
-    } catch(e) { console.warn('Visualizer:', e) }
+    } catch(e) {
+        audioCtx = null
+        analyser = null
+    }
 }
 
 function startViz() {
