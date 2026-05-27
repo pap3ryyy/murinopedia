@@ -61,28 +61,6 @@
         }
         .save-status.success { color: #14866d; }
         .save-status.error { color: #d33; }
-        .verification-code {
-            font-family: monospace;
-            font-size: 1.4em;
-            font-weight: bold;
-            letter-spacing: 2px;
-            background: #f0f4ff;
-            border: 2px dashed #3366cc;
-            padding: 12px 20px;
-            text-align: center;
-            margin: 10px 0;
-            user-select: all;
-            cursor: pointer;
-        }
-        .verification-code:hover {
-            background: #e0eaff;
-        }
-        .code-copied {
-            color: #14866d;
-            font-size: 0.85em;
-            margin-top: 4px;
-            display: none;
-        }
 
         body.dark .settings-wrap {
             background: #1e1e2e;
@@ -99,14 +77,6 @@
         body.dark .theme-option.active {
             background: #3366cc;
             color: #fff;
-        }
-        body.dark .verification-code {
-            background: #1e293b;
-            border-color: #3366cc;
-            color: #89b4fa;
-        }
-        body.dark .verification-code:hover {
-            background: #1e3a5f;
         }
     </style>
 </head>
@@ -131,35 +101,6 @@
         </div>
         <div class="save-status" id="save-status"></div>
     </div>
-
-    <div class="setting-group">
-        <span class="setting-label">Привязка Discord</span>
-        <p style="font-size:0.85em;color:#54595d;margin-bottom:12px;">
-            Свяжи свой аккаунт с Discord чтобы лайкать статьи и оставлять комментарии прямо с сервера М.С.В.
-        </p>
-
-        <div id="discord-linked" style="display:none;">
-            <div class="success-box" style="margin-bottom:10px;">
-                <b>✔ Discord привязан!</b><br>
-                Твой аккаунт связан с Discord-сервером Муринопедии.
-            </div>
-            <button class="btn btn-danger" onclick="unlinkDiscord()" style="font-size:0.85em;">Отвязать Discord</button>
-            <span class="save-status" id="unlink-status"></span>
-        </div>
-
-        <div id="discord-unlinked">
-            <button class="btn btn-primary" onclick="generateCode()" id="generate-btn">Сгенерировать код привязки</button>
-            <span class="save-status" id="generate-status"></span>
-
-            <div id="code-display" style="display:none;margin-top:14px;">
-                <div style="font-size:0.82em;color:#a2a9b1;margin-bottom:4px;">
-                    Скопируй код и введи команду <b>/verify</b> в Discord. Код показывается только один раз.
-                </div>
-                <div class="verification-code" id="verification-code" onclick="copyCode()" title="Нажми чтобы скопировать"></div>
-                <div class="code-copied" id="code-copied">Скопировано!</div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <footer>
@@ -173,7 +114,6 @@
 <script src="js/maintenance.js"></script>
 <script src="js/alert.js"></script>
 <script src="js/ban_check.js"></script>
-<script src="js/theme.js"></script>
 <script>
 let currentTheme = 'light'
 
@@ -182,23 +122,11 @@ async function init() {
     if (!session) { window.location.href = 'login.html'; return }
 
     const { data: user } = await supabaseClient
-        .from('users').select('theme, discord_id, username').eq('id', session.user.id).single()
-
-    if (user) {
-        document.getElementById('header-user').innerHTML = `
-            <a href="profile.html" style="color:#0645ad;font-size:0.85em;">${user.username}</a>&nbsp;
-            <button onclick="supabaseClient.auth.signOut().then(()=>location.reload())" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;">Выйти</button>
-        `
-    }
+        .from('users').select('theme').eq('id', session.user.id).single()
 
     currentTheme = user?.theme || 'light'
     applyTheme(currentTheme)
     updateButtons(currentTheme)
-
-    if (user?.discord_id) {
-        document.getElementById('discord-linked').style.display = 'block'
-        document.getElementById('discord-unlinked').style.display = 'none'
-    }
 }
 
 function applyTheme(theme) {
@@ -237,59 +165,8 @@ async function setTheme(theme) {
     setTimeout(() => { status.textContent = '' }, 2000)
 }
 
-async function generateCode() {
-    const status = document.getElementById('generate-status')
-    status.className = 'save-status'
-    status.textContent = 'Генерируем...'
-
-    const code = 'MSV-' + Math.random().toString(36).substring(2, 6).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase()
-
-    const { data: { session } } = await supabaseClient.auth.getSession()
-    const { error } = await supabaseClient
-        .from('users').update({ verification_code: code }).eq('id', session.user.id)
-
-    if (error) {
-        status.className = 'save-status error'
-        status.textContent = 'Смертч-шум: ' + error.message
-        return
-    }
-
-    document.getElementById('verification-code').textContent = code
-    document.getElementById('code-display').style.display = 'block'
-    document.getElementById('generate-btn').style.display = 'none'
-    status.className = 'save-status success'
-    status.textContent = 'Код готов! Скопируй его и используй /verify в Discord.'
-}
-
-function copyCode() {
-    const code = document.getElementById('verification-code').textContent
-    navigator.clipboard.writeText(code).then(() => {
-        document.getElementById('code-copied').style.display = 'block'
-        setTimeout(() => { document.getElementById('code-copied').style.display = 'none' }, 2000)
-    })
-}
-
-async function unlinkDiscord() {
-    const status = document.getElementById('unlink-status')
-    status.className = 'save-status'
-    status.textContent = 'Отвязываем...'
-
-    const { data: { session } } = await supabaseClient.auth.getSession()
-    const { error } = await supabaseClient
-        .from('users').update({ discord_id: null, verification_code: null }).eq('id', session.user.id)
-
-    if (error) {
-        status.className = 'save-status error'
-        status.textContent = 'Смертч-шум: ' + error.message
-        return
-    }
-
-    status.className = 'save-status success'
-    status.textContent = 'Discord отвязан!'
-    setTimeout(() => { location.reload() }, 1000)
-}
-
 init()
 </script>
-</body>
+<script src="js/theme.js"></script>
+<script src="js/player.js"></script></body>
 </html>
