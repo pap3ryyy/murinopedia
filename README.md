@@ -54,8 +54,8 @@
     <img src="https://img.shields.io/badge/ТЕЛЕГРАМ-Канал-26A5E4?style=for-the-badge&logo=telegram" alt="Телеграм">
   </a>
   &nbsp;
-  <a href="#">
-    <img src="https://img.shields.io/badge/ДИСКОРД-В_разработке-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Дискорд в разработке">
+  <a href="https://discord.gg/GEdgZYbx3z">
+    <img src="https://img.shields.io/badge/ДИСКОРД-Сервер-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Дискорд">
   </a>
 </p>
 
