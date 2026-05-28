@@ -7,60 +7,35 @@
     <link rel="icon" type="image/png" href="asset/logo.ico">
     <link rel="stylesheet" href="css/wiki.css">
     <style>
-        .hero-search {
-            display: flex;
-            gap: 8px;
-            margin: 20px 0 16px;
-            justify-content: center;
-            flex-wrap: wrap;
+        .fog-error {
+            background: #fee7e6;
+            border: 1px solid #d33;
+            border-left: 5px solid #d33;
+            padding: 16px 20px;
+            margin: 20px 0;
+            display: none;
         }
-        .hero-search input {
-            flex: 1;
-            min-width: 220px;
-            padding: 10px 14px;
-            border: 1px solid #a2a9b1;
-            font-size: 1em;
-            background: #f8f9fa;
-            color: #202122;
-            outline: none;
-        }
-        .hero-search input:focus { border-color: #3366cc; background: #fff; }
-        .hero-search button {
-            padding: 10px 20px;
-            background: #3366cc;
-            color: #fff;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1em;
-        }
-        .hero-search button:hover { background: #2a4b8d; }
-        .hero-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 12px;
-        }
-        .section-header {
-            font-family: serif;
-            font-weight: normal;
-            font-size: 1.4em;
-            border-bottom: 1px solid #a2a9b1;
-            padding-bottom: 4px;
-            margin: 32px 0 16px;
-        }
-        .bottom-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 28px;
-        }
-        @media (max-width: 600px) {
-            .bottom-grid { grid-template-columns: 1fr; }
-        }
-        body.dark .hero-search input { background: #27272a; border-color: #3f3f46; color: #e4e4e7; }
-        body.dark .hero-search input:focus { border-color: #89b4fa; }
+        .fog-error h3 { color: #d33; font-family: serif; font-weight: normal; margin: 0 0 6px 0; font-size: 1.1em; }
+        .fog-error p { margin: 0; font-size: 0.88em; color: #54595d; }
+        .notif-wrap { position: relative; display: inline-block; }
+        .notif-btn { background: #f8f9fa; border: 1px solid #a2a9b1; cursor: pointer; padding: 3px 8px; border-radius: 2px; font-size: 1em; line-height: 1; }
+        .notif-btn:hover { background: #eaecf0; }
+        .notif-badge { position: absolute; top: -6px; right: -6px; background: #d33; color: #fff; font-size: 0.65em; font-weight: bold; border-radius: 10px; padding: 1px 4px; min-width: 16px; text-align: center; line-height: 1.4; pointer-events: none; }
+        .notif-dropdown { position: absolute; top: calc(100% + 6px); right: 0; width: 300px; background: #fff; border: 1px solid #a2a9b1; box-shadow: 0 4px 12px rgba(0,0,0,0.12); z-index: 1000; display: none; max-height: 400px; overflow-y: auto; }
+        .notif-dropdown.open { display: block; }
+        .notif-head { padding: 8px 12px; border-bottom: 1px solid #eaecf0; font-size: 0.82em; font-weight: bold; color: #54595d; display: flex; justify-content: space-between; }
+        .notif-item { padding: 10px 12px; border-bottom: 1px solid #eaecf0; font-size: 0.82em; cursor: pointer; display: flex; gap: 8px; }
+        .notif-item:hover { background: #f8f9fa; }
+        .notif-item.unread { background: #f0f4ff; }
+        .notif-dot { width: 8px; height: 8px; border-radius: 50%; background: #3366cc; flex-shrink: 0; margin-top: 3px; }
+        .notif-dot.read { background: #eaecf0; }
+        .notif-text { flex: 1; line-height: 1.4; color: #202122; }
+        .notif-time { font-size: 0.82em; color: #a2a9b1; white-space: nowrap; }
+        .notif-empty { padding: 20px; text-align: center; color: #a2a9b1; font-size: 0.85em; }
+        .mark-all-btn { background: none; border: none; color: #3366cc; font-size: 0.78em; cursor: pointer; padding: 0; }
+        .mark-all-btn:hover { text-decoration: underline; }
+        .update-log-entry { margin-bottom: 6px; border-bottom: 1px solid #eaecf0; padding-bottom: 4px; }
+        .update-log-entry:last-child { border-bottom: none; }
     </style>
 </head>
 <body>
@@ -106,62 +81,139 @@
     </a>
 </div>
 
-<div class="container" style="grid-template-columns:1fr;">
-
+<div class="container">
     <main>
         <div class="fog-error" id="fog-error">
             <h3>Серверность нрт отвечати</h3>
             <p>Сайтость не может достучатись кч серверности. Возможно Фог атаковалость наши серверности — ожидайте, М.С.В. уже вч пути.</p>
         </div>
 
-        <div style="text-align:center; margin: 0 0 12px;">
-            <h1 style="font-size:2.4em; margin-bottom:4px;">Муринопедия</h1>
-            <p style="font-size:1.05em; color:#54595d; margin:0 0 8px;">
-                Официальный архив знаний Муринской Суверенной Агломерации. Защищено М.С.В.
-            </p>
-            <form class="hero-search" onsubmit="event.preventDefault(); window.location.href='articles.html?q='+encodeURIComponent(this.querySelector('input').value);">
-                <input type="text" placeholder="Поиск по архиву знаний..." aria-label="Поиск">
-                <button type="submit">🔍</button>
-            </form>
-            <div class="hero-actions">
-                <a href="articles.html" class="btn btn-primary" style="font-size:1.05em; padding:10px 24px;">📖 Читати Знань</a>
-                <a href="createarticle.html" class="btn btn-secondary" id="create-btn" style="font-size:1.05em; padding:10px 24px; display:none;">✍️ Создати Знань</a>
+        <h1>Заглавная страница</h1>
+
+        <div class="info-box">
+            <b>Ч илу доной, пока естч светл.</b><br>
+            Муринопедия — официальный информационный ресурс Муринской Суверенной Агломерации. Защищено М.С.В.
+        </div>
+
+        <div style="margin-top:20px; margin-bottom: 30px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <a href="articles.html" class="btn btn-primary">Перейти на архив знань</a>
+            <a href="createarticle.html" class="btn btn-secondary" id="create-btn" style="display:none;">+ Создати Знань</a>
+        </div>
+
+        <h2>Официальные Знань <span style="font-size:0.6em;font-family:sans-serif;color:#54595d;font-weight:normal;vertical-align:middle;">Новые разделы</span></h2>
+
+        <div class="nav-grid" style="margin-bottom:30px;">
+            <div class="nav-card" style="background:#f0fff0;border:1px solid #14866d;padding:15px;">
+                <div style="font-size:0.72em;color:#14866d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Реестр · Язык · <span style="color:#14866d;">АКТУАЛЬНО</span></div>
+                <h3 style="margin:0 0 6px 0;"><a href="dictionary.html">Муринский Словарь</a></h3>
+                <p style="margin:0;font-size:0.88em;color:#54595d;">Официальный актуальный реестр муринского языка. Каждый Людич может предложить своё слово.</p>
+            </div>
+            <div class="nav-card" style="background:#fef6e4;border:1px solid #c8a850;padding:15px;">
+                <div style="font-size:0.72em;color:#c8a850;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Реестр · Достижения</div>
+                <h3 style="margin:0 0 6px 0;"><a href="badges.html">Значки М.С.В.</a></h3>
+                <p style="margin:0;font-size:0.88em;color:#54595d;">Реестр всех значков Муринопедии и их обладателей.</p>
+            </div>
+            <div class="nav-card" style="background:#f0f0ff;border:1px solid #3366cc;padding:15px;">
+                <div style="font-size:0.72em;color:#3366cc;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Медиа · Музыкость</div>
+                <h3 style="margin:0 0 6px 0;"><a href="music.html">Мурино FM</a></h3>
+                <p style="margin:0;font-size:0.88em;color:#54595d;">Официальная радиостанция М.С.В. Треки ич мешапость Людич.</p>
+            </div>
+            <div class="nav-card" style="background:#fff9f0;border:1px solid #e67e22;padding:15px;">
+                <div style="font-size:0.72em;color:#e67e22;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Экономика · Торговл</div>
+                <h3 style="margin:0 0 6px 0;"><a href="market.html">Рынок Мурино</a></h3>
+                <p style="margin:0;font-size:0.88em;color:#54595d;">Обмен знаньями, услугами ич ресурсами под надзором М.С.В.</p>
             </div>
         </div>
 
-        <h2 class="section-header">Разделы Муринопедии</h2>
+        <h2>Легаси Знань <span style="font-size:0.6em;font-family:sans-serif;color:#54595d;font-weight:normal;vertical-align:middle;">Официальные записи</span></h2>
+
+        <div style="background:#fef6e4;border:1px solid #c8a850;padding:8px 12px;font-size:0.85em;color:#7a6000;margin-bottom:14px;">
+            Это канонические Знань — первоисточники Муринопедии. Они нрт редактируются и нрт удаляются.
+        </div>
+
         <div class="nav-grid">
-            <div class="nav-card" style="background:#f0f4ff; border:1px solid #a2a9b1; padding:12px;">
-                <h3 style="margin:0 0 4px;"><a href="articles.html">📚 Архив Знаний</a></h3>
-                <p style="margin:0; font-size:0.88em; color:#54595d;">Все опубликованные статьи</p>
+            <div class="nav-card" style="grid-column: span 2; background: #f0f4ff; border: 1px solid #a2a9b1; padding: 15px;">
+                <div style="font-size:0.72em;color:#54595d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Локация · Столица</div>
+                <h3 style="margin:0 0 6px 0;"><a href="murino.html" style="font-size:1.2em;">Мурино</a></h3>
+                <p style="margin:0;font-size:0.9em;color:#54595d;">Центр цивилизации Людич, оплот М.С.В. и главный бастион против Фог-шума.</p>
             </div>
-            <div class="nav-card" style="background:#f0f4ff; border:1px solid #a2a9b1; padding:12px;">
-                <h3 style="margin:0 0 4px;"><a href="dictionary.html">📖 Словарь</a></h3>
-                <p style="margin:0; font-size:0.88em; color:#54595d;">Муринский язык</p>
+            <div class="nav-card">
+                <div style="font-size:0.72em;color:#54595d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Локация · Остров</div>
+                <h3 style="margin:0 0 6px 0;"><a href="mitishi.html">Мытищи</a></h3>
+                <p style="margin:0;font-size:0.88em;color:#54595d;">Локация Фрутигер-аерности. Место дляч отдыха Людич вч тазикостью.</p>
             </div>
-            <div class="nav-card" style="background:#f0f4ff; border:1px solid #a2a9b1; padding:12px;">
-                <h3 style="margin:0 0 4px;"><a href="music.html">🎵 Мурино FM</a></h3>
-                <p style="margin:0; font-size:0.88em; color:#54595d;">Официальная радиостанция</p>
+            <div class="nav-card">
+                <div style="font-size:0.72em;color:#d33;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Локация · Запретч</div>
+                <h3 style="margin:0 0 6px 0;"><a href="molochnoe.html">Молочное</a></h3>
+                <p style="margin:0;font-size:0.88em;color:#54595d;">Паукость ич потерянная территория. Вход запрещенол М.С.В.</p>
             </div>
-            <div class="nav-card" style="background:#f0f4ff; border:1px solid #a2a9b1; padding:12px;">
-                <h3 style="margin:0 0 4px;"><a href="market.html">💰 Рынок</a></h3>
-                <p style="margin:0; font-size:0.88em; color:#54595d;">Торговля значками</p>
+            <div class="nav-card" style="opacity:0.6;">
+                <div style="font-size:0.72em;color:#a2a9b1;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Реестр · 2026.1.1 · <span style="color:#d33;">УСТАРЕЛО</span></div>
+                <h3 style="margin:0 0 6px 0;"><a href="language.html" style="color:#a2a9b1;">Муринскч (Язык)</a></h3>
+                <p style="margin:0;font-size:0.88em;color:#a2a9b1;">Устаревший реестр. Актуальный словарь — <a href="dictionary.html">Муринский Словарь</a>.</p>
             </div>
-        </div>
-
-        <div class="bottom-grid">
-            <div>
-                <h2 class="section-header">Последние обновления</h2>
-                <div id="update-log" style="font-size:0.9em; color:#54595d;">Загружаем сводку...</div>
-                <div style="margin-top:10px;"><a href="changelog.html" style="font-size:0.85em;">→ Весь журнал</a></div>
+            <div class="nav-card">
+                <div style="font-size:0.72em;color:#54595d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Армия · Защитч</div>
+                <h3 style="margin:0 0 6px 0;"><a href="military.html">Муринские Войскч (М.С.В.)</a></h3>
+                <p style="margin:0;font-size:0.88em;color:#54595d;">Устав, вооружениость ич посты защиты Гранч.</p>
             </div>
-            <div>
-                <h2 class="section-header">Архив в цифрах</h2>
-                <div id="archive-stats" style="font-size:0.9em; color:#54595d;">Загружаем...</div>
+            <div class="nav-card">
+                <div style="font-size:0.72em;color:#54595d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">История · Победл</div>
+                <h3 style="margin:0 0 6px 0;"><a href="revolution.html">Фогская Революция</a></h3>
+                <p style="margin:0;font-size:0.88em;color:#54595d;">Как мыч выбили Фог ич основали Муринопедию.</p>
+            </div>
+            <div class="nav-card">
+                <div style="font-size:0.72em;color:#d33;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Сущность · Угроза</div>
+                <h3 style="margin:0 0 6px 0;"><a href="fog.html">Фог</a></h3>
+                <p style="margin:0;font-size:0.88em;color:#54595d;">Исследование врага: Глюч, Паукость ич Смертч-шум.</p>
             </div>
         </div>
     </main>
 
+    <aside>
+        <div class="sidebar-box">
+            <h4>Навигация</h4>
+            <p>
+                <a href="index.html">Заглавная</a><br>
+                <a href="articles.html">Архив Знань</a><br>
+                <a href="music.html">Мурино FM</a><br>
+                <a href="market.html"><b>Рынок</b></a>
+            </p>
+            <p>
+                <a href="language.html" style="color:#a2a9b1;text-decoration:line-through;" title="Устарело">Реестр языка</a><br>
+                <a href="translator.html">Транслятор</a><br>
+                <a href="dictionary.html"><b>Словарь</b></a><br>
+                <a href="badges.html">Значки</a>
+            </p>
+            <div id="msv-nav" style="display:none; border-top: 1px solid #eaecf0; padding-top: 10px; margin-top: 10px;">
+                <b>М.С.В.</b><br>
+                <a href="admin.html" id="nav-admin" style="display:none;">Штаб М.С.В.</a><br>
+                <a href="review.html" id="nav-review" style="display:none;">Проверка Знань</a><br>
+                <a href="createarticle.html">Создати Знань</a>
+            </div>
+        </div>
+
+        <div class="sidebar-box">
+            <h4>Оперативная сводка</h4>
+            Статус: <span style="color: #d33; font-weight: bold;">СТАБИЛЬНАЯ</span><br>
+            Гранч: <span style="color: green;">АКТИВЕН</span>
+        </div>
+
+        <div class="sidebar-box" id="update-log">
+            <h4>Журнал обновлений</h4>
+            <p style="color:#a2a9b1;font-size:0.85em;">Загружати сводку М.С.В...</p>
+        </div>
+
+        <div class="sidebar-box" id="archive-stats">
+            <h4>Статистика</h4>
+            <p style="color:#a2a9b1;font-size:0.85em;">Загружати...</p>
+        </div>
+
+        <div class="sidebar-box">
+            <h4>Транслятор</h4>
+            <a href="translator.html" class="btn-translate">ПЕРЕВОД ЗНАНЬЯ</a>
+        </div>
+    </aside>
 </div>
 
 <footer>
@@ -175,6 +227,7 @@
 <script src="js/alert.js"></script>
 <script src="js/ban_check.js"></script>
 <script src="js/theme.js"></script>
+<script src="js/update_popup.js"></script>
 <script>
 async function init() {
     const dbOk = await checkDb()
@@ -201,6 +254,19 @@ async function init() {
             notifWrap.style.display = 'inline-block'
             notifWrap._userId = user.id
             await loadNotifications(user.id)
+
+            const role = user.role
+            const isMsv = role !== 'людич'
+
+            if (isMsv) {
+                document.getElementById('msv-nav').style.display = 'block'
+                if (role === 'м.с.в.проверкость') {
+                    document.getElementById('nav-review').style.display = 'inline'
+                } else if (role === 'м.с.в.содрунник' || role === 'м.с.в.основательность') {
+                    document.getElementById('nav-admin').style.display = 'inline'
+                    document.getElementById('nav-review').style.display = 'inline'
+                }
+            }
         }
     } else {
         document.getElementById('nav-user-zone').innerHTML =
@@ -227,6 +293,8 @@ async function checkDb() {
         document.getElementById('fog-error').style.display = 'block'
         document.getElementById('db-status').innerHTML =
             'Оперативная обстановка: <span style="color: #d33; font-weight: bold;">ФОГ-АТАКА</span>'
+        document.getElementById('archive-stats').innerHTML =
+            '<h4>Статистика</h4><p style="color:#d33;font-size:0.85em;">Серверность нрт доступна</p>'
         return false
     }
 }
@@ -238,12 +306,15 @@ async function loadStats() {
         .select('id', { count: 'exact', head: true })
         .eq('status', 'published')
     if (error) {
-        statsEl.innerHTML = '<span style="color:#d33;">Ошибка загрузки</span>'
+        statsEl.innerHTML = '<h4>Архив</h4><p style="font-size:0.85em;color:#d33;">Ошибка загрузки</p>'
         return
     }
     statsEl.innerHTML = `
-        📄 Статей: <b>${count ?? 0}</b><br>
-        <a href="articles.html" style="font-size:0.85em;">Открыти Архив →</a>
+        <h4>Архив</h4>
+        <p style="font-size:0.85em;color:#54595d;">
+            Знань: <b>${count ?? 0}</b><br>
+            <a href="articles.html">Открыти Архив →</a>
+        </p>
     `
 }
 
@@ -258,15 +329,21 @@ async function loadUpdateLog() {
         .limit(5)
 
     if (!updates || updates.length === 0) {
-        container.innerHTML = 'Нрт записей — Архив молчит'
+        container.innerHTML = '<h4>Журнал обновлений</h4><p style="color:#a2a9b1;font-size:0.85em;">Нрт записей — Архив молчит</p>'
         return
     }
 
-    let html = ''
+    let html = '<h4>Журнал обновлений</h4><div style="font-size:0.82em;line-height:1.6;">'
     updates.forEach(u => {
         const date = new Date(u.created_at).toLocaleDateString('ru-RU')
-        html += `<div style="margin-bottom:4px;">[${date}] <b>v${u.version}</b> — ${u.title.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`
+        html += `<div class="update-log-entry">
+            <span style="color:#54595d;">[${date}]</span>
+            <span style="font-weight:bold;color:#202122;"> v${u.version}</span> —
+            <span style="color:#54595d;">${u.title.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>
+        </div>`
     })
+    html += `<a href="changelog.html" style="font-size:0.8em;">→ Полный журнал М.С.В.</a></div>`
+
     container.innerHTML = html
 }
 
