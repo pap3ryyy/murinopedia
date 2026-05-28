@@ -173,6 +173,8 @@ if (priceHistory && priceHistory.length >= 2) {
         groupedHolders[uid].count++
     })
 
+    const isTransferable = badge.transferable !== false
+
     document.title = badge.name + ' — Муринопедия'
 
     document.getElementById('main-content').innerHTML = `
@@ -195,38 +197,41 @@ if (priceHistory && priceHistory.length >= 2) {
             ${badge.how_to_get}
         </div>` : ''}
 
-        <h2 class="section-title">Рынок <span style="font-size:0.7em;color:#a2a9b1;font-family:sans-serif;">${listings?.length ?? 0} лотов</span>${priceChangeHtml}</h2>
+        <h2 class="section-title">Рынок <span style="font-size:0.7em;color:#a2a9b1;font-family:sans-serif;">${isTransferable ? (listings?.length ?? 0) + ' лотов' : '—'}</span>${priceChangeHtml}</h2>
 
-        ${!listings || listings.length === 0
-            ? '<p style="color:#a2a9b1;font-style:italic;font-size:0.9em;">Нрт активных лотов</p>'
-            : listings.map(l => {
-                const s = sellerMap[l.seller_id]
-                const isOwn = currentUserId && l.seller_id === currentUserId
-                const nameColor = s?.name_color ? `color:${s.name_color};` : ''
-                return `<div class="sidebar-box" style="display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:6px;">
-                    <img src="${badge.icon_url}" style="width:40px;height:40px;object-fit:contain;border:1px solid #eaecf0;padding:3px;background:#fff;flex-shrink:0;">
-                    <div style="flex:1;min-width:0;">
-                        <div style="font-weight:bold;font-size:1.05em;">💰 ${Number(l.price).toLocaleString('ru-RU')} денег ${l.amount > 1 ? `<span style="color:#a2a9b1;font-weight:normal;">(x${l.amount})</span>` : ''}</div>
-                        ${s ? `<div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-                            ${s.avatar_url
-                                ? `<img src="${s.avatar_url}" style="width:18px;height:18px;border-radius:2px;object-fit:cover;">`
-                                : `<span style="width:18px;height:18px;background:#eaecf0;border-radius:2px;display:inline-flex;align-items:center;justify-content:center;font-size:0.7em;flex-shrink:0;">${s.username[0].toUpperCase()}</span>`
-                            }
-                            <a href="profile.html?id=${s.public_id}" style="font-size:0.82em;${nameColor}">${s.username}</a>
-                        </div>` : ''}
-                        ${l.is_emission ? '<span class="emission-tag">Эмиссия</span>' : ''}
-                    </div>
-                    ${!currentUserId
-                        ? `<a href="login.html" class="btn btn-secondary" style="font-size:0.82em;">Войти</a>`
-                        : isOwn
-                        ? `<button class="btn btn-danger" style="font-size:0.82em;" onclick="cancelListing(${l.id})">Снять</button>`
-                        : `<button class="btn btn-primary" style="font-size:0.82em;" onclick="buyListing(${l.id}, ${l.price})">Купити</button>`
-                    }
-                </div>`
-            }).join('')
+        ${!isTransferable
+            ? `<p style="color:#a2a9b1;font-style:italic;font-size:0.9em;">Данный значок нельзя получить через рынок — он не подлежит передаче.</p>`
+            : (!listings || listings.length === 0
+                ? '<p style="color:#a2a9b1;font-style:italic;font-size:0.9em;">Нрт активных лотов</p>'
+                : listings.map(l => {
+                    const s = sellerMap[l.seller_id]
+                    const isOwn = currentUserId && l.seller_id === currentUserId
+                    const nameColor = s?.name_color ? `color:${s.name_color};` : ''
+                    return `<div class="sidebar-box" style="display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:6px;">
+                        <img src="${badge.icon_url}" style="width:40px;height:40px;object-fit:contain;border:1px solid #eaecf0;padding:3px;background:#fff;flex-shrink:0;">
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-weight:bold;font-size:1.05em;">💰 ${Number(l.price).toLocaleString('ru-RU')} денег ${l.amount > 1 ? `<span style="color:#a2a9b1;font-weight:normal;">(x${l.amount})</span>` : ''}</div>
+                            ${s ? `<div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+                                ${s.avatar_url
+                                    ? `<img src="${s.avatar_url}" style="width:18px;height:18px;border-radius:2px;object-fit:cover;">`
+                                    : `<span style="width:18px;height:18px;background:#eaecf0;border-radius:2px;display:inline-flex;align-items:center;justify-content:center;font-size:0.7em;flex-shrink:0;">${s.username[0].toUpperCase()}</span>`
+                                }
+                                <a href="profile.html?id=${s.public_id}" style="font-size:0.82em;${nameColor}">${s.username}</a>
+                            </div>` : ''}
+                            ${l.is_emission ? '<span class="emission-tag">Эмиссия</span>' : ''}
+                        </div>
+                        ${!currentUserId
+                            ? `<a href="login.html" class="btn btn-secondary" style="font-size:0.82em;">Войти</a>`
+                            : isOwn
+                            ? `<button class="btn btn-danger" style="font-size:0.82em;" onclick="cancelListing(${l.id})">Снять</button>`
+                            : `<button class="btn btn-primary" style="font-size:0.82em;" onclick="buyListing(${l.id}, ${l.price})">Купити</button>`
+                        }
+                    </div>`
+                }).join('')
+            )
         }
 
-        ${myAvailableToSell > 0 && badge.transferable !== false ? `
+        ${myAvailableToSell > 0 && isTransferable ? `
         <div class="sidebar-box" style="margin-top:16px;">
             <b style="font-size:0.9em;">Выставити на продажу (Доступно: ${myAvailableToSell})</b>
             <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
