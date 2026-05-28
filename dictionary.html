@@ -7,119 +7,73 @@
     <title>Муринский Словарь — Муринопедия</title>
     <link rel="stylesheet" href="css/wiki.css">
     <style>
-        .alphabet-nav {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 20px;
-        }
-        .alphabet-nav a {
-            display: inline-block;
-            padding: 4px 10px;
+        .dict-search {
+            padding: 6px 10px;
             border: 1px solid #a2a9b1;
-            border-radius: 2px;
-            color: #0645ad;
-            text-decoration: none;
             font-size: 0.9em;
-            font-weight: bold;
-            background: #f8f9fa;
-        }
-        .alphabet-nav a:hover { background: #eaf0fb; border-color: #3366cc; }
-        .alphabet-nav a.active { background: #3366cc; color: #fff; border-color: #3366cc; }
-
-        .word-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 12px;
-        }
-
-        .word-card {
-            border: 1px solid #c8ccd1;
-            background: #f8f9fa;
-            padding: 14px;
-            transition: border-color 0.15s;
-        }
-        .word-card:hover { border-color: #3366cc; }
-
-        .word-card .ru-word {
-            font-size: 1.1em;
-            font-weight: bold;
+            background: #fff;
             color: #202122;
-            margin-bottom: 4px;
+            outline: none;
+            width: 250px;
+            max-width: 100%;
         }
-        .word-card .mu-word {
-            font-size: 1.3em;
-            color: #3366cc;
-            font-family: serif;
-            margin-bottom: 8px;
+        .dict-search:focus { border-color: #3366cc; }
+        .dict-table {
+            width: 100%;
+            border-collapse: collapse;
         }
-        .word-card .meta {
-            font-size: 0.78em;
-            color: #a2a9b1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .word-card .status-badge {
-            font-size: 0.72em;
-            padding: 2px 6px;
-            border-radius: 2px;
+        .dict-table th {
+            background: #eaecf0;
+            border-bottom: 1px solid #a2a9b1;
+            padding: 8px 12px;
+            text-align: left;
+            font-size: 0.85em;
+            color: #54595d;
             font-weight: bold;
         }
-        .status-pending { background: #fef6e4; color: #7a6000; border: 1px solid #c8a850; }
-        .status-rejected { background: #fee7e6; color: #d33; border: 1px solid #d33; }
-        .status-approved { background: #d4f5e9; color: #14866d; border: 1px solid #14866d; }
-
-        .word-card .actions {
-            display: flex;
-            gap: 4px;
-            margin-top: 8px;
+        .dict-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #eaecf0;
+            vertical-align: middle;
+            font-size: 0.92em;
         }
-
-        .add-word-block {
-            background: #f0f4ff;
-            border: 1px solid #3366cc;
-            border-left: 4px solid #3366cc;
-            padding: 16px 20px;
-            margin-top: 24px;
-        }
-        .add-word-block h3 {
-            font-family: serif;
-            font-weight: normal;
-            font-size: 1.1em;
-            margin: 0 0 12px 0;
-            color: #3366cc;
-        }
-        .add-word-form {
+        .dict-table tr:last-child td { border-bottom: none; }
+        .dict-table tr:hover td { background: #f0f4ff; }
+        .dict-pending-row td { background: #fef6e4 !important; color: #7a6000; }
+        .dict-rejected-row td { background: #fee7e6 !important; color: #d33; }
+        .dict-msv-actions { display: flex; gap: 6px; }
+        .dict-add-form {
             display: flex;
             gap: 10px;
             align-items: center;
             flex-wrap: wrap;
+            margin-top: 16px;
         }
-        .add-word-form input {
+        .dict-input {
             padding: 7px 10px;
             border: 1px solid #a2a9b1;
             font-size: 0.9em;
-            background: #fff;
+            background: #f8f9fa;
+            color: #202122;
             outline: none;
+            min-width: 160px;
             flex: 1;
-            min-width: 150px;
         }
-        .add-word-form input:focus { border-color: #3366cc; }
-        .add-word-form .btn { flex-shrink: 0; }
-
-        .dict-status-msg {
-            font-size: 0.85em;
-            margin-top: 6px;
+        .dict-input:focus { border-color: #3366cc; background: #fff; }
+        .dict-status { font-size: 0.85em; }
+        body.dark .dict-search,
+        body.dark .dict-input {
+            background: #27272a;
+            border-color: #3f3f46;
+            color: #e4e4e7;
         }
-
-        body.dark .alphabet-nav a { background: #27272a; border-color: #3f3f46; color: #89b4fa; }
-        body.dark .alphabet-nav a.active { background: #3366cc; color: #fff; }
-        body.dark .word-card { background: #27272a; border-color: #3f3f46; }
-        body.dark .word-card .ru-word { color: #e4e4e7; }
-        body.dark .add-word-block { background: #1e293b; border-color: #3366cc; }
-        body.dark .add-word-form input { background: #1c1c1f; border-color: #3f3f46; color: #e4e4e7; }
-        body.dark .add-word-form input:focus { border-color: #89b4fa; }
+        body.dark .dict-search:focus,
+        body.dark .dict-input:focus { border-color: #89b4fa; background: #1c1c1f; }
+        body.dark .dict-table th { background: #27272a; border-bottom-color: #3f3f46; color: #a1a1aa; }
+        body.dark .dict-table td { border-bottom-color: #3f3f46; }
+        body.dark .dict-table tr:hover td { background: #1e293b; }
+        body.dark .dict-pending-row td { background: #2d2510 !important; color: #f9e2af; }
+        body.dark .dict-rejected-row td { background: #2d1b1b !important; color: #f38ba8; }
     </style>
 </head>
 <body>
@@ -140,42 +94,45 @@
 <div class="container">
     <main>
         <h1>📖 Муринский Словарь</h1>
-        <div class="info-box" style="margin-bottom:16px;">
+
+        <div class="info-box">
             Официальный актуальный реестр муринского языка. Каждый Людич может предложить своё слово — М.С.В. проверит и одобрит.
         </div>
 
-        <input type="text" class="dict-search" id="dict-search" placeholder="Поиск по словарю..." oninput="applyFilters()"
-            style="width:100%; padding:8px 12px; margin-bottom:16px; border:1px solid #a2a9b1; font-size:0.95em; background: #f8f9fa; color:#202122; outline: none;">
-
-        <div class="alphabet-nav" id="alphabet-nav"></div>
-
-        <div style="margin-bottom: 8px; font-size:0.9em; color:#54595d;">
-            Показано: <span id="visible-count">0</span> слов
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+            <input type="text" class="dict-search" id="dict-search" placeholder="Поиск по словарю..." oninput="filterDict(this.value)">
+            <span style="font-size:0.9em;color:#54595d;" id="words-count">Загружати...</span>
         </div>
 
-        <div class="word-grid" id="word-grid">
-            <p style="color:#a2a9b1;">Загружати словарь...</p>
+        <div style="overflow-x:auto;">
+            <table class="dict-table" id="dict-table">
+                <thead><tr><th>Русский</th><th>Муринский</th><th>Автор</th><th id="dict-actions-col" style="display:none;">Действия</th></tr></thead>
+                <tbody id="dict-body">
+                    <tr><td colspan="4" style="text-align:center;color:#a2a9b1;">Загружати словарь...</td></tr>
+                </tbody>
+            </table>
         </div>
 
-        <div id="add-word-section" style="display:none;">
-            <div class="add-word-block">
-                <h3>Предложити новое слово</h3>
-                <div class="add-word-form">
-                    <input type="text" id="dict-ru" placeholder="Русское слово" maxlength="40">
-                    <input type="text" id="dict-mu" placeholder="Муринское слово" maxlength="40">
-                    <button class="btn btn-primary" onclick="submitWord()">Предложити</button>
-                </div>
-                <div class="dict-status-msg" id="dict-status"></div>
+        <div id="dict-form-container" style="display:none;">
+            <div class="dict-add-form">
+                <input type="text" class="dict-input" id="dict-ru" placeholder="Русское слово" maxlength="40">
+                <input type="text" class="dict-input" id="dict-mu" placeholder="Муринское слово" maxlength="40">
+                <button class="btn btn-primary" onclick="submitDictWord()">Предложити</button>
             </div>
+            <div class="dict-status" id="dict-status"></div>
         </div>
-        <div id="login-prompt" style="margin-top:16px; font-size:0.9em; color:#54595d;">
+
+        <div id="dict-login-prompt" style="margin-top:16px;font-size:0.9em;color:#54595d;">
             <a href="login.html">Войти</a> чтобы предложить слово.
         </div>
     </main>
     <aside>
         <div class="sidebar-box">
             <h4>Навигация</h4>
-            <p><a href="index.html">← Главная</a></p>
+            <p>
+                <a href="index.html">← Главная</a><br>
+                <a href="articles.html">Архив Знань</a>
+            </p>
         </div>
         <div class="sidebar-box" style="border-color:#d33;background:#fee7e6;">
             <h4 style="color:#d33;">Напоминание</h4>
@@ -205,7 +162,6 @@ let currentUser = null
 let currentUserId = null
 let currentRole = null
 let allWords = []
-let selectedLetter = ''
 
 async function init() {
     const { data: { session } } = await supabaseClient.auth.getSession()
@@ -221,90 +177,89 @@ async function init() {
                 &nbsp;
                 <button onclick="logout()" style="padding:3px 10px;border:1px solid #a2a9b1;background:#f8f9fa;cursor:pointer;font-size:0.85em;border-radius:2px;">Выйти</button>
             `
-            document.getElementById('add-word-section').style.display = 'block'
-            document.getElementById('login-prompt').style.display = 'none'
+            document.getElementById('dict-form-container').style.display = 'block'
+            document.getElementById('dict-login-prompt').style.display = 'none'
         }
     } else {
         document.getElementById('header-user').innerHTML = `<a href="login.html" style="font-size:0.85em;">Войти</a>`
+        document.getElementById('dict-login-prompt').style.display = 'block'
+        document.getElementById('dict-form-container').style.display = 'none'
     }
 
-    await loadWords()
-    buildAlphabet()
+    if (['м.с.в.содрунник','м.с.в.основательность'].includes(currentRole)) {
+        document.getElementById('dict-actions-col').style.display = ''
+    }
+
+    await loadDictionary()
 }
 
-async function loadWords() {
+async function loadDictionary() {
     const { data } = await supabaseClient
         .from('dictionary')
         .select('*')
-        .order('russian', { ascending: true })
+        .order('created_at', { ascending: true })
+
     allWords = data ?? []
-    applyFilters()
+    const approved = allWords.filter(w => w.status === 'approved')
+    document.getElementById('words-count').textContent = `Слов: ${approved.length}`
+
+    renderTable(allWords)
 }
 
-function buildAlphabet() {
-    const letters = new Set()
-    allWords.forEach(w => {
-        const first = w.russian.charAt(0).toUpperCase()
-        if (/[А-ЯЁ]/.test(first)) letters.add(first)
-    })
-    const sorted = [...letters].sort()
-    const nav = document.getElementById('alphabet-nav')
-    nav.innerHTML = `<a href="#" class="${selectedLetter === '' ? 'active' : ''}" onclick="selectLetter('')">Все</a>` +
-        sorted.map(l => `<a href="#" class="${selectedLetter === l ? 'active' : ''}" onclick="selectLetter('${l}')">${l}</a>`).join('')
-}
-
-function selectLetter(letter) {
-    selectedLetter = letter
-    buildAlphabet()
-    applyFilters()
-}
-
-function applyFilters() {
-    const query = document.getElementById('dict-search').value.trim().toLowerCase()
+function renderTable(words) {
     const canModerate = ['м.с.в.содрунник','м.с.в.основательность'].includes(currentRole)
+    const tbody = document.getElementById('dict-body')
 
-    const visible = allWords.filter(w => {
-        const matchLetter = !selectedLetter || w.russian.charAt(0).toUpperCase() === selectedLetter
-        const matchSearch = !query || w.russian.toLowerCase().includes(query) || w.murino.toLowerCase().includes(query)
-        return matchLetter && matchSearch
-    })
-
-    document.getElementById('visible-count').textContent = visible.length
-    const grid = document.getElementById('word-grid')
-
-    if (visible.length === 0) {
-        grid.innerHTML = '<p style="color:#a2a9b1;font-style:italic;">Нрт слов по данному запросу</p>'
+    if (words.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#a2a9b1;">Словарь пуст — предложи первое слово</td></tr>'
         return
     }
 
-    grid.innerHTML = visible.map(w => {
-        let statusHtml = ''
-        if (w.status === 'pending') statusHtml = '<span class="status-badge status-pending">на проверке</span>'
-        else if (w.status === 'rejected') statusHtml = '<span class="status-badge status-rejected">отклоненол</span>'
-        else statusHtml = '<span class="status-badge status-approved">одобренол</span>'
+    // Показываем: все approved + свои pending/rejected + (если модератор) все pending других
+    const visible = words.filter(w => {
+        if (w.status === 'approved') return true
+        if (w.author_id === currentUserId) return true
+        if (canModerate && w.status === 'pending') return true
+        return false
+    })
 
-        const canAct = canModerate && w.status === 'pending'
-        const showActions = canAct || (currentUserId && w.author_id === currentUserId && w.status !== 'approved')
+    tbody.innerHTML = visible.map(w => {
+        let rowClass = ''
+        let extra = ''
+        if (w.status === 'pending') {
+            rowClass = 'dict-pending-row'
+            extra = ' <span style="font-size:0.75em;">(на проверке)</span>'
+        } else if (w.status === 'rejected') {
+            rowClass = 'dict-rejected-row'
+            extra = ` <span style="font-size:0.75em;">— отклоненол${w.reject_reason ? ': '+w.reject_reason : ''}</span>`
+        }
 
-        return `<div class="word-card" id="wcard-${w.id}">
-            <div class="ru-word">${safe(w.russian)}</div>
-            <div class="mu-word">${safe(w.murino)}</div>
-            <div class="meta">
-                <span>${safe(w.author_username ?? '—')}</span>
-                ${statusHtml}
-            </div>
-            ${showActions ? `
-            <div class="actions">
-                ${canAct ? `
-                    <button class="btn btn-primary" style="font-size:0.75em;padding:2px 8px;" onclick="approveWord(${w.id})">Принять</button>
-                    <button class="btn btn-danger" style="font-size:0.75em;padding:2px 8px;" onclick="rejectWord(${w.id})">Отклонить</button>
-                ` : ''}
-            </div>` : ''}
-        </div>`
+        return `<tr class="${rowClass}" id="drow-${w.id}">
+            <td>${safe(w.russian)}${extra}</td>
+            <td>${safe(w.murino)}</td>
+            <td style="color:#a2a9b1;font-size:0.85em;">${safe(w.author_username ?? '—')}</td>
+            ${canModerate ? `<td>
+                ${w.status === 'pending' ? `
+                    <div class="dict-msv-actions">
+                        <button class="btn btn-primary" style="font-size:0.75em;padding:2px 8px;" onclick="approveWord(${w.id})">Принять</button>
+                        <button class="btn btn-danger" style="font-size:0.75em;padding:2px 8px;" onclick="rejectWord(${w.id})">Отклонить</button>
+                    </div>
+                ` : `<span style="font-size:0.8em;color:#a2a9b1;">${w.status}</span>`}
+            </td>` : ''}
+        </tr>`
     }).join('')
 }
 
-async function submitWord() {
+function filterDict(query) {
+    const rows = document.querySelectorAll('#dict-body tr')
+    const q = query.toLowerCase()
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase()
+        row.style.display = text.includes(q) ? '' : 'none'
+    })
+}
+
+async function submitDictWord() {
     const ru = document.getElementById('dict-ru').value.trim()
     const mu = document.getElementById('dict-mu').value.trim()
     const status = document.getElementById('dict-status')
@@ -326,18 +281,20 @@ async function submitWord() {
     status.style.color = '#14866d'; status.textContent = 'Предложенол — ждёт проверки М.С.В.'
     document.getElementById('dict-ru').value = ''
     document.getElementById('dict-mu').value = ''
-    await loadWords()
+    await loadDictionary()
+    document.getElementById('dict-search').value = ''
+    filterDict('')
 }
 
 async function approveWord(id) {
     await supabaseClient.from('dictionary').update({ status: 'approved' }).eq('id', id)
-    await loadWords()
+    await loadDictionary()
 }
 
 async function rejectWord(id) {
     const reason = prompt('Причина отклонения (необязательно):') ?? ''
     await supabaseClient.from('dictionary').update({ status: 'rejected', reject_reason: reason || null }).eq('id', id)
-    await loadWords()
+    await loadDictionary()
 }
 
 async function logout() {
