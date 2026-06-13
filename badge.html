@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Значок — Муринопедия</title>
     <link rel="icon" type="image/png" href="asset/logo.ico">
-        <link rel="stylesheet" href="css/wiki.css">
-    <meta property="og:title" content="Муринопедия">
-    <meta property="og:description" content="Официальный архив знаний Муринской Суверенной Агломерации. Защищено М.С.В.">
+    <link rel="stylesheet" href="css/wiki.css">
+    <meta property="og:title" content="Значок — Муринопедия">
+    <meta property="og:description" content="Значок в реестре М.С.В.">
     <meta property="og:image" content="https://pap3ryyy.github.io/murinopedia/asset/logo.png">
-    <meta property="og:url" content="https://pap3ryyy.github.io/murinopedia/">
+    <meta property="og:url" content="https://pap3ryyy.github.io/murinopedia/badges.html">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="theme-color" content="#3366cc">
@@ -67,6 +67,8 @@
                 <a href="market.html">Рынок</a>
             </p>
         </div>
+    </aside>
+</div>
 
 <footer>
     Муринопедия — 2026 год.<br>
@@ -116,6 +118,12 @@ async function init() {
         .from('badges').select('*').eq('id', badgeId).single()
     if (error || !badge) { showError('Значок нрт найденол вч реестре'); return }
 
+    document.title = badge.name + ' — Муринопедия'
+    document.querySelector('meta[property="og:title"]').setAttribute('content', badge.name + ' — Муринопедия')
+    document.querySelector('meta[property="og:description"]').setAttribute('content', badge.description || 'Значок в реестре М.С.В.')
+    document.querySelector('meta[property="og:image"]').setAttribute('content', badge.icon_url || 'https://pap3ryyy.github.io/murinopedia/asset/logo.png')
+    document.querySelector('meta[property="og:url"]').setAttribute('content', 'https://pap3ryyy.github.io/murinopedia/badge.html?id=' + badgeId)
+
     const { data: holderRows } = await supabaseClient
         .from('user_badges').select('user_id, granted_at').eq('badge_id', badgeId)
         .order('granted_at', { ascending: true })
@@ -148,13 +156,13 @@ async function init() {
         .order('sold_at', { ascending: true })
         .limit(30)
     let priceChangeHtml = ''
-if (priceHistory && priceHistory.length >= 2) {
-    const first = priceHistory[0].price
-    const last = priceHistory[priceHistory.length - 1].price
-    const change = ((last - first) / first * 100).toFixed(1)
-    const isUp = last >= first
-    priceChangeHtml = `<span style="font-size:0.82em;font-weight:bold;color:${isUp ? '#14866d' : '#d33'};margin-left:8px;">${isUp ? '▲' : '▼'} ${isUp ? '+' : ''}${change}%</span>`
-}
+    if (priceHistory && priceHistory.length >= 2) {
+        const first = priceHistory[0].price
+        const last = priceHistory[priceHistory.length - 1].price
+        const change = ((last - first) / first * 100).toFixed(1)
+        const isUp = last >= first
+        priceChangeHtml = `<span style="font-size:0.82em;font-weight:bold;color:${isUp ? '#14866d' : '#d33'};margin-left:8px;">${isUp ? '▲' : '▼'} ${isUp ? '+' : ''}${change}%</span>`
+    }
 
     const myCopiesTotal = holderRows?.filter(r => r.user_id === currentUserId).length || 0
     const myListedCount = listings?.filter(l => l.seller_id === currentUserId && !l.is_emission)
@@ -175,8 +183,6 @@ if (priceHistory && priceHistory.length >= 2) {
     })
 
     const isTransferable = badge.transferable !== false
-
-    document.title = badge.name + ' — Муринопедия'
 
     document.getElementById('main-content').innerHTML = `
         <div class="badge-hero">
