@@ -170,9 +170,17 @@ function renderEditor() {
                 <button class="toolbar-btn" onclick="insertText('**', '**')">Жирный</button>
                 <button class="toolbar-btn" onclick="insertText('*', '*')">Курсив</button>
                 <button class="toolbar-btn" onclick="insertText('<image>', '')">Картинка</button>
+                <button class="toolbar-btn" onclick="insertText('<gif>', '')">GIF</button>
                 <button class="toolbar-btn" onclick="insertText('> ', '')">Цитата</button>
+                <button class="toolbar-btn" onclick="insertText('- ', '')">Список</button>
+                <button class="toolbar-btn" onclick="insertText('1. ', '')">Нумер. список</button>
+                <button class="toolbar-btn" onclick="insertTableTemplate()">Таблица</button>
+                <button class="toolbar-btn" onclick="insertSpoilerTemplate()">Спойлер</button>
+                <button class="toolbar-btn" onclick="insertText('---', '')">Разделитель</button>
             </div>
-            <div class="content-hint">Используй &lt;image&gt; дляч вставки картинки вч тексте. ## — заголовок, ### — подзаголовок, **текст** — жирный.</div>
+            <div class="content-hint">
+                ## — заголовок, ### — подзаголовок, **жирный**, *курсив*, &lt;image&gt; — картинка, &lt;gif&gt; — анимация, &gt; — цитата, - — список, 1. — нумерованный, --- — разделитель, :::spoiler — скрытый блок.
+            </div>
             <textarea class="field-input" id="f-content" placeholder="Пиши Знань здесч..."></textarea>
         </div>
 
@@ -289,6 +297,16 @@ function insertText(before, after) {
     ta.focus()
     ta.selectionStart = start + before.length
     ta.selectionEnd = start + before.length + selected.length
+}
+
+function insertTableTemplate() {
+    const template = '| Заголовок | Заголовок |\n|-----------|-----------|\n| Ячейка    | Ячейка    |\n| Ячейка    | Ячейка    |'
+    insertText(template, '')
+}
+
+function insertSpoilerTemplate() {
+    const template = ':::spoiler Заголовок\nСкрытый текст\n:::'
+    insertText(template, '')
 }
 
 async function submitArticle() {
