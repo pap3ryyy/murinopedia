@@ -42,7 +42,9 @@ let isFounder = false
 let infoboxFields = []
 let codeBlocks = []
 let coverUrl = ''
-let contentImageUrl = ''
+let uploadedImages = []
+let uploadedGifs = []
+const MAX_UPLOADS = 5
 
 async function init() {
     const { data: { session } } = await supabaseClient.auth.getSession()
@@ -132,31 +134,41 @@ function renderEditor() {
         ` : ''}
 
         <div class="image-section">
-            <h3>Картинки</h3>
+            <h3>Медиа <span style="font-size:0.8em;color:#a2a9b1;">(макс. ${MAX_UPLOADS} файлов, всего)</span></h3>
             <div class="image-grid">
 
                 <div class="image-block">
                     <h4>Обложка (инфобокс) — макс. 300×200px</h4>
                     <div class="image-preview" id="cover-preview">Нрт обложки</div>
-                    <div class="image-tab-content active" id="cover-content-upload">
-                        <div class="upload-zone" onclick="document.getElementById('cover-file').click()">
-                            Выбери PNG / JPG / WebP
-                            <input type="file" id="cover-file" accept="image/png,image/jpeg,image/webp,image/gif" onchange="uploadImage(this,'cover')">
-                        </div>
-                        <div class="upload-status" id="cover-upload-status"></div>
+                    <div class="upload-zone" onclick="document.getElementById('cover-file').click()">
+                        Выбери PNG / JPG / WebP
+                        <input type="file" id="cover-file" accept="image/png,image/jpeg,image/webp,image/gif" onchange="uploadCover(this)">
                     </div>
+                    <div class="upload-status" id="cover-upload-status"></div>
                 </div>
 
                 <div class="image-block">
-                    <h4>Картинка для &lt;image&gt; в тексте — макс. 800×500px</h4>
-                    <div class="image-preview" id="content-preview">Нрт картинки</div>
-                    <div class="image-tab-content active" id="content-content-upload">
-                        <div class="upload-zone" onclick="document.getElementById('content-file').click()">
-                            Выбери PNG / JPG / WebP
-                            <input type="file" id="content-file" accept="image/png,image/jpeg,image/webp,image/gif" onchange="uploadImage(this,'content')">
-                        </div>
-                        <div class="upload-status" id="content-upload-status"></div>
+                    <h4>Картинки для &lt;image&gt;</h4>
+                    <div id="image-list" style="margin-bottom:8px;">
+                        <p style="color:#a2a9b1;font-size:0.85em;">Нрт загруженных картинок</p>
                     </div>
+                    <div class="upload-zone" onclick="document.getElementById('image-file').click()" id="image-upload-zone">
+                        + Загрузити картинку
+                        <input type="file" id="image-file" accept="image/png,image/jpeg,image/webp" onchange="uploadMedia(this, 'image')">
+                    </div>
+                    <div class="upload-status" id="image-upload-status"></div>
+                </div>
+
+                <div class="image-block">
+                    <h4>GIF для &lt;gif&gt;</h4>
+                    <div id="gif-list" style="margin-bottom:8px;">
+                        <p style="color:#a2a9b1;font-size:0.85em;">Нрт загруженных GIF</p>
+                    </div>
+                    <div class="upload-zone" onclick="document.getElementById('gif-file').click()" id="gif-upload-zone">
+                        + Загрузити GIF
+                        <input type="file" id="gif-file" accept="image/gif" onchange="uploadMedia(this, 'gif')">
+                    </div>
+                    <div class="upload-status" id="gif-upload-status"></div>
                 </div>
 
             </div>
@@ -202,6 +214,7 @@ function renderEditor() {
     `
 
     renderInfoboxFields()
+    updateMediaLists()
 }
 
 function onTagChange(select) {
@@ -225,25 +238,110 @@ function getSeasonValue() {
     return sub
 }
 
-function updatePreview(type, url) {
-    const preview = document.getElementById(type + '-preview')
-    if (url) {
-        preview.innerHTML = `<img src="${url}" onerror="this.parentElement.textContent='Нрт — нрт загружалость'">`
+function totalUploads() {
+    return uploadedImages.length + uploadedGifs.length + (coverUrl ? 1 : 0)
+}
+
+function canUpload() {
+    return totalUploads() < MAX_UPLOADS
+}
+
+function updateMediaLists() {
+    const imageList = document.getElementById('image-list')
+    const gifList = document.getElementById('gif-list')
+    const imageZone = document.getElementById('image-upload-zone')
+    const gifZone = document.getElementById('gif-upload-zone')
+
+    if (imageList) {
+        if (uploadedImages.length === 0) {
+            imageList.innerHTML = '<p style="color:#a2a9b1;font-size:0.85em;">Нрт загруженных картинок</p>'
+        } else {
+            imageList.innerHTML = uploadedImages.map((url, i) => `
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                    <img src="${url}" style="width:40px;height:40px;object-fit:cover;border:1px solid #a2a9b1;">
+                    <span style="font-size:0.78em;color:#54595d;">Картинка ${i + 1}</span>
+                    <button class="btn-remove" onclick="removeMedia('image', ${i})" style="font-size:0.7em;">✕</button>
+                </div>
+            `).join('')
+        }
+    }
+
+    if (gifList) {
+        if (uploadedGifs.length === 0) {
+            gifList.innerHTML = '<p style="color:#a2a9b1;font-size:0.85em;">Нрт загруженных GIF</p>'
+        } else {
+            gifList.innerHTML = uploadedGifs.map((url, i) => `
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                    <img src="${url}" style="width:40px;height:40px;object-fit:cover;border:1px solid #a2a9b1;">
+                    <span style="font-size:0.78em;color:#54595d;">GIF ${i + 1}</span>
+                    <button class="btn-remove" onclick="removeMedia('gif', ${i})" style="font-size:0.7em;">✕</button>
+                </div>
+            `).join('')
+        }
+    }
+
+    if (!canUpload()) {
+        if (imageZone) imageZone.style.display = 'none'
+        if (gifZone) gifZone.style.display = 'none'
     } else {
-        preview.textContent = type === 'cover' ? 'Нрт обложки' : 'Нрт картинки'
+        if (imageZone) imageZone.style.display = ''
+        if (gifZone) gifZone.style.display = ''
     }
 }
 
-async function uploadImage(input, type) {
+function updateCoverPreview(url) {
+    const preview = document.getElementById('cover-preview')
+    if (url) {
+        preview.innerHTML = `<img src="${url}" onerror="this.parentElement.textContent='Нрт — нрт загружалость'">`
+    } else {
+        preview.textContent = 'Нрт обложки'
+    }
+}
+
+async function uploadCover(input) {
     const file = input.files[0]
     if (!file) return
+
+    const status = document.getElementById('cover-upload-status')
+    status.className = 'upload-status'
+    status.textContent = 'Загружати...'
+
+    const ext = file.name.split('.').pop()
+    const fileName = `covers/${Date.now()}.${ext}`
+
+    const { error } = await supabaseClient.storage
+        .from('images').upload(fileName, file, { upsert: false })
+
+    if (error) {
+        status.className = 'upload-status error'
+        status.textContent = 'Смертч-шум: ' + error.message
+        return
+    }
+
+    const { data: urlData } = supabaseClient.storage.from('images').getPublicUrl(fileName)
+    coverUrl = urlData.publicUrl
+
+    status.className = 'upload-status success'
+    status.textContent = 'Загруженол: ' + file.name
+    updateCoverPreview(coverUrl)
+    updateMediaLists()
+}
+
+async function uploadMedia(input, type) {
+    const file = input.files[0]
+    if (!file) return
+
+    if (!canUpload()) {
+        alert(`Достигнут лимит в ${MAX_UPLOADS} файлов`)
+        return
+    }
 
     const status = document.getElementById(type + '-upload-status')
     status.className = 'upload-status'
     status.textContent = 'Загружати...'
 
     const ext = file.name.split('.').pop()
-    const folder = type === 'cover' ? 'covers' : 'content'
+    const folder = type === 'image' ? 'content' : 'content'
     const fileName = `${folder}/${Date.now()}.${ext}`
 
     const { error } = await supabaseClient.storage
@@ -258,12 +356,24 @@ async function uploadImage(input, type) {
     const { data: urlData } = supabaseClient.storage.from('images').getPublicUrl(fileName)
     const url = urlData.publicUrl
 
-    if (type === 'cover') coverUrl = url
-    else contentImageUrl = url
+    if (type === 'image') {
+        uploadedImages.push(url)
+    } else {
+        uploadedGifs.push(url)
+    }
 
     status.className = 'upload-status success'
     status.textContent = 'Загруженол: ' + file.name
-    updatePreview(type, url)
+    updateMediaLists()
+}
+
+function removeMedia(type, index) {
+    if (type === 'image') {
+        uploadedImages.splice(index, 1)
+    } else {
+        uploadedGifs.splice(index, 1)
+    }
+    updateMediaLists()
 }
 
 function addInfoboxField() {
@@ -325,6 +435,11 @@ async function submitArticle() {
     msg.className = 'status-msg'
     msg.textContent = 'Отправляти...'
 
+    const codeBlocksData = codeBlocks.filter(b => b.name && b.content)
+    const contentImages = uploadedImages.map((url, i) => ({ name: `image${i + 1}`, content: `<img class="content-image" src="${url}" alt="Картинка ${i + 1}">` }))
+    const contentGifs = uploadedGifs.map((url, i) => ({ name: `gif${i + 1}`, content: `<img class="content-image" src="${url}" alt="GIF ${i + 1}">` }))
+    const allCodeBlocks = [...codeBlocksData, ...contentImages, ...contentGifs]
+
     const { data, error } = await supabaseClient.from('articles').insert({
         title,
         tag,
@@ -333,9 +448,9 @@ async function submitArticle() {
         author: currentUser,
         status,
         cover_url: coverUrl || null,
-        image_url: contentImageUrl || null,
+        image_url: uploadedImages[0] || null,
         infobox: infoboxFields.filter(f => f.label || f.value),
-        code_blocks: codeBlocks.filter(b => b.name && b.content),
+        code_blocks: allCodeBlocks,
         season: season || null
     }).select().single()
 
