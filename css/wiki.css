@@ -1439,3 +1439,14 @@ body.dark .update-log-entry .meta { color: #a1a1aa; }
 body.dark .admin-user-bar { color: #a1a1aa; }
 body.dark .admin-user-bar a { color: #89b4fa; }
 body.dark .admin-user-bar button { background: #27272a; border-color: #3f3f46; color: #e4e4e7; }
+hr { border: none; border-top: 1px solid #a2a9b1; margin: 24px 0; }
+.article-content ul, .article-content ol { padding-left: 24px; margin: 12px 0; }
+.article-content li { margin: 4px 0; }
+.wiki-spoiler { border: 1px solid #a2a9b1; background: #f8f9fa; margin: 12px 0; }
+.wiki-spoiler summary { padding: 10px 14px; font-weight: bold; cursor: pointer; background: #eaecf0; user-select: none; }
+.wiki-spoiler summary:hover { background: #cee0f2; }
+.wiki-spoiler[open] { padding: 0 14px 14px; }
+body.dark hr { border-top-color: #3f3f46; }
+body.dark .wiki-spoiler { background: #27272a; border-color: #3f3f46; }
+body.dark .wiki-spoiler summary { background: #3f3f46; color: #e4e4e7; }
+body.dark .wiki-spoiler summary:hover { background: #52525b; }
