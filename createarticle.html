@@ -341,7 +341,7 @@ async function uploadMedia(input, type) {
     status.textContent = 'Загружати...'
 
     const ext = file.name.split('.').pop()
-    const folder = type === 'image' ? 'content' : 'content'
+    const folder = 'content'
     const fileName = `${folder}/${Date.now()}.${ext}`
 
     const { error } = await supabaseClient.storage
