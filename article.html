@@ -31,6 +31,8 @@
             <h4>Навигация</h4>
             <p><a href="articles.html">← Архив Знань</a></p>
         </div>
+    </aside>
+</div>
 
 <footer>
     Муринопедия — 2026 год. <br>
@@ -213,35 +215,71 @@ function renderContentInfobox(article) {
 function renderContent(content, imageUrl, codeBlocks) {
     codeBlocks = codeBlocks || []
     if (!content) return ''
-    
+
     let html = content
-        .replace(/^> (.+)$/gm, '~~BQ~~$1~~END~~')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/^---+\s*$/gm, '~~HR~~')
+
+    html = html.replace(/:::spoiler (.+?)\n([\s\S]*?):::/g, '~~SPOILER~~$1~~SPOILERTITLEEND~~$2~~SPOILEREND~~')
+
+    html = html.replace(/\n((\|[^\n]+\|)\n(\|[-:| ]+\|)\n((\|[^\n]+\|\n?)+))/g, (match) => {
+        let rows = match.trim().split('\n')
+        let tableHtml = '<table class="wiki-table">'
+        rows.forEach((row, idx) => {
+            const cells = row.split('|').filter(c => c.trim() !== '')
+            const tag = idx === 0 ? 'th' : 'td'
+            tableHtml += '<tr>' + cells.map(c => `<${tag}>${c.trim()}</${tag}>`).join('') + '</tr>'
+        })
+        tableHtml += '</table>'
+        return '~~TABLE~~' + tableHtml + '~~TABLEEND~~'
+    })
+
+    html = html
         .replace(/^## (.+)$/gm, '~~H2~~$1~~END~~')
         .replace(/^### (.+)$/gm, '~~H3~~$1~~END~~')
         .replace(/\*\*(.+?)\*\*/g, '~~ST~~$1~~ENDST~~')
         .replace(/\*(.+?)\*/g, '~~EM~~$1~~ENDEM~~')
-    
-    html = html
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/&lt;image&gt;/g, imageUrl
-            ? `<img class="content-image" src="${imageUrl}" alt="Картинка">`
-            : `<div class="inline-image-placeholder">Нрт картинки дляч этого тега</div>`)
-    
+        .replace(/^> (.+)$/gm, '~~BQ~~$1~~END~~')
+        .replace(/^- (.+)$/gm, '~~LI~~$1~~ENDLI~~')
+        .replace(/^1\. (.+)$/gm, '~~OLI~~$1~~ENDOLI~~')
+
+    html = html.replace(/&lt;gif&gt;/g, imageUrl
+        ? `<img class="content-image" src="${imageUrl}" alt="GIF">`
+        : `<div class="inline-image-placeholder">Нрт GIF дляч этого тега</div>`)
+
+    html = html.replace(/&lt;image&gt;/g, imageUrl
+        ? `<img class="content-image" src="${imageUrl}" alt="Картинка">`
+        : `<div class="inline-image-placeholder">Нрт картинки дляч этого тега</div>`)
+
     codeBlocks.forEach(b => {
         if (!b.name || !b.content) return
         const tag = new RegExp('<' + b.name + '>', 'g')
         html = html.replace(tag, '<div class="article-codeblock">' + b.content + '</div>')
     })
 
+    html = html.replace(/~~SPOILER~~(.+?)~~SPOILERTITLEEND~~([\s\S]*?)~~SPOILEREND~~/g, '<details class="wiki-spoiler"><summary>$1</summary>$2</details>')
+
+    html = html.replace(/~~TABLE~~([\s\S]*?)~~TABLEEND~~/g, '$1')
+
     html = html
-        .replace(/~~BQ~~(.+?)~~END~~/g, '<blockquote>$1</blockquote>')
+        .replace(/~~HR~~/g, '<hr>')
         .replace(/~~H2~~(.+?)~~END~~/g, '<h2>$1</h2>')
         .replace(/~~H3~~(.+?)~~END~~/g, '<h3>$1</h3>')
         .replace(/~~ST~~(.+?)~~ENDST~~/g, '<strong>$1</strong>')
         .replace(/~~EM~~(.+?)~~ENDEM~~/g, '<em>$1</em>')
+        .replace(/~~BQ~~(.+?)~~END~~/g, '<blockquote>$1</blockquote>')
+
+    html = html.replace(/(~~LI~~.*?~~ENDLI~~\n?)+/g, (match) => {
+        const items = match.match(/~~LI~~(.*?)~~ENDLI~~/g).map(item => '<li>' + item.replace(/~~LI~~|~~ENDLI~~/g, '') + '</li>')
+        return '<ul>' + items.join('') + '</ul>'
+    })
+    html = html.replace(/(~~OLI~~.*?~~ENDOLI~~\n?)+/g, (match) => {
+        const items = match.match(/~~OLI~~(.*?)~~ENDOLI~~/g).map(item => '<li>' + item.replace(/~~OLI~~|~~ENDOLI~~/g, '') + '</li>')
+        return '<ol>' + items.join('') + '</ol>'
+    })
 
     return html.split('\n').map(line => {
-        if (/^<(h2|h3|blockquote|img|div)/.test(line)) return line
+        if (/^<(h2|h3|blockquote|img|div|table|ul|ol|hr|details)/.test(line)) return line
         if (line.trim() === '') return '<br>'
         return `<p>${line}</p>`
     }).join('')
