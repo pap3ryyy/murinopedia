@@ -243,22 +243,39 @@ function renderContent(content, imageUrl, codeBlocks) {
         .replace(/^- (.+)$/gm, '~~LI~~$1~~ENDLI~~')
         .replace(/^1\. (.+)$/gm, '~~OLI~~$1~~ENDOLI~~')
 
-    html = html.replace(/&lt;gif&gt;/g, imageUrl
-        ? `<img class="content-image" src="${imageUrl}" alt="GIF">`
-        : `<div class="inline-image-placeholder">Нрт GIF дляч этого тега</div>`)
+    const imageBlocks = codeBlocks.filter(b => b.name && b.name.startsWith('image'))
+    const gifBlocks = codeBlocks.filter(b => b.name && b.name.startsWith('gif'))
+    const otherBlocks = codeBlocks.filter(b => b.name && !b.name.startsWith('image') && !b.name.startsWith('gif'))
 
-    html = html.replace(/&lt;image&gt;/g, imageUrl
-        ? `<img class="content-image" src="${imageUrl}" alt="Картинка">`
-        : `<div class="inline-image-placeholder">Нрт картинки дляч этого тега</div>`)
+    imageBlocks.forEach(b => {
+        const tag = new RegExp('<' + b.name + '>', 'g')
+        html = html.replace(tag, b.content)
+    })
+    html = html.replace(/&lt;image(\d*)&gt;/g, (match, num) => {
+        if (imageBlocks.length === 0) return '<div class="inline-image-placeholder">Нрт картинки дляч этого тега</div>'
+        const targetName = 'image' + (num || '1')
+        const block = imageBlocks.find(b => b.name === targetName)
+        return block ? block.content : '<div class="inline-image-placeholder">Нрт картинки дляч этого тега</div>'
+    })
 
-    codeBlocks.forEach(b => {
+    gifBlocks.forEach(b => {
+        const tag = new RegExp('<' + b.name + '>', 'g')
+        html = html.replace(tag, b.content)
+    })
+    html = html.replace(/&lt;gif(\d*)&gt;/g, (match, num) => {
+        if (gifBlocks.length === 0) return '<div class="inline-image-placeholder">Нрт GIF дляч этого тега</div>'
+        const targetName = 'gif' + (num || '1')
+        const block = gifBlocks.find(b => b.name === targetName)
+        return block ? block.content : '<div class="inline-image-placeholder">Нрт GIF дляч этого тега</div>'
+    })
+
+    otherBlocks.forEach(b => {
         if (!b.name || !b.content) return
         const tag = new RegExp('<' + b.name + '>', 'g')
         html = html.replace(tag, '<div class="article-codeblock">' + b.content + '</div>')
     })
 
     html = html.replace(/~~SPOILER~~(.+?)~~SPOILERTITLEEND~~([\s\S]*?)~~SPOILEREND~~/g, '<details class="wiki-spoiler"><summary>$1</summary>$2</details>')
-
     html = html.replace(/~~TABLE~~([\s\S]*?)~~TABLEEND~~/g, '$1')
 
     html = html
@@ -284,7 +301,6 @@ function renderContent(content, imageUrl, codeBlocks) {
         return `<p>${line}</p>`
     }).join('')
 }
-
 function renderArticle(article) {
     const userIsMsv = isMsv()
     const _canDelete = canDelete()
