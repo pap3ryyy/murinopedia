@@ -44,7 +44,7 @@
     </div>
     <div style="display:flex;align-items:center;gap:12px;">
         <div class="status-bar" id="db-status">
-            Оперативная обстановка: <span style="color: #d33; font-weight: bold;">СТАБИЛЬНАЯ</span>
+            Оперативная обстановка: <span class="text-danger" style="font-weight:bold;">СТАБИЛЬНАЯ</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
             <div class="notif-wrap" id="notif-wrap" style="display:none;">
@@ -62,17 +62,17 @@
     </div>
 </header>
 
-<div class="info-box">
-    <strong>Сообщества М.С.В.:</strong>
-    <a href="https://t.me/pap3rysklad" target="_blank">
+<div class="info-box" style="display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:0;">
+    <span style="font-weight:bold;">Сообщества М.С.В.:</span>
+    <a href="https://t.me/pap3rysklad" target="_blank" style="display:flex;align-items:center;gap:5px;color:#0645ad;text-decoration:none;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="#26A5E4"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.87 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.938z"/></svg>
         Telegram
     </a>
-    <a href="https://discord.gg/Ftm4DbCdCG" target="_blank" style="opacity:0.7;" title="В разработке">
+    <a href="https://discord.gg/Ftm4DbCdCG" target="_blank" style="display:flex;align-items:center;gap:5px;color:#0645ad;text-decoration:none;opacity:0.7;" title="В разработке">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="#5865F2"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
         Discord
     </a>
-    <a href="https://murinopedia.pages.dev" target="_blank">
+    <a href="https://murinopedia.pages.dev" target="_blank" style="display:flex;align-items:center;gap:5px;color:#0645ad;text-decoration:none;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="#f6821f"><path d="M16.509 16.845c.147-.507.16-1.066.06-1.607l-.015-.077c-.383-1.625-1.537-2.909-3.07-3.418l-.07-.023c-.663-.22-1.38-.22-2.043 0l-.07.023c-1.533.509-2.687 1.793-3.07 3.418l-.015.077c-.1.541-.087 1.1.06 1.607l.023.071c.34 1.105 1.15 1.986 2.23 2.396l.073.026c.587.196 1.22.196 1.807 0l.073-.026c1.08-.41 1.89-1.291 2.23-2.396l.023-.071zM12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.5 14.845c-.168.583-.53 1.09-1.026 1.462l-.078.05c-.66.393-1.44.523-2.201.37l-.08-.017c-.826-.126-1.577-.538-2.137-1.162l-.06-.07c-.572-.647-.853-1.459-.796-2.277l.007-.097c.1-1.14.585-2.184 1.35-2.937l.074-.07c.235-.204.502-.366.788-.482l.073-.026c.216-.073.44-.11.664-.11h.01c.224 0 .448.037.664.11l.073.026c.286.116.553.278.788.482l.074.07c.765.753 1.25 1.797 1.35 2.937l.007.097c.057.818-.224 1.63-.796 2.277l-.06.07z"/></svg>
         Зеркало
     </a>
@@ -87,82 +87,82 @@
 
         <h1>Заглавная страница</h1>
 
-        <div class="info-box">
+        <div class="welcome-box">
             <b>Ч илу доной, пока естч светл.</b><br>
             Муринопедия — официальный информационный ресурс Муринской Суверенной Агломерации. Защищено М.С.В.
         </div>
 
-        <div style="margin-top:20px; margin-bottom: 30px;">
+        <div class="mt-0 mb-0" style="margin-top:20px; margin-bottom: 30px;">
             <a href="articles.html" class="btn btn-primary">Перейти на архив знань</a>
             <a href="createarticle.html" class="btn btn-secondary" id="create-btn" style="display:none;">+ Создати Знань</a>
         </div>
 
-        <h2>Официальные Знань <span style="font-size:0.6em;font-family:sans-serif;color:#54595d;font-weight:normal;vertical-align:middle;">Новые разделы</span></h2>
+        <h2>Официальные Знань <span class="text-muted" style="font-size:0.6em;font-family:sans-serif;font-weight:normal;vertical-align:middle;">Новые разделы</span></h2>
 
         <div class="nav-grid" style="margin-bottom:30px;">
-            <div class="nav-card success-box">
-                <div style="font-size:0.72em;color:#14866d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Реестр · Язык · <span style="color:#14866d;">АКТУАЛЬНО</span></div>
-                <h3 style="margin:0 0 6px 0;"><a href="dictionary.html">Муринский Словарь</a></h3>
-                <p style="margin:0;font-size:0.88em;color:#54595d;">Официальный актуальный реестр муринского языка. Каждый Людич может предложить своё слово.</p>
+            <div class="nav-card">
+                <div class="text-success" style="font-size:0.72em;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Реестр · Язык · <span class="text-success">АКТУАЛЬНО</span></div>
+                <h3 class="mt-0 mb-0" style="margin-bottom:6px;"><a href="dictionary.html">Муринский Словарь</a></h3>
+                <p class="text-muted mb-0">Официальный актуальный реестр муринского языка. Каждый Людич может предложить своё слово.</p>
             </div>
-            <div class="nav-card notice-box">
+            <div class="nav-card">
                 <div style="font-size:0.72em;color:#c8a850;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Реестр · Достижения</div>
-                <h3 style="margin:0 0 6px 0;"><a href="badges.html">Значки М.С.В.</a></h3>
-                <p style="margin:0;font-size:0.88em;color:#54595d;">Реестр всех значков Муринопедии и их обладателей.</p>
+                <h3 class="mt-0 mb-0" style="margin-bottom:6px;"><a href="badges.html">Значки М.С.В.</a></h3>
+                <p class="text-muted mb-0">Реестр всех значков Муринопедии и их обладателей.</p>
             </div>
-            <div class="nav-card info-box">
+            <div class="nav-card">
                 <div style="font-size:0.72em;color:#3366cc;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Медиа · Музыкость</div>
-                <h3 style="margin:0 0 6px 0;"><a href="music.html">Мурино FM</a></h3>
-                <p style="margin:0;font-size:0.88em;color:#54595d;">Официальная радиостанция М.С.В. Треки ич мешапость Людич.</p>
+                <h3 class="mt-0 mb-0" style="margin-bottom:6px;"><a href="music.html">Мурино FM</a></h3>
+                <p class="text-muted mb-0">Официальная радиостанция М.С.В. Треки ич мешапость Людич.</p>
             </div>
-            <div class="nav-card warning-box">
-                <div style="font-size:0.72em;color:#d33;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Экономика · Торговл</div>
-                <h3 style="margin:0 0 6px 0;"><a href="market.html">Рынок Мурино</a></h3>
-                <p style="margin:0;font-size:0.88em;color:#54595d;">Обмен знаньями, услугами ич ресурсами под надзором М.С.В.</p>
+            <div class="nav-card">
+                <div class="text-danger" style="font-size:0.72em;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Экономика · Торговл</div>
+                <h3 class="mt-0 mb-0" style="margin-bottom:6px;"><a href="market.html">Рынок Мурино</a></h3>
+                <p class="text-muted mb-0">Обмен знаньями, услугами ич ресурсами под надзором М.С.В.</p>
             </div>
         </div>
 
-        <h2>Легаси Знань <span style="font-size:0.6em;font-family:sans-serif;color:#54595d;font-weight:normal;vertical-align:middle;">Официальные записи</span></h2>
+        <h2>Легаси Знань <span class="text-muted" style="font-size:0.6em;font-family:sans-serif;font-weight:normal;vertical-align:middle;">Официальные записи</span></h2>
 
         <div class="notice-box" style="padding:8px 12px;font-size:0.85em;color:#7a6000;margin-bottom:14px;">
             Это канонические Знань — первоисточники Муринопедии. Они нрт редактируются и нрт удаляются.
         </div>
 
         <div class="nav-grid">
-            <div class="nav-card info-box">
-                <div style="font-size:0.72em;color:#54595d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Локация · Столица</div>
-                <h3 style="margin:0 0 6px 0;"><a href="murino.html" style="font-size:1.2em;">Мурино</a></h3>
-                <p style="margin:0;font-size:0.9em;color:#54595d;">Центр цивилизации Людич, оплот М.С.В. и главный бастион против Фог-шума.</p>
+            <div class="nav-card">
+                <div class="text-muted" style="font-size:0.72em;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Локация · Столица</div>
+                <h3 class="mt-0 mb-0" style="margin-bottom:6px;"><a href="murino.html" style="font-size:1.2em;">Мурино</a></h3>
+                <p class="text-muted mb-0">Центр цивилизации Людич, оплот М.С.В. и главный бастион против Фог-шума.</p>
             </div>
             <div class="nav-card">
                 <div style="font-size:0.72em;color:#54595d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Локация · Остров</div>
-                <h3 style="margin:0 0 6px 0;"><a href="mitishi.html">Мытищи</a></h3>
-                <p style="margin:0;font-size:0.88em;color:#54595d;">Локация Фрутигер-аерности. Место дляч отдыха Людич вч тазикостью.</p>
+                <h3 class="mt-0 mb-0" style="margin-bottom:6px;"><a href="mitishi.html">Мытищи</a></h3>
+                <p class="text-muted mb-0">Локация Фрутигер-аерности. Место дляч отдыха Людич вч тазикостью.</p>
             </div>
             <div class="nav-card">
-                <div style="font-size:0.72em;color:#d33;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Локация · Запретч</div>
-                <h3 style="margin:0 0 6px 0;"><a href="molochnoe.html">Молочное</a></h3>
-                <p style="margin:0;font-size:0.88em;color:#54595d;">Паукость ич потерянная территория. Вход запрещенол М.С.В.</p>
+                <div class="text-danger" style="font-size:0.72em;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Локация · Запретч</div>
+                <h3 class="mt-0 mb-0" style="margin-bottom:6px;"><a href="molochnoe.html">Молочное</a></h3>
+                <p class="text-muted mb-0">Паукость ич потерянная территория. Вход запрещенол М.С.В.</p>
             </div>
-            <div class="nav-card text-muted">
-                <div style="font-size:0.72em;color:#a2a9b1;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Реестр · 2026.1.1 · <span style="color:#d33;">УСТАРЕЛО</span></div>
-                <h3 style="margin:0 0 6px 0;"><a href="language.html" style="color:#a2a9b1;">Муринскч (Язык)</a></h3>
-                <p style="margin:0;font-size:0.88em;color:#a2a9b1;">Устаревший реестр. Актуальный словарь — <a href="dictionary.html">Муринский Словарь</a>.</p>
+            <div class="nav-card" style="opacity:0.6;">
+                <div style="font-size:0.72em;color:#a2a9b1;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Реестр · 2026.1.1 · <span class="text-danger">УСТАРЕЛО</span></div>
+                <h3 class="mt-0 mb-0" style="margin-bottom:6px;"><a href="language.html" style="color:#a2a9b1;">Муринскч (Язык)</a></h3>
+                <p class="text-muted mb-0" style="color:#a2a9b1;">Устаревший реестр. Актуальный словарь — <a href="dictionary.html">Муринский Словарь</a>.</p>
             </div>
             <div class="nav-card">
                 <div style="font-size:0.72em;color:#54595d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Армия · Защитч</div>
-                <h3 style="margin:0 0 6px 0;"><a href="military.html">Муринские Войскч (М.С.В.)</a></h3>
-                <p style="margin:0;font-size:0.88em;color:#54595d;">Устав, вооружениость ич посты защиты Гранч.</p>
+                <h3 class="mt-0 mb-0" style="margin-bottom:6px;"><a href="military.html">Муринские Войскч (М.С.В.)</a></h3>
+                <p class="text-muted mb-0">Устав, вооружениость ич посты защиты Гранч.</p>
             </div>
             <div class="nav-card">
                 <div style="font-size:0.72em;color:#54595d;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">История · Победл</div>
-                <h3 style="margin:0 0 6px 0;"><a href="revolution.html">Фогская Революция</a></h3>
-                <p style="margin:0;font-size:0.88em;color:#54595d;">Как мыч выбили Фог ич основали Муринопедию.</p>
+                <h3 class="mt-0 mb-0" style="margin-bottom:6px;"><a href="revolution.html">Фогская Революция</a></h3>
+                <p class="text-muted mb-0">Как мыч выбили Фог ич основали Муринопедию.</p>
             </div>
             <div class="nav-card">
-                <div style="font-size:0.72em;color:#d33;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Сущность · Угроза</div>
-                <h3 style="margin:0 0 6px 0;"><a href="fog.html">Фог</a></h3>
-                <p style="margin:0;font-size:0.88em;color:#54595d;">Исследование врага: Глюч, Паукость ич Смертч-шум.</p>
+                <div class="text-danger" style="font-size:0.72em;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Сущность · Угроза</div>
+                <h3 class="mt-0 mb-0" style="margin-bottom:6px;"><a href="fog.html">Фог</a></h3>
+                <p class="text-muted mb-0">Исследование врага: Глюч, Паукость ич Смертч-шум.</p>
             </div>
         </div>
     </main>
@@ -192,18 +192,18 @@
 
         <div class="sidebar-box">
             <h4>Оперативная сводка</h4>
-            Статус: <span class="text-danger"><strong>СТАБИЛЬНАЯ</strong></span><br>
+            Статус: <span class="text-danger" style="font-weight:bold;">СТАБИЛЬНАЯ</span><br>
             Гранч: <span class="text-success">АКТИВЕН</span>
         </div>
 
         <div class="sidebar-box" id="update-log">
             <h4>Журнал обновлений</h4>
-            <p style="color:#a2a9b1;font-size:0.85em;">Загружати сводку М.С.В...</p>
+            <p class="text-muted" style="font-size:0.85em;">Загружати сводку М.С.В...</p>
         </div>
 
         <div class="sidebar-box" id="archive-stats">
             <h4>Статистика</h4>
-            <p style="color:#a2a9b1;font-size:0.85em;">Загружати...</p>
+            <p class="text-muted" style="font-size:0.85em;">Загружати...</p>
         </div>
 
         <div class="sidebar-box">
@@ -289,9 +289,9 @@ async function checkDb() {
     } catch (e) {
         document.getElementById('fog-error').style.display = 'block'
         document.getElementById('db-status').innerHTML =
-            'Оперативная обстановка: <span style="color: #d33; font-weight: bold;">ФОГ-АТАКА</span>'
+            'Оперативная обстановка: <span class="text-danger" style="font-weight:bold;">ФОГ-АТАКА</span>'
         document.getElementById('archive-stats').innerHTML =
-            '<h4>Статистика</h4><p style="color:#d33;font-size:0.85em;">Серверность нрт доступна</p>'
+            '<h4>Статистика</h4><p class="text-danger" style="font-size:0.85em;">Серверность нрт доступна</p>'
         return false
     }
 }
@@ -303,7 +303,7 @@ async function loadStats() {
         .select('id', { count: 'exact', head: true })
         .eq('status', 'published')
     if (error) {
-        statsEl.innerHTML = '<h4>Архив</h4><p style="font-size:0.85em;color:#d33;">Ошибка загрузки</p>'
+        statsEl.innerHTML = '<h4>Архив</h4><p class="text-danger" style="font-size:0.85em;">Ошибка загрузки</p>'
         return
     }
     statsEl.innerHTML = `
@@ -326,7 +326,7 @@ async function loadUpdateLog() {
         .limit(5)
 
     if (!updates || updates.length === 0) {
-        container.innerHTML = '<h4>Журнал обновлений</h4><p style="color:#a2a9b1;font-size:0.85em;">Нрт записей — Архив молчит</p>'
+        container.innerHTML = '<h4>Журнал обновлений</h4><p class="text-muted" style="font-size:0.85em;">Нрт записей — Архив молчит</p>'
         return
     }
 
