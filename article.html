@@ -73,8 +73,6 @@ function canDelete() {
 let articleId = null
 let userCommentLikes = new Set()
 let articleLiked = false
-let authorPublicIds = {}
-let authorData = {}
 
 async function init() {
     const params = new URLSearchParams(window.location.search)
@@ -144,20 +142,6 @@ async function loadArticle() {
         articleLiked = !!alreadyLiked
     }
 
-    if (article.author) {
-        const { data: aData } = await supabaseClient
-            .from('users').select('id, public_id, banner_url, avatar_url, name_color, title')
-            .eq('username', article.author).single()
-        if (aData) {
-            authorPublicIds[article.author] = aData.public_id
-            const { data: badges } = await supabaseClient
-                .from('user_badges')
-                .select('badges(id, name, description, icon_url)')
-                .eq('user_id', aData.id)
-            authorData = { ...aData, badges: badges ?? [] }
-        }
-    }
-
     document.title = article.title + ' — Муринопедия'
     document.querySelector('meta[property="og:title"]').setAttribute('content', article.title + ' — Муринопедия')
     document.querySelector('meta[property="og:description"]').setAttribute('content', article.description || 'Статья в архиве знаний Муринской Суверенной Агломерации')
@@ -169,43 +153,6 @@ async function loadArticle() {
     await loadComments()
 }
 
-function renderReviewBadge(article) {
-    if (article.status === 'pending') return `<span class="review-badge pending">На проверке</span>`
-    if (article.reviewed_by) return `<span class="review-badge verified">Проверена — ${article.reviewed_by}</span>`
-    return `<span class="review-badge msv">Опубликована без проверки (М.С.В.)</span>`
-}
-
-function renderMetaInfobox(article) {
-    const created = new Date(article.created_at).toLocaleDateString('ru-RU')
-    const reviewed = article.reviewed_at ? new Date(article.reviewed_at).toLocaleDateString('ru-RU') : '—'
-    const authorPid = authorPublicIds[article.author]
-    const badges = (authorData.badges ?? []).map(ub => {
-        const b = ub.badges
-        return `<a href="badge.html?id=${b.id}" style="text-decoration:none;"><span style="position:relative;display:inline-flex;align-items:center;margin-left:3px;" class="badge-wrap">
-            <img src="${b.icon_url}" style="width:16px;height:16px;object-fit:contain;vertical-align:middle;cursor:pointer;" title="${b.description ?? b.name}">
-        </span></a>`
-    }).join('')
-    const nameColor = authorData.name_color ? `color:${authorData.name_color};` : ''
-    const authorHtml = authorPid
-        ? `<a href="profile.html?id=${authorPid}" style="${nameColor}">${safe(article.author ?? 'Аноним')}</a>${badges}`
-        : `${safe(article.author ?? 'Аноним')}${badges}`
-    return `
-        <div class="meta-infobox">
-            <span class="infobox-title">Сведения о Знань</span>
-            <table class="infobox-table">
-                <tr><td>Автор</td><td>${authorHtml}</td></tr>
-                <tr><td>Категория</td><td>${safe(article.tag ?? '—')}</td></tr>
-                ${article.season ? `<tr><td>Подраздел</td><td>${safe(article.season)}</td></tr>` : ''}
-                <tr><td>Создано</td><td>${created}</td></tr>
-                <tr><td>Проверено</td><td>${reviewed}</td></tr>
-                <tr><td>Статус</td><td>${renderReviewBadge(article)}</td></tr>
-                <tr><td>Просмотры</td><td>${(article.views_count ?? 0) + 1}</td></tr>
-                <tr><td>Лайки</td><td>${article.likes_count ?? 0}</td></tr>
-            </table>
-        </div>
-    `
-}
-
 function renderContentInfobox(article) {
     const fields = article.infobox ?? []
     const hasCover = article.cover_url
@@ -213,8 +160,8 @@ function renderContentInfobox(article) {
     if (!hasCover && !hasFields) return ''
     return `
         <div class="article-infobox">
-            <span class="infobox-title">${safe(article.title)}</span>
             ${hasCover ? `<div class="infobox-image"><img src="${article.cover_url}" alt="${safe(article.title)}"></div>` : ''}
+            <span class="infobox-title">${safe(article.title)}</span>
             ${hasFields ? `
             <table class="infobox-table">
                 ${fields.map(f => `<tr><td>${f.label}</td><td>${f.value}</td></tr>`).join('')}
@@ -312,6 +259,7 @@ function renderContent(content, imageUrl, codeBlocks) {
         return `<p>${line}</p>`
     }).join('')
 }
+
 function renderArticle(article) {
     const userIsMsv = isMsv()
     const _canDelete = canDelete()
@@ -333,7 +281,6 @@ function renderArticle(article) {
         ` : ''}
 
         <div class="article-content clearfix">
-            ${renderMetaInfobox(article)}
             ${renderContentInfobox(article)}
             ${renderContent(article.content, article.image_url, article.code_blocks)}
         </div>
