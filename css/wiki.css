@@ -1513,3 +1513,75 @@ body.dark hr { border-top-color: var(--color-border); }
 body.dark .wiki-spoiler { background: #1c2128; border-color: var(--color-border); }
 body.dark .wiki-spoiler summary { background: #21262d; color: var(--color-text); }
 body.dark .wiki-spoiler summary:hover { background: #30363d; }
+.profile-banner,
+.profile-banner-placeholder {
+    border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
+    background: linear-gradient(135deg, var(--color-sky), var(--color-border)) !important;
+}
+.profile-head {
+    margin-top: -24px !important;
+}
+.profile-avatar-wrap {
+    border-radius: var(--radius-md) !important;
+    overflow: hidden !important;
+}
+.wallet-strip {
+    border-radius: var(--radius-md) !important;
+    background: var(--color-sky) !important;
+    border-color: var(--color-border) !important;
+}
+.edit-section {
+    border-radius: var(--radius-md) !important;
+    background: var(--color-surface) !important;
+    border-color: var(--color-border) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+.edit-tab {
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0 !important;
+    color: var(--color-muted) !important;
+}
+.edit-tab.active {
+    background: var(--color-surface) !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-text) !important;
+}
+.edit-input,
+.color-swatch,
+.border-option,
+.equipped-slot {
+    border-radius: var(--radius-sm) !important;
+}
+.article-row {
+    border-radius: var(--radius-md) !important;
+    background: var(--color-surface) !important;
+    border-color: var(--color-border) !important;
+}
+.pinned-article-card {
+    border-radius: var(--radius-md) !important;
+}
+body.dark .wallet-strip {
+    background: #1e293b !important;
+    border-color: var(--color-primary) !important;
+}
+body.dark .edit-section {
+    background: var(--color-surface) !important;
+    border-color: var(--color-border) !important;
+}
+body.dark .edit-input {
+    background: #0d1117 !important;
+    border-color: var(--color-border) !important;
+    color: var(--color-text) !important;
+}
+body.dark .article-row {
+    background: var(--color-surface) !important;
+    border-color: var(--color-border) !important;
+}
+body.dark .equip-item,
+body.dark .equipped-slot {
+    background: #21262d !important;
+    border-color: var(--color-border) !important;
+}
+body.dark .equip-item.equipped {
+    background: #14221a !important;
+    border-color: var(--color-success) !important;
+}
