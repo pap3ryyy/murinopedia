@@ -160,8 +160,8 @@ function renderContentInfobox(article) {
     if (!hasCover && !hasFields) return ''
     return `
         <div class="article-infobox">
-            ${hasCover ? `<div class="infobox-image"><img src="${article.cover_url}" alt="${safe(article.title)}"></div>` : ''}
             <span class="infobox-title">${safe(article.title)}</span>
+            ${hasCover ? `<div class="infobox-image"><img src="${article.cover_url}" alt="${safe(article.title)}"></div>` : ''}
             ${hasFields ? `
             <table class="infobox-table">
                 ${fields.map(f => `<tr><td>${f.label}</td><td>${f.value}</td></tr>`).join('')}
