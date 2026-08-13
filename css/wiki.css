@@ -194,7 +194,7 @@ main p {
     border-radius: var(--radius-md);
     font-size: 0.9em;
     min-width: 180px;
-    max-width: 240px;   /* уменьшено с 280px */
+    max-width: 500px;
     box-shadow: none;
     overflow: hidden;
     padding: 0;
