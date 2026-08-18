@@ -1,12 +1,18 @@
-/**(async function () {
-    const data = {
-        value: 'true',
-        mode: 'maintenance',
-        reason: 'Муринопедия закрыта на техническую переработку, ожидайте открытие в июне'
-    };
+(async function () {
+    const { data, error } = await supabaseClient
+        .from('site_config')
+        .select('value, mode, reason')
+        .eq('key', 'maintenance')
+        .single();
 
-    const mode = data.mode ?? 'maintenance';
-    const reason = data.reason ?? null;
+    if (error || !data) return;
+
+    const isEnabled = data.value === true || data.value === 'true';
+    if (!isEnabled) return;
+
+    const mode = data.mode || 'maintenance';
+    const reason = data.reason || null;
+
     const isWelldone = mode === 'welldone';
     const isSecret = mode === '???';
 
@@ -16,7 +22,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Муринопедия — ${isWelldone ? 'Конец Дона' : (isSecret ? 'Дон в разработке..' : 'Дон ограничен')}</title>
     <link rel="icon" type="image/png" href="asset/logo.ico">
-        <link rel="stylesheet" href="css/wiki.css">
+    <link rel="stylesheet" href="css/wiki.css">
     <meta property="og:title" content="Муринопедия">
     <meta property="og:description" content="Официальный архив знаний Муринской Суверенной Агломерации. Защищено М.С.В.">
     <meta property="og:image" content="https://pap3ryyy.github.io/murinopedia/asset/logo.png">
