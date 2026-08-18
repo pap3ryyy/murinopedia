@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="icon" type="image/png" href="asset/logo.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Футажи Меллстроя — Муринопедия</title>
+    <link rel="stylesheet" href="css/wiki.css">
+    <meta property="og:title" content="Футажи Меллстроя — Муринопедия">
+    <meta property="og:description" content="Библиотека футажей с Меллстроем. Загружай, ищи по тегам, используй в своих роликах.">
+    <meta property="og:image" content="https://pap3ryyy.github.io/murinopedia/asset/logo.png">
+    <meta property="og:url" content="https://pap3ryyy.github.io/murinopedia/footages.html">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#3366cc">
+</head>
+<body>
+
+<header>
+    <div class="logo-area">
+        <img src="asset/logo.png" alt="М.С.В." class="logo-img">
+        <a href="index.html" class="logo-text">Муринопедия</a>
+    </div>
+    <div class="header-actions">
+        <div class="status-bar">
+            Оперативная обстановка: <span class="status-stable">СТАБИЛЬНАЯ</span>
+        </div>
+        <div id="header-user" class="header-user"></div>
+    </div>
+</header>
+
+<div class="container">
+    <main class="footages-main">
+        <h1>🎬 Футажи Меллстроя</h1>
+        <div class="info-box">
+            Библиотека футажей с Меллстроем. Загружай свои находки, ищи по тегам и используй в роликах. М.С.В. следит за порядком.
+        </div>
+
+        <div class="search-panel">
+            <input type="text" id="search-input" class="field-input" placeholder="Поиск по названию, описанию или тегам..." autocomplete="off">
+            <button class="btn btn-secondary" onclick="resetSearch()">Сбросить</button>
+        </div>
+
+        <div id="upload-section" class="edit-section">
+            <h2>Загрузить футаж</h2>
+            <div class="field-group">
+                <label class="field-label">Название</label>
+                <input type="text" id="footage-title" class="field-input" placeholder="Название футажа" maxlength="100">
+            </div>
+            <div class="field-group">
+                <label class="field-label">Теги</label>
+                <input type="text" id="footage-tags" class="field-input" placeholder="Теги через запятую: #испуг, #смех" maxlength="200">
+            </div>
+            <div class="field-group">
+                <label class="field-label">Описание</label>
+                <textarea id="footage-desc" class="field-input" placeholder="Описание (необязательно)" maxlength="300"></textarea>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Файл</label>
+                <input type="file" id="footage-file" class="field-input" accept="video/mp4,image/gif">
+            </div>
+            <button class="btn btn-primary" onclick="uploadFootage()">Загрузить</button>
+            <div class="upload-status" id="upload-status"></div>
+        </div>
+
+        <div id="login-prompt" class="login-prompt">
+            <a href="login.html">Войди</a> чтобы загружать футажи.
+        </div>
+
+        <div class="footages-grid" id="footages-grid">
+            <p class="text-muted">Загружаем футажи...</p>
+        </div>
+    </main>
+    <aside>
+        <div class="sidebar-box">
+            <h4>Навигация</h4>
+            <p>
+                <a href="index.html">← Главная</a><br>
+                <a href="articles.html">Архив Знань</a>
+            </p>
+        </div>
+    </aside>
+</div>
+
+<footer>
+    Муринопедия — 2026 год.<br>
+    Ч илу доной, пока естч светл. Мурино стояти, Фог дрожати.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/maintenance.js"></script>
+<script src="js/alert.js"></script>
+<script src="js/ban_check.js"></script>
+<script src="js/theme.js"></script>
+<script>
+let currentUser = null
+let currentUserId = null
+let allFootages = []
+
+async function init() {
+    const { data: { session } } = await supabaseClient.auth.getSession()
+    if (session) {
+        currentUserId = session.user.id
+        const { data: user } = await supabaseClient
+            .from('users').select('username, public_id').eq('id', session.user.id).single()
+        if (user) {
+            currentUser = user.username
+            document.getElementById('header-user').innerHTML = `
+                <a href="profile.html?id=${user.public_id}" class="header-user-link">${user.username}</a>
+                <button onclick="logout()" class="btn btn-secondary">Выйти</button>
+            `
+            document.getElementById('upload-section').style.display = 'block'
+            document.getElementById('login-prompt').style.display = 'none'
+        }
+    } else {
+        document.getElementById('header-user').innerHTML = `<a href="login.html" class="header-user-link">Войти</a>`
+        document.getElementById('upload-section').style.display = 'none'
+        document.getElementById('login-prompt').style.display = 'block'
+    }
+
+    await loadFootages()
+}
+
+async function logout() {
+    await supabaseClient.auth.signOut()
+    window.location.href = 'login.html'
+}
+
+function safe(str) {
+    if (!str) return ''
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')
+}
+
+async function loadFootages() {
+    const { data } = await supabaseClient
+        .from('footages')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+    allFootages = data ?? []
+    renderFootages(allFootages)
+}
+
+function renderFootages(footages) {
+    const grid = document.getElementById('footages-grid')
+
+    if (footages.length === 0) {
+        grid.innerHTML = '<p class="text-muted">Нрт футажей. Загрузи первый!</p>'
+        return
+    }
+
+    grid.innerHTML = footages.map(f => {
+        const tags = (f.tags || []).map(t => 
+            `<span class="footage-tag" onclick="searchByTag('${safe(t)}')">#${safe(t)}</span>`
+        ).join('')
+        
+        const preview = f.file_type === 'video/mp4'
+            ? `<video src="${f.file_url}" muted loop preload="metadata"></video>`
+            : `<img src="${f.file_url}" alt="${safe(f.title)}" loading="lazy">`
+
+        return `
+        <div class="footage-card">
+            <div class="footage-preview" onclick="previewFootage('${f.id}')">${preview}</div>
+            <div class="footage-info">
+                <h3 class="footage-title">${safe(f.title)}</h3>
+                ${f.description ? `<p class="footage-desc">${safe(f.description)}</p>` : ''}
+                <div class="footage-tags">${tags}</div>
+                <div class="footage-meta">
+                    <span>${safe(f.author_username || 'Аноним')}</span>
+                    <span>⬇ ${f.downloads_count || 0}</span>
+                </div>
+                <div class="footage-actions">
+                    <a href="${f.file_url}" download class="btn btn-secondary" onclick="incrementDownload(${f.id})">Скачать</a>
+                    <a href="${f.file_url}" target="_blank" class="btn btn-secondary">Открыть</a>
+                </div>
+            </div>
+        </div>`
+    }).join('')
+}
+
+function searchByTag(tag) {
+    document.getElementById('search-input').value = '#' + tag
+    applySearch()
+}
+
+function resetSearch() {
+    document.getElementById('search-input').value = ''
+    applySearch()
+}
+
+function applySearch() {
+    const q = document.getElementById('search-input').value.trim().toLowerCase()
+    if (!q) {
+        renderFootages(allFootages)
+        return
+    }
+    const filtered = allFootages.filter(f => {
+        const text = (f.title + ' ' + (f.description || '') + ' ' + (f.tags || []).join(' ')).toLowerCase()
+        return text.includes(q)
+    })
+    renderFootages(filtered)
+}
+
+document.getElementById('search-input').addEventListener('input', applySearch)
+
+function previewFootage(id) {
+    const f = allFootages.find(x => x.id == id)
+    if (!f) return
+    window.open(f.file_url, '_blank')
+}
+
+async function incrementDownload(id) {
+    const f = allFootages.find(x => x.id == id)
+    if (!f) return
+    const newCount = (f.downloads_count || 0) + 1
+    await supabaseClient.from('footages').update({ downloads_count: newCount }).eq('id', id)
+    f.downloads_count = newCount
+    renderFootages(allFootages)
+}
+
+async function uploadFootage() {
+    const title = document.getElementById('footage-title').value.trim()
+    const desc = document.getElementById('footage-desc').value.trim()
+    const tagsInput = document.getElementById('footage-tags').value.trim()
+    const fileInput = document.getElementById('footage-file')
+    const file = fileInput.files[0]
+    const status = document.getElementById('upload-status')
+
+    if (!title || !file) {
+        status.className = 'upload-status error'
+        status.textContent = 'Укажи название и выбери файл'
+        return
+    }
+
+    if (!currentUserId) {
+        status.className = 'upload-status error'
+        status.textContent = 'Нрт авторизации'
+        return
+    }
+
+    const fileType = file.type === 'video/mp4' ? 'video/mp4' : 'image/gif'
+
+    if (fileType !== 'video/mp4' && fileType !== 'image/gif') {
+        status.className = 'upload-status error'
+        status.textContent = 'Поддерживаются только MP4 и GIF'
+        return
+    }
+
+    status.className = 'upload-status'
+    status.textContent = 'Загружаем...'
+
+    const fileExt = file.name.split('.').pop()
+    const fileName = `footages/${Date.now()}.${fileExt}`
+
+    const { error: uploadError } = await supabaseClient.storage
+        .from('footages')
+        .upload(fileName, file, { upsert: false })
+
+    if (uploadError) {
+        status.className = 'upload-status error'
+        status.textContent = 'Смертч-шум: ' + uploadError.message
+        return
+    }
+
+    const { data: urlData } = supabaseClient.storage.from('footages').getPublicUrl(fileName)
+    const fileUrl = urlData.publicUrl
+
+    const tags = tagsInput.split(',').map(t => t.trim().replace(/^#/, '')).filter(Boolean)
+
+    const { error: insertError } = await supabaseClient.from('footages').insert({
+        title,
+        description: desc || null,
+        file_url: fileUrl,
+        file_type: fileType,
+        tags,
+        author_id: currentUserId,
+        author_username: currentUser
+    })
+
+    if (insertError) {
+        status.className = 'upload-status error'
+        status.textContent = 'Смертч-шум: ' + insertError.message
+        return
+    }
+
+    status.className = 'upload-status success'
+    status.textContent = 'Футаж загружен ✓'
+
+    document.getElementById('footage-title').value = ''
+    document.getElementById('footage-desc').value = ''
+    document.getElementById('footage-tags').value = ''
+    fileInput.value = ''
+
+    await loadFootages()
+}
+
+init()
+</script>
+
+</body>
+</html>
