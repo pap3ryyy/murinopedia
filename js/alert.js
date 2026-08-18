@@ -8,9 +8,9 @@
     if (!alerts || alerts.length === 0) return
 
     const colors = {
-        error:   { bg: '#fff0f0', border: '#d33',    text: '#a00' },
-        warn:    { bg: '#fff8e6', border: '#c8a850',  text: '#7a5800' },
-        success: { bg: '#f0fff4', border: '#14866d',  text: '#0a5c3a' }
+        danger: { bg: '#fff0f0', border: '#d33',    text: '#a00' },
+        warn:   { bg: '#fff8e6', border: '#c8a850', text: '#7a5800' },
+        info:   { bg: '#f0f4ff', border: '#3366cc', text: '#1a3e7a' }
     }
 
     const wrap = document.createElement('div')
